@@ -7,6 +7,7 @@ instance/
 .coverage
 htmlcov/
 dist/
+logs/
 build/
 *.egg-info/
 .idea/
