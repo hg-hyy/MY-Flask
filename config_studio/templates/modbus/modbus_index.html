@@ -16,18 +16,18 @@
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
 
                     <div class="form-group row">
-                        <label for="module" class="col-sm-1 col-form-label col-form-label-md">module_name</label>
+                        <label for="module" class="col-sm-2 col-form-label col-form-label-md">module_name</label>
                         <div class="col-sm-4">
                             <select class="form-control form-control-md " name='module' id="module">
                                 <option>modbus1</option>
                                 <option>modbus2</option>
-
+                                <option>modbus3</option>
                             </select>
                         </div>
-                        <label for="module" class="col-sm-2 col-form-label col-form-label-md">模块名称</label>
+                        <label for="module" class="col-sm-2 col-form-label col-form-label-md">请选择模块名称</label>
                     </div>
                     <div class="form-group row">
-                        <label for="ID" class="col-sm-1 col-form-label col-form-label-md">设备ID:</label>
+                        <label for="ID" class="col-sm-2 col-form-label col-form-label-md">设备ID:</label>
                         <div class="col-sm-4">
                             <input type="text" name='id' class="form-control form-control-md" id="ID"
                                 placeholder="device ID" style="width: 100%" required>
@@ -37,7 +37,7 @@
                     </div>
 
                     <div class="form-group row">
-                        <label for="type" class="col-sm-1 col-form-label col-form-label-md">通讯类型:</label>
+                        <label for="type" class="col-sm-2 col-form-label col-form-label-md">通讯类型:</label>
                         <div class="col-sm-4">
                             <select class="form-control form-control-md " name='type' id="type" onchange="rtu_tcp()">
                                 <option>TCP</option>
@@ -52,14 +52,14 @@
 
                     <div id='tcp'>
                         <div class="form-group row">
-                            <label for="ip" class="col-sm-1 col-form-label col-form-label-md">IP地址:</label>
+                            <label for="ip" class="col-sm-2 col-form-label col-form-label-md">IP地址:</label>
                             <div class="col-sm-4">
                                 <input type="text" name="ip" class="form-control form-control-md" id="ip"
                                     placeholder="ip address">
                             </div>
                         </div>
                         <div class="form-group row">
-                            <label for="port" class="col-sm-1 col-form-label col-form-label-md">通讯端口:</label>
+                            <label for="port" class="col-sm-2 col-form-label col-form-label-md">通讯端口:</label>
                             <div class="col-sm-4">
                                 <input type="text" name="port" value="502" class="form-control form-control-md"
                                     id="port" placeholder="默认502">
@@ -69,7 +69,7 @@
 
                     <div id='rtu'>
                         <div class="form-group row">
-                            <label for="com" class="col-sm-1 col-form-label col-form-label-md">串口:</label>
+                            <label for="com" class="col-sm-2 col-form-label col-form-label-md">串口:</label>
                             <div class="col-sm-4">
                                 <input type="text" name='com' class="form-control form-control-md" id="com"
                                     placeholder="com端口" style="width: 100%">
@@ -77,7 +77,7 @@
                             </div>
                         </div>
                         <div class="form-group row">
-                            <label for="baud" class="col-sm-1 col-form-label col-form-label-md">波特率:</label>
+                            <label for="baud" class="col-sm-2 col-form-label col-form-label-md">波特率:</label>
                             <div class="col-sm-4">
                                 <select class="form-control form-control-md " name='baud' id="baud">
                                     <option>4800</option>
@@ -89,7 +89,7 @@
                         </div>
 
                         <div class="form-group row">
-                            <label for="data_bit" class="col-sm-1 col-form-label col-form-label-md">数据位:</label>
+                            <label for="data_bit" class="col-sm-2 col-form-label col-form-label-md">数据位:</label>
                             <div class="col-sm-4">
                                 <select class="form-control form-control-md " name='data_bit' id="data_bit">
                                     <option>7</option>
@@ -100,7 +100,7 @@
                             </div>
                         </div>
                         <div class="form-group row">
-                            <label for="stop_bit" class="col-sm-1 col-form-label col-form-label-md">停止位:</label>
+                            <label for="stop_bit" class="col-sm-2 col-form-label col-form-label-md">停止位:</label>
                             <div class="col-sm-4">
                                 <select class="form-control form-control-md " name='stop_bit' id="stop_bit">
                                     <option selected>1</option>
@@ -110,7 +110,7 @@
                             </div>
                         </div>
                         <div class="form-group row">
-                            <label for="parity" class="col-sm-1 col-form-label col-form-label-md">校验:</label>
+                            <label for="parity" class="col-sm-2 col-form-label col-form-label-md">校验:</label>
                             <div class="col-sm-4">
                                 <select class="form-control form-control-md " name='parity' id="parity">
                                     <option selected>none</option>
@@ -123,7 +123,7 @@
                     </div>
 
                     <div class="form-group row">
-                        <label for="file" class="col-sm-1 col-form-label col-form-label-md">上传位号:</label>
+                        <label for="file" class="col-sm-2 col-form-label col-form-label-md">上传位号:</label>
                         <div class="col-sm-4">
                             <input type="file" name='file' class="form-control form-control-md" id="file">
                         </div>
@@ -131,7 +131,7 @@
 
                 </fieldset>
                 <div class="form-group row">
-                    <div class="col-sm-4  offset-1">
+                    <div class="col-sm-4  offset-2">
                         <button type="button" class="btn btn-info btn-block btn-md" id='alter'
                             onclick="edit()">edit</button>
                         <button type="submit" class="btn btn-primary d-none btn-block btn-md" id='comm1'
@@ -162,6 +162,8 @@
     var csrftoken = $("meta[name=csrf-token]").attr("content");
 
     function edit() {
+        var module_name = $("#module").val()
+        alarms('开始编辑'+module_name)
         $("#alter").addClass("d-none");
         $("#comm1").removeClass("d-none");
         $("#bj").removeAttr("disabled");;
@@ -188,45 +190,65 @@
     }
 
 
+    // $(document).ready(function () {
+    //     rtu_tcp();
+    //     var module_name = $("#module").val()
+    //     $("#alter").click(function () {
+    //         $.ajax({
+    //             url: "{{url_for('cs.alter_module')}}",
+    //             data: {
+    //                 'module': module_name
+    //             },
+    //             headers: {
+    //                 "X-CSRFToken": csrftoken
+    //             },
+    //             type: 'post',
+    //             dataType: 'json',
+    //             success: success,
+    //             error: function (data) {
+    //                 console.log(data);
+    //             },
+    //         });
+    //         return false;
+    //     });
+    // })
+
+
     $(document).ready(function () {
         rtu_tcp();
+        var module_name = $("#module").val()
         $("#alter").click(function () {
             $.ajax({
-                url: "{{url_for('cs.show_modbus')}}",
+                url: "{{url_for('cs.alter_module')}}",
                 data: {
-                    'id': 1
+                    'module': module_name
                 },
-                headers: {
-                    "X-CSRFToken": csrftoken
-                },
-                type: 'post',
+                type: 'get',
                 dataType: 'json',
                 success: success,
                 error: function (data) {
-                    console.log(data);
+                    console.log("请填写完全");
                 },
-                complete: function () {
-                    console.log("提交完成！");
-                }
             });
             return false;
         });
     })
 
+
     function success(data) {
         console.log(data)
-        $('#ID').val(data.dev_id)
-        $('#type').val(data.Coll_Type)
+        $('#ID').val(data.basic_config.adev_id)
+        $('#type').val(data.basic_config.bColl_Type)
         rtu_tcp()
-        if (data.Coll_Type === "TCP") {
-            $('#ip').val(data.TCP_RTU['host'])
-            $('#port').val(data.TCP_RTU['port'])
+        if (data.basic_config.bColl_Type === "TCP") {
+            $('#ip').val(data.basic_config.chost)
+            $('#port').val(data.basic_config.dport)
         } else {
-            $('#com').val(data.TCP_RTU['serial'])
-            $('#baud').val(data.TCP_RTU['baud'])
-            $('#data_bit').val(data.TCP_RTU['data_bit'])
-            $('#stop_bit').val(data.TCP_RTU['stop_bit'])
-            $('#parity').val(data.TCP_RTU['parity'])
+            $('#com').val(data.basic_config.cserial)
+            $('#baud').val(data.basic_config.dbaud)
+            $('#data_bit').val(data.basic_config.edata_bit)
+            $('#stop_bit').val(data.basic_config.fstop_bit)
+            $('#parity').val(data.basic_config.gparity)
         }
 
 

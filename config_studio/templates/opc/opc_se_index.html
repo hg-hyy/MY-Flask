@@ -8,7 +8,8 @@
 {% block content %}
 <div class="row">
     <div class="col-12">
-
+        <p>opc server参数配置</p>
+        <hr />
         <form action="{{url_for('cs.load_opc_se')}}" method="post" id='shen' enctype="multipart/form-data">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
             <fieldset disabled id='bj'>
@@ -61,7 +62,7 @@
 
             <div class="form-group row">
                 <div class="col-sm-4  offset-2">
-                    <button type="button" class="btn btn-info btn-block btn-md" id='alter1'
+                    <button type="button" class="btn btn-info btn-block btn-md" id='alter'
                         onclick="edit()">edit</button>
                     <button type="submit" class="btn btn-primary d-none btn-block btn-md" id='comm1'
                         onclick="save()">save</button>
@@ -76,6 +77,8 @@
 
 
     function edit() {
+        var module_name = $("#module").val()
+        alarms('开始编辑'+module_name)
         $("#alter").addClass("d-none");
         $("#comm1").removeClass("d-none");
         $("#bj").removeAttr("disabled");;
@@ -90,12 +93,12 @@
 
 
     $(document).ready(function () {
-
+        var module_name = $("#module").val()
         $("#alter").click(function () {
             $.ajax({
-                url: "{{url_for('cs.alter_opc_da')}}",
+                url: "{{url_for('cs.alter_module')}}",
                 data: {
-                    'id': 1
+                    'module': module_name
                 },
                 type: 'get',
                 dataType: 'json',
@@ -109,9 +112,9 @@
     })
 
     function success(data) {
-
-        $('#main_server_ip').val(data.opc.main_ip)
-        $('#main_server_progid').val(data.opc.main_progid)
+        console.log(data)
+        $('#enAutoTag').val(data.basic_config.enAutoTag)
+        $('#isDataConvert').val(data.basic_config.isDataConvert)
     }
 
     function show_load() {

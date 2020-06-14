@@ -13,18 +13,16 @@ import re
 from pathlib import Path
 from flask import Flask, request, render_template, Blueprint, Markup, make_response, jsonify, flash
 from werkzeug.utils import secure_filename
-from flask_wtf import CSRFProtect
 import os
 import time
 from flask_wtf.csrf import generate_csrf
 from uuid import uuid4
-import logging
-from logging.config import dictConfig, fileConfig
 import linecache
-from flask_cors import CORS
 import requests
 from flask import Blueprint
 from config_studio import conf_path, log_path, log
+
+
 """
 ##################################### 基础配置 #########################################
 """
@@ -47,7 +45,8 @@ client = [
     's_opcda_client3',
     's_opcae_client1',
     's_opcae_client2',
-    's_opcae_client3']
+    's_opcae_client3'
+]
 
 
 opc = [
@@ -62,6 +61,8 @@ opc = [
     's_opcae_client3'
 ]
 modbus = ['modbus1', 'modbus2']
+
+
 """
 ##################################### 公用方法 #########################################
 """
@@ -91,101 +92,116 @@ def search_tag(tagname, source, tag_list):
 
 def read_json(module):
     json_name = conf_path+module[:-1]+'_run_config.json'
-    with open(json_name, 'r', encoding='utf-8') as f:
-        cfg_msg = json.loads(f.read())
-    return cfg_msg
+    cfg_msg = {}
+    try:
+        with open(json_name, 'r', encoding='utf-8') as f:
+            cfg_msg = json.loads(f.read())
+        return cfg_msg
+    except Exception as e:
+        return cfg_msg
 
 
 def read_modbus_config(cfg_msg, module):
     tag_list = []
     basic_config = {}
-    try:
-        for d in cfg_msg["data"][module+'.data']:
-            slave_id = d['slave_id']
-            block = d['block']
+    if cfg_msg:
+        try:
+            for d in cfg_msg["data"][module+'.data']:
+                slave_id = d['slave_id']
+                block = d['block']
 
-            for b in block:
-                fun_code = b['fun_code']
-                tag_list.append(b['tags'])
+                for b in block:
+                    fun_code = b['fun_code']
+                    tag_list.append(b['tags'])
 
-        dev_id = cfg_msg["data"][module+'.dev_id']
-        Coll_Type = cfg_msg["data"][module+'.Coll_Type']
-        TCP = cfg_msg["data"][module+'.TCP']
-        RTU = cfg_msg["data"][module+'.RTU']
+            dev_id = cfg_msg["data"][module+'.dev_id']
+            Coll_Type = cfg_msg["data"][module+'.Coll_Type']
+            TCP = cfg_msg["data"][module+'.TCP']
+            RTU = cfg_msg["data"][module+'.RTU']
 
-        if Coll_Type == 'TCP':
-            basic_config = {
-                'adev_id': dev_id,
-                'bColl_Type': Coll_Type,
-                'chost': TCP['host'],
-                'dport': TCP['port']
-            }
-        else:
-            basic_config = {
-                'adev_id': dev_id,
-                'bColl_Type': Coll_Type,
-                'cserial': RTU['serial'],
-                'dbaud': RTU['baud'],
-                'edata_bit': RTU['data_bit'],
-                'fstop_bit': RTU['stop_bit'],
-                'gparity': RTU['parity'],
-            }
+            if Coll_Type == 'TCP':
+                basic_config = {
+                    'adev_id': dev_id,
+                    'bColl_Type': Coll_Type,
+                    'chost': TCP['host'],
+                    'dport': TCP['port']
+                }
+            else:
+                basic_config = {
+                    'adev_id': dev_id,
+                    'bColl_Type': Coll_Type,
+                    'cserial': RTU['serial'],
+                    'dbaud': RTU['baud'],
+                    'edata_bit': RTU['data_bit'],
+                    'fstop_bit': RTU['stop_bit'],
+                    'gparity': RTU['parity'],
+                }
 
-        return tag_list, basic_config
-    except Exception as e:
+            return tag_list, basic_config
+        except Exception as e:
+            return tag_list, basic_config
+    else:
         return tag_list, basic_config
 
 
 def read_opc_config(cfg_msg, module):
     opc_config = {}
     tag_list = []
-    try:
-        if module in client:
-            main_server_ip = cfg_msg['data'][module+'.main_server_ip']
-            main_server_prgid = cfg_msg['data'][module+'.main_server_prgid']
-            main_server_clsid = cfg_msg['data'][module+'.main_server_clsid']
-            main_server_domain = cfg_msg['data'][module+'.main_server_domain']
-            main_server_user = cfg_msg['data'][module+'.main_server_user']
-            main_server_password = cfg_msg['data'][module +
-                                                   '.main_server_password']
-            bak_server_ip = cfg_msg['data'][module+'.bak_server_ip']
-            bak_server_prgid = cfg_msg['data'][module+'.bak_server_prgid']
-            bak_server_clsid = cfg_msg['data'][module+'.bak_server_clsid']
-            bak_server_domain = cfg_msg['data'][module+'.bak_server_domain']
-            bak_server_username = cfg_msg['data'][module+'.bak_server_user']
-            bak_server_password = cfg_msg['data'][module +
-                                                  '.bak_server_password']
+    if cfg_msg:
+        try:
+            if module in client and cfg_msg:
+                main_server_ip = cfg_msg['data'][module+'.main_server_ip']
+                main_server_prgid = cfg_msg['data'][module +
+                                                    '.main_server_prgid']
+                main_server_clsid = cfg_msg['data'][module +
+                                                    '.main_server_clsid']
+                main_server_domain = cfg_msg['data'][module +
+                                                     '.main_server_domain']
+                main_server_user = cfg_msg['data'][module+'.main_server_user']
+                main_server_password = cfg_msg['data'][module +
+                                                       '.main_server_password']
+                bak_server_ip = cfg_msg['data'][module+'.bak_server_ip']
+                bak_server_prgid = cfg_msg['data'][module+'.bak_server_prgid']
+                bak_server_clsid = cfg_msg['data'][module+'.bak_server_clsid']
+                bak_server_domain = cfg_msg['data'][module +
+                                                    '.bak_server_domain']
+                bak_server_username = cfg_msg['data'][module +
+                                                      '.bak_server_user']
+                bak_server_password = cfg_msg['data'][module +
+                                                      '.bak_server_password']
 
-            opc_config = {
-                'main_server_ip': main_server_ip,
-                'main_server_progid': main_server_prgid,
-                'main_server_classid': main_server_clsid,
-                'main_server_domain': main_server_domain,
-                'main_server_username': main_server_user,
-                'main_server_password': main_server_password,
-                'bak_server_ip': bak_server_ip,
-                'bak_server_prgid': bak_server_prgid,
-                'bak_server_clsid': bak_server_clsid,
-                'bak_server_domain': bak_server_domain,
-                'bak_server_username': bak_server_username,
-                'bak_server_password': bak_server_password
-            }
-        else:
-            enAutoTag = cfg_msg['data'][module+'.enAutoTag']
-            isDataConvert = cfg_msg['data'][module+'.isDataConvert']
-            opc_config = {
-                'enAutoTag': enAutoTag,
-                'isDataConvert': isDataConvert,
-            }
-        if module in ['s_opcda_client1', 's_opcda_client1', 's_opcda_client1']:
-            for g in cfg_msg['data'][module+'.groups']:
-                group_id = g['group_id']
-                group_name = g['group_name']
-                collect_cycle = g['collect_cycle']
-                tag_list.append(g['tags'])
-        return tag_list, opc_config
-    except Exception as e:
-        print(str(e))
+                opc_config = {
+                    'main_server_ip': main_server_ip,
+                    'main_server_progid': main_server_prgid,
+                    'main_server_classid': main_server_clsid,
+                    'main_server_domain': main_server_domain,
+                    'main_server_username': main_server_user,
+                    'main_server_password': main_server_password,
+                    'bak_server_ip': bak_server_ip,
+                    'bak_server_prgid': bak_server_prgid,
+                    'bak_server_clsid': bak_server_clsid,
+                    'bak_server_domain': bak_server_domain,
+                    'bak_server_username': bak_server_username,
+                    'bak_server_password': bak_server_password
+                }
+            else:
+                enAutoTag = cfg_msg['data'][module+'.enAutoTag']
+                isDataConvert = cfg_msg['data'][module+'.isDataConvert']
+                opc_config = {
+                    'enAutoTag': enAutoTag,
+                    'isDataConvert': isDataConvert,
+                }
+            if module in ['s_opcda_client1', 's_opcda_client1', 's_opcda_client1']:
+                for g in cfg_msg['data'][module+'.groups']:
+                    group_id = g['group_id']
+                    group_name = g['group_name']
+                    collect_cycle = g['collect_cycle']
+                    tag_list.append(g['tags'])
+            return tag_list, opc_config
+        except Exception as e:
+            print(str(e), '---------------------------')
+            return tag_list, opc_config
+    else:
         return tag_list, opc_config
 
 
@@ -247,122 +263,16 @@ def call_s_config(ref_url, json_data):
         headers = {'content-type': 'application/json'}
         response = requests.post(
             url=ref_url, data=data, headers=headers, timeout=5)
-        status = False
+        stu = False
+        res = {}
         if response.status_code == 200 and json.loads(response.text)["code"] == 1000:
-            status = True
-            return response, status
-            log.info('写入配置中心动态采集配置成功!')
+            stu = True
+            res = json.loads(response.text)["data"]
+            return res, stu
         else:
-            log.error(
-                f'写入配置中心动态采集配置失败!原因code:{json.loads(response.text)["code"]}')
+            res, stu
     except Exception as error:
-        log.error(f'写入配置中心动态采集配置异常!原因:{error}')
-
-
-"""
-##################################### Modbus配置 #####################################
-
-"""
-
-
-@cs.route('/load_modbus', methods=['GET', 'POST'], endpoint='load_modbus')
-def load_modbus():
-    if request.method == 'POST':
-        module = request.form['module']
-        dev_id = request.form['id']
-        Coll_Type = request.form['type']
-        host = request.form['ip']
-        port = request.form['port']
-        serial = request.form['com']
-        baud = request.form['baud']
-        data_bit = request.form['data_bit']
-        stop_bit = request.form['stop_bit']
-        parity = request.form['parity']
-
-        dict1 = {
-            module+'.dev_id': dev_id,
-            module+'.Coll_Type': Coll_Type,
-            module+'.TCP': {'host': host,
-                            'port': port},
-            module+'.RTU': {'serial': serial,
-                            'baud': baud,
-                            'data_bit': data_bit,
-                            'stop_bit': stop_bit,
-                            'parity': parity}
-        }
-        dict2 = {}
-        f = request.files['file']
-
-        if f and allowed_file(f.filename):
-            f.save(conf_path+secure_filename(f.filename))
-
-            xl = list(p.rglob('modbus.xlsx'))
-            for T in xl:
-                wb = xlrd.open_workbook(T)
-                names = wb.sheet_names()
-
-            st = wb.sheet_by_name(names[0])
-            nrows = st.nrows
-            ncols = st.ncols
-            d_type_1 = ['INT16', 'UINT16']
-            d_type_2 = ['INT32', 'UINT32', 'FLOAT', 'DOUBLE']
-            data = []
-            data_dict = {}
-            block = []
-            block_dict = {}
-            tags = []
-
-            for i in range(1, nrows):
-                tags_list = st.row_values(i, start_colx=0, end_colx=None)
-                tag = {
-                    'tag': tags_list[0],
-                    "start": int(tags_list[4]),
-                    "register_number": 1 if tags_list[1] in d_type_1 else 2,
-                    "data_type": tags_list[1],
-                    "data_format": int(tags_list[5]),
-                    "desc": tags_list[6],
-                }
-                slave_id = tags_list[2],
-                fun_code = tags_list[3],
-                tags.append(tag)
-
-            block_dict = {'fun_code': int(fun_code[0]), 'tags': tags}
-            block.append(block_dict)
-            data_dict = {"slave_id": int(slave_id[0]), "block": block}
-            data.append(data_dict)
-
-        dict2 = {module+'.data': data}
-        data = {**dict1, **dict2}
-        res = {
-            "module": "local",
-            "data": data
-        }
-        with open(conf_path+"modbus_run_config.json", 'w', encoding='utf-8') as f:
-            f.write(json.dumps(res, ensure_ascii=False,
-                               sort_keys=False, indent=4))
-
-        tags, basic_config = read_modbus_config(
-            conf_path, 'modbus_run_config.json')
-        log.debug('保存配置')
-        return render_template('modbus/modbus_tags.html', tags=tags, basic_config=basic_config)
-    return render_template('modbus/modbus_index.html')
-
-
-@cs.route('/show_modbus', methods=['GET', 'POST'], endpoint='show_modbus')
-def show_modbus():
-    """
-    编辑
-    """
-    if request.method == 'POST':
-        module = request.form['module']
-        cfg_msg = read_json(module)
-        if module in opc:
-            tags, basic_config = read_opc_config(cfg_msg, module)
-        else:
-            tags, basic_config = read_modbus_config(cfg_msg, module)
-            log.debug('编辑配置')
-        return {'basic_config': basic_config}
-    return render_template('modbus/modbus_tags.html')
+        log.error(f'配置异常!原因:{error}')
 
 
 @cs.route('/page', methods=['GET', 'POST'], endpoint='page')
@@ -387,18 +297,19 @@ def page():
     else:
         tags, basic_config = read_opc_config(cfg_msg, module)
     total = 0
-
-    groups = len(tags)  # 总计条目数
-    for i in tags:
-        total += len(i)
-    max_pages, a = divmod(total, pages)
-    if a > 0:
-        max_pages = max_pages + 1
-    print(module, group, pages, page, groups, total, max_pages)
-    start = (page-1) * pages
-    end = page*pages
-    data = tags[group][start:end]
-    return {"tags": data, "basic_config": basic_config, "total": total, "max_pages": max_pages, 'groups': groups}
+    if tags:
+        groups = len(tags)  # 总计条目数
+        for i in tags:
+            total += len(i)
+        max_pages, a = divmod(total, pages)
+        if a > 0:
+            max_pages = max_pages + 1
+        # print(module, group, pages, page, groups, total, max_pages)
+        start = (page-1) * pages
+        end = page*pages
+        data = tags[group][start:end]
+        return {"tags": data, "basic_config": basic_config, "total": total, "max_pages": max_pages, 'groups': groups}
+    return {"tags": [[]], "basic_config": basic_config, "total": 0, "max_pages": 0, 'groups': 0}
 
 
 @cs.route('/search', methods=['GET', 'POST'], endpoint='search')
@@ -416,7 +327,7 @@ def search():
 
 
 """
-##################################### OPC配置 ########################################
+##################################### config_setting ########################################
 
 """
 
@@ -453,18 +364,21 @@ def load_opc_sev():
                         X = dict(zip(tag_key, tag_value))
                         tag.append(X)
             tags = tag
+        basic_config = {module+'.enAutoTag': enAutoTag,
+                        module+'.isDataConvert': isDataConvert}
+        tags = {module+'.tags': tags}
+
+        data = {**basic_config, **tags}
+
         res = {
             "module": "local",
-            "data": {
-                module+'.enAutoTag': enAutoTag,
-                module+'.isDataConvert': isDataConvert,
-                module+'.tags': tags
-            }
+            "data": data
         }
         with open(conf_path+"s_opcda_server_run_config.json", 'w', encoding='utf-8') as f:
             f.write(json.dumps(res, ensure_ascii=False,
                                sort_keys=False, indent=4))
-        return render_template("opc/opc_show.html")
+        log.debug(f'保存{module}配置成功')
+        return render_template("opc/opc_show.html", basic_config=basic_config)
     return render_template("opc/opc_se_index.html")
 
 
@@ -554,28 +468,9 @@ def load_opc_da():
         with open(conf_path+"s_opcda_client_run_config.json", 'w', encoding='utf-8') as f:
             f.write(json.dumps(res, ensure_ascii=False,
                                sort_keys=False, indent=4))
-        return render_template("opc/opc_show.html", opc_config=dict1)
+        log.debug(f'保存{module}配置成功')
+        return render_template("opc/opc_show.html", basic_config=dict1)
     return render_template("opc/opc_da_index.html")
-
-
-@cs.route('/alter_opc_da', methods=['GET', 'POST'], endpoint='alter_opc_da')
-def alter_opc_da():
-    tag_list, opc_da_config = read_opc_config(
-        conf_path, 's_opcda_client_run_config.json')
-    if request.method == 'POST':
-        log.debug('查看OPC配置')
-        return opc_da_config
-    return render_template('opc/opc_show.html', tags=tag_list, opc_da_config=opc_da_config)
-
-
-@ cs.route('/opc_tags', methods=['GET', 'POST'], endpoint='opc_tags')
-def opc_da_tags():
-    tag_list, opc_config = read_opc_config(
-        conf_path, 's_opcda_client_run_config.json')
-    if request.method == 'POST':
-        log.debug('查看OPC配置')
-        return opc_config
-    return render_template('opc/opc_tags.html', opc_tags=tag_list)
 
 
 @ cs.route('/load_opc_ae', methods=['GET', 'POST'], endpoint='load_opc_ae')
@@ -631,57 +526,212 @@ def load_opc_ae():
         with open(conf_path+"s_opcae_client_run_config.json", 'w', encoding='utf-8') as f:
             f.write(json.dumps(res, ensure_ascii=False,
                                sort_keys=False, indent=4))
-        return render_template("opc/opc_show.html", opc_config=dict1)
+        log.debug(f'保存{module}配置成功')
+        return render_template("opc/opc_show.html", basic_config=dict1)
     return render_template("opc/opc_ae_index.html")
 
 
-@ cs.route('/alter_opc_ae', methods=['GET', 'POST'], endpoint='alter_opc_ae')
-def alter_opc_ae():
-    tag_list, opc_ae_config = read_opc_config(
-        conf_path, 's_opcae_client_run_config.json')
+@cs.route('/load_modbus', methods=['GET', 'POST'], endpoint='load_modbus')
+def load_modbus():
     if request.method == 'POST':
-        log.debug('查看OPC配置')
-        return opc_ae_config
-    return render_template('opc/opc_show.html', tags=tag_list, opc_ae_config=opc_ae_config)
+        module = request.form['module']
+        dev_id = request.form['id']
+        Coll_Type = request.form['type']
+        host = request.form['ip']
+        port = request.form['port']
+        serial = request.form['com']
+        baud = request.form['baud']
+        data_bit = request.form['data_bit']
+        stop_bit = request.form['stop_bit']
+        parity = request.form['parity']
+
+        dict1 = {
+            module+'.dev_id': dev_id,
+            module+'.Coll_Type': Coll_Type,
+            module+'.TCP': {'host': host,
+                            'port': port},
+            module+'.RTU': {'serial': serial,
+                            'baud': baud,
+                            'data_bit': data_bit,
+                            'stop_bit': stop_bit,
+                            'parity': parity}
+        }
+        dict2 = {}
+        f = request.files['file']
+        data = []
+        if f and allowed_file(f.filename):
+            f.save(conf_path+secure_filename(f.filename))
+
+            xl = list(p.rglob('modbus.xlsx'))
+            for T in xl:
+                wb = xlrd.open_workbook(T)
+                names = wb.sheet_names()
+
+            st = wb.sheet_by_name(names[0])
+            nrows = st.nrows
+            ncols = st.ncols
+            d_type_1 = ['INT16', 'UINT16']
+            d_type_2 = ['INT32', 'UINT32', 'FLOAT', 'DOUBLE']
+            
+            data_dict = {}
+            block = []
+            block_dict = {}
+            tags = []
+
+            for i in range(1, nrows):
+                tags_list = st.row_values(i, start_colx=0, end_colx=None)
+                tag = {
+                    'tag': tags_list[0],
+                    "start": int(tags_list[4]),
+                    "register_number": 1 if tags_list[1] in d_type_1 else 2,
+                    "data_type": tags_list[1],
+                    "data_format": int(tags_list[5]),
+                    "desc": tags_list[6],
+                }
+                slave_id = tags_list[2],
+                fun_code = tags_list[3],
+                tags.append(tag)
+
+            block_dict = {'fun_code': int(fun_code[0]), 'tags': tags}
+            block.append(block_dict)
+            data_dict = {"slave_id": int(slave_id[0]), "block": block}
+            data.append(data_dict)
+
+        dict2 = {module+'.data': data}
+        data = {**dict1, **dict2}
+        res = {
+            "module": "local",
+            "data": data
+        }
+        with open(conf_path+"modbus_run_config.json", 'w', encoding='utf-8') as f:
+            f.write(json.dumps(res, ensure_ascii=False,
+                               sort_keys=False, indent=4))
+        cfg_msg = read_json(module)
+        tags, basic_config = read_modbus_config(cfg_msg,module)
+        log.debug(f'保存{module}配置成功')
+        return render_template('opc/opc_show.html',basic_config=basic_config)
+    return render_template('modbus/modbus_index.html')
 
 
-@ cs.route('/show_opc/<module>', methods=['GET', 'POST'], endpoint='show_opc')
-def show_opc(module):
+"""
+##################################### 模块注册 #########################################
+
+"""
+
+
+@ cs.route('/module_reg', methods=['GET', 'POST'], endpoint='module_reg')
+def module_reg():
+    return render_template('reg/register.html')
+
+
+@ cs.route('/regist', methods=['GET', 'POST'], endpoint='regist')
+def regist():
+    if requests.method == 'POST':
+        module = requests.json.get['module']
+        res, stu = call_s_config(unregist_url, module)
+        if stu:
+            log.debug(f'{module}模块注册成功')
+        else:
+            log.debug(f'{module}模块注册失败')
+
+    return render_template('reg/register.html')
+
+
+@ cs.route('/unregist', methods=['GET', 'POST'], endpoint='unregist')
+def unregist():
+    if requests.method == 'POST':
+        module = requests.json.get['module']
+        res, stu = call_s_config(regist_url, module)
+        if stu:
+            log.debug(f'{module}模块注销成功')
+        else:
+            log.debug(f'{module}模块注销失败')
+
+    return render_template('reg/register.html')
+
+
+"""
+##################################### review_config ########################################
+
+"""
+
+
+@ cs.route('/alter_module', methods=['GET', 'POST'], endpoint='alter_module')
+def alter_module():
+
+    module = request.args.get('module')
+    cfg_msg = read_json(module)
+    if module in opc:
+        tags, basic_config = read_opc_config(cfg_msg, module)
+        log.info(f'开始编辑{module}基础配置')
+    else:
+        tags, basic_config = read_modbus_config(cfg_msg, module)
+        log.info(f'开始编辑{module}基础配置')
+    return {'basic_config': basic_config}
+
+
+@ cs.route('/config_review', methods=['GET', 'POST'], endpoint='config_review')
+def config_review():
     if request.method == 'POST':
         module = request.form['module']
         cfg_msg = read_json(module)
         if module in opc:
             tags, basic_config = read_opc_config(cfg_msg, module)
+            log.debug(f'查看{module}基础配置')
         else:
             tags, basic_config = read_modbus_config(cfg_msg, module)
-            log.debug('编辑配置')
+            log.debug(f'查看{module}基础配置')
         return {'basic_config': basic_config}
 
-    # module1 = request.args.get('module')
+    module = 's_opcda_client1'
     cfg_msg = read_json(module)
     if module in opc:
         tags, basic_config = read_opc_config(cfg_msg, module)
     else:
         tags, basic_config = read_modbus_config(cfg_msg, module)
-        log.debug('编辑配置')
-    return render_template('opc/opc_show.html',basic_config=basic_config)
+    return render_template('opc/opc_show.html', basic_config=basic_config)
+
+
+@ cs.route('/tags_review/', methods=['GET', 'POST'], endpoint='tags_review')
+def tags_review():
+    if request.method == 'POST':
+        module = request.form['module']
+        cfg_msg = read_json(module)
+        if module in opc:
+            tags, basic_config = read_opc_config(cfg_msg, module)
+            log.debug(f'查看{module}位号配置')
+        else:
+            tags, basic_config = read_modbus_config(cfg_msg, module)
+            log.debug(f'查看{module}位号配置')
+        return {'tags': tags}
+
+    # module1 = request.args.get('module')
+    module = 's_opcda_client1'
+    cfg_msg = read_json(module)
+    if module in opc:
+        tags, basic_config = read_opc_config(cfg_msg, module)
+    else:
+        tags, basic_config = read_modbus_config(cfg_msg, module)
+    return render_template('opc/opc_tags.html', tags=tags)
 
 
 @ cs.route('/get_config', methods=['GET', 'POST'], endpoint='get_config')
 def get_config():
-    if request.method=='POST':
+    if request.method == 'POST':
         module = request.form['module']
         res, stu = call_s_config(getconfig_url, module)
         if stu:
+            res_msg = decode_config(res, module)
             log.debug(f'获取{module}模块配置成功')
         else:
             log.debug(f'获取{module}模块配置失败{res}')
-    
+
     return '不支持的方法'
+
 
 @ cs.route('/set_config', methods=['GET', 'POST'], endpoint='set_config')
 def set_config():
-    if request.method=='POST':
+    if request.method == 'POST':
         module = request.json.get('module')
         res, stu = call_s_config(setconfig_url, module)
         if stu:
@@ -689,6 +739,7 @@ def set_config():
         else:
             log.debug(f'获取{module}模块配置失败{res}')
     return '不支持的方法'
+
 
 """
 ##################################### 日志查询 #########################################
@@ -831,43 +882,6 @@ def vue():
         'config': {}
     }
     return render_template('vue/vue.html', res=res)
-
-
-"""
-##################################### 模块注册 #########################################
-
-"""
-
-
-@ cs.route('/module_reg', methods=['GET', 'POST'], endpoint='module_reg')
-def module_reg():
-    return render_template('reg/register.html')
-
-
-@ cs.route('/regist', methods=['GET', 'POST'], endpoint='regist')
-def regist():
-    if requests.method == 'POST':
-        module = requests.json.get['module']
-        res, stu = call_s_config(unregist_url, module)
-        if stu:
-            log.debug(f'{module}模块注册成功')
-        else:
-            log.debug(f'{module}模块注册失败')
-
-    return render_template('reg/register.html')
-
-
-@ cs.route('/unregist', methods=['GET', 'POST'], endpoint='unregist')
-def unregist():
-    if requests.method == 'POST':
-        module = requests.json.get['module']
-        res, stu = call_s_config(regist_url, module)
-        if stu:
-            log.debug(f'{module}模块注销成功')
-        else:
-            log.debug(f'{module}模块注销失败')
-
-    return render_template('reg/register.html')
 
 
 if __name__ == "__main__":

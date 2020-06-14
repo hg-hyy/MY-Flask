@@ -60,13 +60,13 @@ dictConfig({
             'level': 'INFO',
             'handlers': ['wsgi']
         },
-        'modbus_tool': {
+        'config_studio': {
             'level': 'DEBUG',
             'handlers': ['file']
         }}
 })
 
-log = logging.getLogger('modbus_tool')
+log = logging.getLogger('config_studio')
 
 
 """
@@ -98,7 +98,7 @@ def page_not_found(error):
 
 @app.before_first_request
 def before_first():
-    log.debug("第一次请求你会看到这条信息")
+    log.info("config_studio 重新启动...")
 
 
 

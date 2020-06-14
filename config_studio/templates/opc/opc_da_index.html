@@ -8,6 +8,8 @@
 {% block content %}
 <div class="row">
     <div class="col-12">
+        <p>opc client参数配置</p>
+        <hr />
         <form action="{{ url_for('cs.load_opc_da') }}" method="post" id='shen' enctype="multipart/form-data">
             <fieldset disabled id='bj'>
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
@@ -180,7 +182,8 @@
 
 
     function edit() {
-        alarms('开始编辑')
+        var module_name = $("#module").val()
+        alarms('开始编辑'+module_name)
         $("#alter").addClass("d-none");
         $("#comm1").removeClass("d-none");
         $("#bj").removeAttr("disabled");;
@@ -199,7 +202,7 @@
         $("#alter").click(function () {
             var module_name = $("#module").val()
             $.ajax({
-                url: "{{url_for('cs.alter_opc_da')}}",
+                url: "{{url_for('cs.alter_module')}}",
                 data: {
                     'module': module_name
                 },
@@ -215,17 +218,19 @@
     })
 
     function success(data) {
-
-        $('#main_server_ip').val(data.opc.main_ip)
-        $('#main_server_progid').val(data.opc.main_progid)
-        $('#main_server_classid').val(data.opc.main_classid)
-        $('#main_server_username').val(data.opc.main_username)
-        $('#main_server_password').val(data.opc.main_password)
-        $('#back_server_ip').val(data.opc.back_ip)
-        $('#back_server_progid').val(data.opc.back_progid)
-        $('#back_server_classid').val(data.opc.back_classid)
-        $('#back_server_username').val(data.opc.back_username)
-        $('#back_server_password').val(data.opc.back_password)
+        console.log(data.basic_config)
+        $('#main_server_ip').val(data.basic_config.main_server_ip)
+        $('#main_server_progid').val(data.basic_config.main_server_progid)
+        $('#main_server_classid').val(data.basic_config.main_server_classid)
+        $('#main_server_domain').val(data.basic_config.main_server_domain)
+        $('#main_server_username').val(data.basic_config.main_server_username)
+        $('#main_server_password').val(data.basic_config.main_server_password)
+        $('#back_server_ip').val(data.basic_config.back_server_ip)
+        $('#back_server_progid').val(data.basic_config.bak_server_prgid)
+        $('#back_server_classid').val(data.basic_config.bak_server_clsid)
+        $('#back_server_domain').val(data.basic_config.bak_server_domain)
+        $('#back_server_username').val(data.basic_config.bak_server_username)
+        $('#back_server_password').val(data.basic_config.bak_server_password)
 
 
     }

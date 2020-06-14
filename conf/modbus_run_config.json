@@ -1,0 +1,398 @@
+{
+    "module": "local",
+    "data": {
+        "modbus1.dev_id": "201",
+        "modbus1.Coll_Type": "RTU",
+        "modbus1.TCP": {
+            "host": "",
+            "port": "502"
+        },
+        "modbus1.RTU": {
+            "serial": "com5",
+            "baud": "9600",
+            "data_bit": "8",
+            "stop_bit": "1",
+            "parity": "none"
+        },
+        "modbus1.data": [
+            {
+                "slave_id": 1,
+                "block": [
+                    {
+                        "fun_code": 3,
+                        "tags": [
+                            {
+                                "tag": "modbus_1",
+                                "start": 40001,
+                                "register_number": 1,
+                                "data_type": "UINT16",
+                                "data_format": 12,
+                                "desc": "有功点度量"
+                            },
+                            {
+                                "tag": "modbus_2",
+                                "start": 40002,
+                                "register_number": 1,
+                                "data_type": "INT16",
+                                "data_format": 12,
+                                "desc": "无功电度量"
+                            },
+                            {
+                                "tag": "modbus_3",
+                                "start": 40002,
+                                "register_number": 2,
+                                "data_type": "INT17",
+                                "data_format": 12,
+                                "desc": "无功电度量"
+                            },
+                            {
+                                "tag": "modbus_4",
+                                "start": 40002,
+                                "register_number": 2,
+                                "data_type": "INT18",
+                                "data_format": 12,
+                                "desc": "无功电度量"
+                            },
+                            {
+                                "tag": "modbus_5",
+                                "start": 40002,
+                                "register_number": 2,
+                                "data_type": "INT19",
+                                "data_format": 12,
+                                "desc": "无功电度量"
+                            },
+                            {
+                                "tag": "modbus_6",
+                                "start": 40002,
+                                "register_number": 2,
+                                "data_type": "INT20",
+                                "data_format": 12,
+                                "desc": "无功电度量"
+                            },
+                            {
+                                "tag": "modbus_7",
+                                "start": 40002,
+                                "register_number": 2,
+                                "data_type": "INT21",
+                                "data_format": 12,
+                                "desc": "无功电度量"
+                            },
+                            {
+                                "tag": "modbus_8",
+                                "start": 40002,
+                                "register_number": 2,
+                                "data_type": "INT22",
+                                "data_format": 12,
+                                "desc": "无功电度量"
+                            },
+                            {
+                                "tag": "modbus_9",
+                                "start": 40002,
+                                "register_number": 2,
+                                "data_type": "INT23",
+                                "data_format": 12,
+                                "desc": "无功电度量"
+                            },
+                            {
+                                "tag": "modbus_10",
+                                "start": 40002,
+                                "register_number": 2,
+                                "data_type": "INT24",
+                                "data_format": 12,
+                                "desc": "无功电度量"
+                            },
+                            {
+                                "tag": "modbus_11",
+                                "start": 40002,
+                                "register_number": 2,
+                                "data_type": "INT25",
+                                "data_format": 12,
+                                "desc": "无功电度量"
+                            },
+                            {
+                                "tag": "modbus_12",
+                                "start": 40002,
+                                "register_number": 2,
+                                "data_type": "INT26",
+                                "data_format": 12,
+                                "desc": "无功电度量"
+                            },
+                            {
+                                "tag": "modbus_13",
+                                "start": 40002,
+                                "register_number": 2,
+                                "data_type": "INT27",
+                                "data_format": 12,
+                                "desc": "无功电度量"
+                            },
+                            {
+                                "tag": "modbus_14",
+                                "start": 40002,
+                                "register_number": 2,
+                                "data_type": "INT28",
+                                "data_format": 12,
+                                "desc": "无功电度量"
+                            },
+                            {
+                                "tag": "modbus_15",
+                                "start": 40002,
+                                "register_number": 2,
+                                "data_type": "INT29",
+                                "data_format": 12,
+                                "desc": "无功电度量"
+                            },
+                            {
+                                "tag": "modbus_16",
+                                "start": 40002,
+                                "register_number": 2,
+                                "data_type": "INT30",
+                                "data_format": 12,
+                                "desc": "无功电度量"
+                            },
+                            {
+                                "tag": "modbus_17",
+                                "start": 40002,
+                                "register_number": 2,
+                                "data_type": "INT31",
+                                "data_format": 12,
+                                "desc": "无功电度量"
+                            },
+                            {
+                                "tag": "modbus_18",
+                                "start": 40002,
+                                "register_number": 2,
+                                "data_type": "INT32",
+                                "data_format": 12,
+                                "desc": "无功电度量"
+                            },
+                            {
+                                "tag": "modbus_19",
+                                "start": 40002,
+                                "register_number": 2,
+                                "data_type": "INT33",
+                                "data_format": 12,
+                                "desc": "无功电度量"
+                            },
+                            {
+                                "tag": "modbus_20",
+                                "start": 40002,
+                                "register_number": 2,
+                                "data_type": "INT34",
+                                "data_format": 12,
+                                "desc": "无功电度量"
+                            },
+                            {
+                                "tag": "modbus_21",
+                                "start": 40002,
+                                "register_number": 2,
+                                "data_type": "INT35",
+                                "data_format": 12,
+                                "desc": "无功电度量"
+                            },
+                            {
+                                "tag": "modbus_22",
+                                "start": 40002,
+                                "register_number": 2,
+                                "data_type": "INT36",
+                                "data_format": 12,
+                                "desc": "无功电度量"
+                            },
+                            {
+                                "tag": "modbus_23",
+                                "start": 40002,
+                                "register_number": 2,
+                                "data_type": "INT37",
+                                "data_format": 12,
+                                "desc": "无功电度量"
+                            },
+                            {
+                                "tag": "modbus_24",
+                                "start": 40002,
+                                "register_number": 2,
+                                "data_type": "INT38",
+                                "data_format": 12,
+                                "desc": "无功电度量"
+                            },
+                            {
+                                "tag": "modbus_25",
+                                "start": 40002,
+                                "register_number": 2,
+                                "data_type": "INT39",
+                                "data_format": 12,
+                                "desc": "无功电度量"
+                            },
+                            {
+                                "tag": "modbus_26",
+                                "start": 40002,
+                                "register_number": 2,
+                                "data_type": "INT40",
+                                "data_format": 12,
+                                "desc": "无功电度量"
+                            },
+                            {
+                                "tag": "modbus_27",
+                                "start": 40002,
+                                "register_number": 2,
+                                "data_type": "INT41",
+                                "data_format": 12,
+                                "desc": "无功电度量"
+                            },
+                            {
+                                "tag": "modbus_28",
+                                "start": 40002,
+                                "register_number": 2,
+                                "data_type": "INT42",
+                                "data_format": 12,
+                                "desc": "无功电度量"
+                            },
+                            {
+                                "tag": "modbus_29",
+                                "start": 40002,
+                                "register_number": 2,
+                                "data_type": "INT43",
+                                "data_format": 12,
+                                "desc": "无功电度量"
+                            },
+                            {
+                                "tag": "modbus_30",
+                                "start": 40002,
+                                "register_number": 2,
+                                "data_type": "INT44",
+                                "data_format": 12,
+                                "desc": "无功电度量"
+                            },
+                            {
+                                "tag": "modbus_31",
+                                "start": 40002,
+                                "register_number": 2,
+                                "data_type": "INT45",
+                                "data_format": 12,
+                                "desc": "无功电度量"
+                            },
+                            {
+                                "tag": "modbus_32",
+                                "start": 40002,
+                                "register_number": 2,
+                                "data_type": "INT46",
+                                "data_format": 12,
+                                "desc": "无功电度量"
+                            },
+                            {
+                                "tag": "modbus_33",
+                                "start": 40002,
+                                "register_number": 2,
+                                "data_type": "INT47",
+                                "data_format": 12,
+                                "desc": "无功电度量"
+                            },
+                            {
+                                "tag": "modbus_34",
+                                "start": 40002,
+                                "register_number": 2,
+                                "data_type": "INT48",
+                                "data_format": 12,
+                                "desc": "无功电度量"
+                            },
+                            {
+                                "tag": "modbus_35",
+                                "start": 40002,
+                                "register_number": 2,
+                                "data_type": "INT49",
+                                "data_format": 12,
+                                "desc": "无功电度量"
+                            },
+                            {
+                                "tag": "modbus_36",
+                                "start": 40002,
+                                "register_number": 2,
+                                "data_type": "INT50",
+                                "data_format": 12,
+                                "desc": "无功电度量"
+                            },
+                            {
+                                "tag": "modbus_37",
+                                "start": 40002,
+                                "register_number": 2,
+                                "data_type": "INT51",
+                                "data_format": 12,
+                                "desc": "无功电度量"
+                            },
+                            {
+                                "tag": "modbus_38",
+                                "start": 40002,
+                                "register_number": 2,
+                                "data_type": "INT52",
+                                "data_format": 12,
+                                "desc": "无功电度量"
+                            },
+                            {
+                                "tag": "modbus_39",
+                                "start": 40002,
+                                "register_number": 2,
+                                "data_type": "INT53",
+                                "data_format": 12,
+                                "desc": "无功电度量"
+                            },
+                            {
+                                "tag": "modbus_40",
+                                "start": 40002,
+                                "register_number": 2,
+                                "data_type": "INT54",
+                                "data_format": 12,
+                                "desc": "无功电度量"
+                            },
+                            {
+                                "tag": "modbus_41",
+                                "start": 40002,
+                                "register_number": 2,
+                                "data_type": "INT55",
+                                "data_format": 12,
+                                "desc": "无功电度量"
+                            },
+                            {
+                                "tag": "modbus_42",
+                                "start": 40002,
+                                "register_number": 2,
+                                "data_type": "INT56",
+                                "data_format": 12,
+                                "desc": "无功电度量"
+                            },
+                            {
+                                "tag": "modbus_43",
+                                "start": 40002,
+                                "register_number": 2,
+                                "data_type": "INT57",
+                                "data_format": 12,
+                                "desc": "无功电度量"
+                            },
+                            {
+                                "tag": "modbus_44",
+                                "start": 40002,
+                                "register_number": 2,
+                                "data_type": "INT58",
+                                "data_format": 12,
+                                "desc": "无功电度量"
+                            },
+                            {
+                                "tag": "modbus_45",
+                                "start": 40002,
+                                "register_number": 2,
+                                "data_type": "INT59",
+                                "data_format": 12,
+                                "desc": "无功电度量"
+                            },
+                            {
+                                "tag": "modbus_46",
+                                "start": 40002,
+                                "register_number": 2,
+                                "data_type": "INT60",
+                                "data_format": 12,
+                                "desc": "无功电度量"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+}

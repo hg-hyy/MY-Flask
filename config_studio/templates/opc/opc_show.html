@@ -119,7 +119,7 @@
     function opc_show() {
         var module_name = $("#module").val()
         $.ajax({
-            url: "{{url_for('cs.show_opc',module='1111')}}",
+            url: "{{url_for('cs.config_review')}}",
             data: {
                 'module': module_name
             },
@@ -161,7 +161,7 @@
         for (odc in data.basic_config) {
             $comm += 
                 '<tr>' +
-                '<td scope="row" class="table-info">' + odc.substring(1) + '</td>' +
+                '<td scope="row" class="table-info">' + odc.substring(0) + '</td>' +
                 '<td scope="row" class="table-success">' + data.basic_config[odc] + '</td>' +
                 '</tr>'
         }
