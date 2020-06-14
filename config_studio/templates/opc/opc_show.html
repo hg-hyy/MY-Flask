@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+{% block title %}OPC参数{% endblock %}
+{% block head %}
+<style type="text/css">
+
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+
+    <div class="col-12">
+        <h1 class="border-bottom mb-3">模块配置预览</h1>
+
+        <div class="form-group row">
+            <label for="module" class="col-sm1 col-form-label col-form-label-md ">
+                <h5>请选择需要查看的模块:</h5>
+            </label>
+            <div class="col-auto">
+                <select class="form-control form-control-md " name='module' id="module">
+                    <option>s_opcda_server1</option>
+                    <option>s_opcda_server2</option>
+                    <option>s_opcda_server3</option>
+                    <option>s_opcda_client1</option>
+                    <option>s_opcda_client2</option>
+                    <option>s_opcda_client3</option>
+                    <option>s_opcae_client1</option>
+                    <option>s_opcae_client2</option>
+                    <option>s_opcae_client3</option>
+                    <option>modbus1</option>
+                    <option>modbus2</option>
+
+                </select>
+            </div>
+            <button type="button" class="col-sm-1 form-control form-control-md btn btn-outline-primary"
+                onclick="opc_show()">show me </button>
+            <button type="button" class="col-sm-1 form-control form-control-md btn btn-outline-primary"
+                onclick="get_config()">s_config </button>
+        </div>
+    </div>
+
+    <div class="col-5 p-0">
+        <table class="table table-bordered table-hover">
+            <thead>
+                <tr>
+
+                    <th scope="col">配置名称</th>
+                    <th scope="col">配置值</th>
+                </tr>
+            </thead>
+            <tbody id='opc_da_config'>
+                {% for k,v in basic_config.items()%}
+                  <tr>
+                      
+                      <td class="table-info">
+                          {{k}}
+                      </td>
+                      <td class="table-success">
+                          {{v}}
+                      </td>
+                  </tr>
+                  {%endfor%}
+            </tbody>
+        </table>
+    </div>
+    <!-- 配置说明 -->
+    <div class="col-2 p-0">
+        <table class="table table-bordered table-hover">
+            <th>配置说明</th>
+            <tr>
+                <td>主opc服务器ip地址</td>
+            </tr>
+            <tr>
+                <td>主opc名称</td>
+            </tr>
+            <tr>
+                <td>主opc classid</td>
+            </tr>
+            <tr>
+                <td>主机域名：计算机名</td>
+            </tr>
+            <tr>
+                <td>主opc登录账户</td>
+            </tr>
+            <tr>
+                <td>主opc登录密码</td>
+            </tr>
+            <tr>
+                <td>备opc服务器ip地址</td>
+            </tr>
+            <tr>
+                <td>备opc名称</td>
+            </tr>
+            <tr>
+                <td>备opc classid</td>
+            </tr>
+            <tr>
+                <td>备机器域名:计算机名</td>
+            </tr>
+            <tr>
+                <td>备opc登录账户</td>
+            </tr>
+            <tr>
+                <td>备opc登录密码</td>
+            </tr>
+
+        </table>
+    </div>
+
+    <div class="col-2 offset-6">
+        <a href="{{url_for('cs.load_opc_da')}}" class="btn btn-info">修改配置</a>
+    </div>
+
+
+</div>
+<script>
+    var csrftoken = $("meta[name=csrf-token]").attr("content");
+
+    function opc_show() {
+        var module_name = $("#module").val()
+        $.ajax({
+            url: "{{url_for('cs.show_opc',module='1111')}}",
+            data: {
+                'module': module_name
+            },
+            type: 'post',
+            headers: {
+                "X-CSRFToken": csrftoken
+            },
+            dataType: 'json',
+            success: success,
+            error: function (data) {
+                console.log(data);
+            },
+        });
+    }
+    
+    
+    function get_config() {
+        var modlue = $("#module").val()
+        $.ajax({
+            url: "{{url_for('cs.get_config')}}",
+            data: {
+                'modlue': modlue
+            },
+            type: 'post',
+            headers: {
+                "X-CSRFToken": csrftoken
+            },
+            dataType: 'json',
+            success: success,
+            error: function (data) {
+                console.log(data);
+            },
+        });
+    }
+
+    function success(data) {
+        console.log(data)
+        var $comm = '';
+        for (odc in data.basic_config) {
+            $comm += 
+                '<tr>' +
+                '<td scope="row" class="table-info">' + odc.substring(1) + '</td>' +
+                '<td scope="row" class="table-success">' + data.basic_config[odc] + '</td>' +
+                '</tr>'
+        }
+        var $opc_da_config = $('#opc_da_config');
+        $opc_da_config.html($comm)
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,197 @@
+{% extends "base.html" %}
+{% block title %}OPC模块注册{% endblock %}
+{% block head %}
+<style type="text/css">
+
+</style>
+{% endblock %}
+{% block content %}
+<div class="row">
+    <div class="col-12">
+
+        <form method="post" id='shen'>
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+            <fieldset id='bj'>
+                <div class="form-group row">
+                    <label for="module" class="col-sm-2 col-form-label col-form-label-md">module_name</label>
+                    <div class="col-sm-4">
+                        <select class="form-control form-control-md " name='module' id="module">
+                            <option>s_opcda_server1</option>
+                            <option>s_opcda_server2</option>
+                            <option>s_opcda_server3</option>
+                            <option>s_opcda_client1</option>
+                            <option>s_opcda_client2</option>
+                            <option>s_opcda_client3</option>
+                            <option>s_opcae_server1</option>
+                            <option>s_opcae_serve2</option>
+                            <option>s_opcae_serve3</option>
+                            <option>s_opcae_client1</option>
+                            <option>s_opcae_client2</option>
+                            <option>s_opcae_client3</option>
+                            <option>n_modbus_master</option>
+                            <option>n_modbus_slave</option>
+                            <option>n_checker</option>
+                        </select>
+                        <small id="emailHelp" class="form-text text-muted">请选择模块名称</small>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="resful_url" class="col-sm-2 col-form-label col-form-label-md">resful_url</label>
+                    <div class="col-sm-4">
+                        <select class="form-control form-control-md " name='resful_url' id="resful_url">
+                            <option>http://127.0.0.1:40121/s_opcda_server/v1.0/config</option>
+                            <option>http://127.0.0.1:40123/s_opcda_server/v1.0/config</option>
+                            <option>http://127.0.0.1:40125/s_opcda_server/v1.0/config</option>
+                            <option>http://127.0.0.1:40121/s_opcda_client/v1.0/config</option>
+                            <option>http://127.0.0.1:40123/s_opcda_client/v1.0/config</option>
+                            <option>http://127.0.0.1:40125/s_opcda_client/v1.0/config</option>
+                            <option>http://127.0.0.1:40151/s_opcae_server/v1.0/config</option>
+                            <option>http://127.0.0.1:40153/s_opcae_server/v1.0/config</option>
+                            <option>http://127.0.0.1:40155/s_opcae_server/v1.0/config</option>
+                            <option>http://127.0.0.1:40151/s_opcae_client/v1.0/config</option>
+                            <option>http://127.0.0.1:40153/s_opcae_client/v1.0/config</option>
+                            <option>http://127.0.0.1:40155/s_opcae_client/v1.0/config</option>
+                            <option>http://127.0.0.1:40131/n_modbus_master/v1.0/config</option>
+                            <option>http://127.0.0.1:40131/n_modbus_slave/v1.0/config</option>
+                            <option>http://127.0.0.1:40241/n_checker/v1.0/config</option>
+                        </select>
+                        <small id="emailHelp" class="form-text text-muted">请选择模块名称</small>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label for="config_name" class="col-sm-2 col-form-label col-form-label-md">config_name</label>
+                    <div class="col-sm-4">
+                        <select class="form-control form-control-md " name='config_name' id="config_name">
+                            <option>s_opcda_server_run_config.json</option>
+                            <option>s_opcae_server_run_config.json</option>
+                            <option>s_opcda_client_run_config.json</option>
+                            <option>s_opcae_client_run_config.json</option>
+                            <option>basic_modbus_master.json</option>
+                            <option>basic_modbus_slave.json</option>
+                            <option>run_checker.json</option>
+                        </select>
+                        <small id="emailHelp" class="form-text text-muted">请选择模块名称</small>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="enAutoTag" class="col-sm-2 col-form-label col-form-label-md">enAutoTag</label>
+                    <div class="col-sm-4">
+                        <input type="text" name="enAutoTag" class="form-control form-control-md" id="enAutoTag"
+                            placeholder="OPC login name">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="isDataConvert" class="col-sm-2 col-form-label col-form-label-md">isDataConvert</label>
+                    <div class="col-sm-4">
+                        <input type="text" name="isDataConvert" class="form-control form-control-md" id="isDataConvert"
+                            placeholder="OPC login name">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="tags" class="col-sm-2 col-form-label col-form-label-md">tags</label>
+                    <div class="col-sm-4">
+                        <input type="text" name="tags" class="form-control form-control-md" id="tags"
+                            placeholder="OPC login name">
+                    </div>
+                </div>
+
+            </fieldset>
+        </form>
+
+        <div class="form-group row">
+            <div class="col-sm-2  offset-2">
+                <button type="button" class="btn btn-info btn-block btn-md" id='regist'>regist</button>
+            </div>
+            <div class="col-sm-2">
+                <button type="button" class="btn btn-danger btn-block btn-md" id='unregist'>unregist</button>
+            </div>
+        </div>
+
+
+    </div>
+</div>
+
+<script>
+        var csrftoken = $("meta[name=csrf-token]").attr("content");
+
+    $(document).ready(function () {
+
+        $("#regist").click(function () {
+            var module_name = $("#module").val();
+            var resful_url = $("#resful_url").val();
+            var config = $("#config_name").val();
+            var enAutoTag = $("#enAutoTag").val();
+            var isDataConvert = $("#isDataConvert").val();
+            var tags = $("#tags").val();
+            var data = {}
+
+            var data = {
+                "module": module_name,
+                "url": resful_url,
+                "config": {
+                    [config]: {
+                        "enAutoTag": enAutoTag,
+                        "isDataConvert": isDataConvert,
+                        "tags": tags
+                    }
+                }
+            };
+            console.log(data)
+            $.ajax({
+                url: "{{url_for('cs.regist')}}",
+                data: JSON.stringify(data),
+                contentType: "application/json;charset=utf-8",
+                type: 'post',
+                dataType: 'json',
+                headers: {
+                    "X-CSRFToken": csrftoken
+                },
+                success: function success(data) {
+                    console.log(data)
+                },
+                error: function (data) {
+                    console.log(data)
+                },
+            });
+            return false;
+        });
+        $("#unregist").click(function () {
+            var module_name = $("#module").val();
+            var config = $("#config_name").val();
+
+            var data = {
+                "module": module_name,
+                "config": config
+                };
+            $.ajax({
+                url: "{{url_for('cs.unregist')}}",
+                data: JSON.stringify(data),
+                contentType: "application/json;charset=utf-8",
+                type: 'post',
+                dataType: 'json',
+                headers: {
+                    "X-CSRFToken": csrftoken
+                },
+                success: function success(data) {
+                    console.log(data)
+                },
+                error: function (data) {
+                    console.log(data)
+                },
+            });
+            return false;
+        });
+
+
+
+
+    });
+
+
+
+
+    
+
+</script>
+{% endblock %}

@@ -1,0 +1,286 @@
+{% extends "base.html" %}
+{% block title %}OPC参数{% endblock %}
+{% block head %}
+<style type="text/css">
+</style>
+{% endblock %}
+{% block content %}
+<div class="div1">
+    <h1>OPC位号配置</h1>
+    <div class="form-group row ml-1">
+        <label for="module" class="col-sm1 col-form-label col-form-label-md ">
+            <h5>请选择需要查看的模块:</h5>
+        </label>
+        <div class="col-auto">
+            <select class="form-control form-control-md " name='module' id="module">
+                <option>s_opcda_client1</option>
+                <option>s_opcda_client2</option>
+                <option>s_opcda_client3</option>
+                <option>modbus1</option>
+                <option>modbus2</option>
+            </select>
+        </div>
+        <div class="col-auto">
+            <select class="form-control form-control-md " name='groups' id="groups">
+
+            </select>
+        </div>
+        <button type="button" class="col-sm-1 form-control form-control-md btn btn-outline-info"
+            onclick="module_tag_select()">click me </button>
+    </div>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>tag_id:</th>
+                <th>publish_tag_name:</th>
+                <th>source_tag_name:</th>
+                <th>data_type:</th>
+            </tr>
+        </thead>
+        <tbody id='tags'>
+        </tbody>
+    </table>
+
+    <div class="row">
+        <div class="col-md-12 col-sm-12 ">
+            <nav>
+                <ul class="pagination justify-content-end">
+                    <select class="form-control " name='pages' id="pages" onchange="pages(this)"
+                        style="width: fit-content;">
+                        <option selected>5</option>
+                        <option>10</option>
+                        <option>12</option>
+                        <option>20</option>
+                        <option>50</option>
+                    </select>
+
+                    <ul class="pagination  justify-content-end" id='page'>
+                        <li class="page-item "><a class="page-link form-control ">Pres</a></li>
+                        <li class="page-item"><a class="page-link form-control btn btn-info" id='page1'
+                                onclick="page(this)">1</a></li>
+                        <li class="page-item"><a class="page-link form-control" href="#">Next</a></li>
+                    </ul>
+
+                    <li class="page-item"><a class="page-link form-control">共</a></li>
+                    <input id='total' name='total' class="form-control" style="width: 60px;" />
+                    <li class="page-item"><a class="page-link form-control">条</a></li>
+                    <li class="page-item"><a class="page-link form-control">共</a></li>
+                    <input id='max_pages' name='max_pages' class="form-control" style="width: 60px;" />
+                    <li class="page-item"><a class="page-link form-control">页</a></li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+
+
+</div>
+<script>
+    var csrftoken = $("meta[name=csrf-token]").attr("content");
+
+    function module_tag_select() {
+        var module_name = $("#module").val()
+        var pages = $("#pages").val();
+        var page = $('#page1').text();
+        $.ajax({
+            url: "{{url_for('cs.page')}}",
+            data: {
+                "module": module_name,
+                "group": 1,
+                "pages": pages,
+                "page": page,
+            },
+            type: 'post',
+            headers: {
+                "X-CSRFToken": csrftoken
+            },
+            dataType: 'json',
+            success: page_success,
+            error: function (data) {
+                console.log(data);
+            },
+        });
+    }
+
+    function Search(obj) {
+        var tagname = $("#tagname").val();
+        $.ajax({
+            url: "{{url_for('cs.search')}}",
+            data: {
+                "tagname": tagname,
+            },
+            type: 'get',
+            dataType: 'json',
+            success: search_success,
+            error: function (data) {
+                console.log(data);
+            },
+            complete: function () {
+                console.log("提交完成！");
+            }
+        });
+        return false;
+    }
+
+    function page(obj) {
+        var pages = $("#pages").val();
+        var page = $(obj).text();
+        var module_name = $("#module").val()
+
+        $.ajax({
+            url: "{{url_for('cs.page')}}",
+            // data: "pages=10&page=1" ,
+            data: {
+                "module": module_name,
+                "group": 1,
+                "pages": pages,
+                "page": page,
+            },
+            type: 'get',
+            dataType: 'json',
+            success: page_success,
+            error: function (data) {
+                console.log(data);
+            },
+        });
+        return false;
+    }
+
+    function pages(obj) {
+        var pages = $(obj).val();
+        var module_name = $("#module").val()
+        var group = $("#groups").val()
+        $.ajax({
+            url: "{{url_for('cs.page')}}",
+            data: {
+                "module": module_name,
+                "group": group,
+                "pages": pages,
+                "page": 1,
+            },
+            type: 'get',
+            dataType: 'json',
+            success: pages_success,
+            error: function (data) {
+                console.log(data);
+            },
+        });
+        return false;
+    }
+
+    function page_success(data) {
+        var $comm = '';
+        // var $td = '';
+        var $option = '';
+        var count = data.tags.length //组数
+        var groups = data.groups
+        $("#total").val(count)
+        $("#max_pages").val(data.max_pages)
+        if (count > 0) {
+            for (i in data.tags) {
+                var $td=''
+                for (t in data.tags[i]) {
+
+                    $td +=
+                        // '<td scope="row" class="table-success">' + data.tags[i].tag_id + '</td>' +
+                        // '<td scope="row" class="table-info">' + data.tags[i].publish_tag_name + '</td>' +
+                        // '<td scope="row" class="table-secondary">' + data.tags[i].source_tag_name + '</td>' +
+                        // '<td scope="row" class="table-danger">' + data.tags[i].data_type + '</td>' +
+                        '<td scope="row" class="table-danger">' + data.tags[i][t] + '</td>'
+                        
+                };
+                console.log($td)
+                $comm += '<tr>' + $td + '</tr>'
+                var $subject_con = $('#tags');
+                $subject_con.html($comm)
+
+            }
+
+
+            for (var g = 1; g < groups + 1; g++) {
+                $option += '<option>' + g + '</option>'
+                var $groups = $('#groups');
+                $groups.html($option)
+            }
+        } else {
+            $comm += '<tr>' + '<td scope="row" class="table-danger">' + '没有位号信息，请重新上传。。。' + '</td>' + '</tr>'
+            var $subject_con = $('#tags');
+            $subject_con.html($comm)
+        }
+    }
+
+    function search_success(data) {
+        var $comm = '';
+        var count = data.tags.length
+        if (count > 0) {
+            for (var i = 0; i < count; i++) {
+                $comm += '<tr>' +
+                    '<td scope="row" class="table-light">' + i + '</td>' +
+                    '<td scope="row" class="table-success">' + data.tags[i].tag + '</td>' +
+                    '<td scope="row" class="table-info">' + data.tags[i].start + '</td>' +
+                    '<td scope="row" class="table-secondary">' + data.tags[i].register_number + '</td>' +
+                    '<td scope="row" class="table-danger">' + data.tags[i].data_type + '</td>' +
+                    '<td scope="row" class="table-primary">' + data.tags[i].data_format + '</td>' +
+                    '<td scope="row" class="table-warning">' + data.tags[i].desc + '</td>' +
+                    '</tr>'
+                var $subject_con = $('#tags');
+                $subject_con.html($comm)
+            }
+        } else {
+            $comm += '<tr>' + '<td scope="row" class="table-danger">' + '没有位号信息，请重新上传。。。' + '</td>' + '</tr>'
+            var $subject_con = $('#tags');
+            $subject_con.html($comm)
+        }
+    }
+
+    function pages_success(data) {
+        var $comm = '';
+        var $lis = '';
+        var $lis1 = '';
+        var count = data.total //条数
+        var groups = data.groups //组数
+        console.log(data.tags[0].tag_id)
+        $("#total").val(count)
+        $("#max_pages").val(data.max_pages)
+        if (count > 0) {
+            for (var i = 0; i < count; i++) {
+                $comm += '<tr>' +
+                    '<td scope="row" class="table-success">' + data.tags[i].tag_id + '</td>' +
+                    '<td scope="row" class="table-info">' + data.tags[i].publish_tag_name + '</td>' +
+                    '<td scope="row" class="table-secondary">' + data.tags[i].source_tag_name + '</td>' +
+                    '<td scope="row" class="table-danger">' + data.tags[i].data_type + '</td>' +
+                    '</tr>'
+                var $subject_con = $('#tags');
+                $subject_con.html($comm)
+            }
+        } else {
+            $comm += '<tr>' + '<td scope="row" class="table-danger">' + '没有位号信息，请重新上传。。。' + '</td>' + '</tr>'
+            var $subject_con = $('#tags');
+            $subject_con.html($comm)
+        }
+
+        var head = '<li class="page-item "><a class="page-link form-control">' + 'Pres' + '</a></li>'
+        var tail = '<li class="page-item "><a class="page-link form-control">' + 'Next' + '</a></li>'
+        if (data.max_pages > 0) {
+            for (var i = 1; i < data.max_pages + 1; i++) {
+                $lis +=
+                    '<li class="page-item"><a class="page-link form-control btn btn-info" id="page1" onclick="page(this)">' +
+                    i + '</a></li>'
+            }
+            $lis1 = head + $lis + tail
+            var $subject_con = $('#page');
+            $subject_con.html($lis1)
+        } else {
+            $lis1 +=
+                '<li class="page-item"><a class="page-link form-control btn btn-info" id="page1" onclick="page(this)">' +
+                '对不起，没有' + '</a></li>'
+            var $subject_con = $('#tags');
+            $subject_con.html($comm)
+        }
+    }
+
+    $(document).ready(function () {
+        page($("#page1"))
+    })
+</script>
+{% endblock %}

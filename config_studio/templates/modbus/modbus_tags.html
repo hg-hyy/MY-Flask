@@ -1,0 +1,335 @@
+{% extends "base.html" %}
+{% block title %}modbus参数{% endblock %}
+{% block head %}
+<style type="text/css">
+
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-md-start">
+
+    <div class="col-12">
+        <h1 class="border-bottom mb-3">modbus位号预览</h1>
+
+
+<div class="form-row mb-3">
+
+    <div class="col-sm-4 my-1">
+        <label class="sr-only" for="module_name">模块</label>
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <div class="input-group-text">模块</div>
+            </div>
+            <select class="form-control" name='module_name' id="module_name">
+                <option>modbus1</option>
+                <option>modbus2</option>
+                <option>s_opcda_client1</option>
+                <option>s_opcda_client2</option>
+                <option>s_opcda_client3</option>
+            </select>
+        </div>
+    </div>
+    <div class="col-sm-4 my-1">
+        <label class="sr-only" for="groups">组</label>
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <div class="input-group-text">组</div>
+            </div>
+            <select class="form-control form-control-md " name='groups' id="groups">
+
+            </select>
+        </div>
+    </div>
+
+    <div class="col-sm-3 my-1">
+        <label class="sr-only" for="tagname">search</label>
+        <input type="text" name='tagname' class="form-control" id="tagname" placeholder="Jane Doe">
+    </div>
+
+    <div class="col-auto my-1">
+        <button type="button" class="btn btn-primary" onclick="search()">Search</button>
+    </div>
+</div>
+<!-- 标签表 -->
+<table id='table' class="table table-bordered table-hover">
+    <caption>List of users</caption>
+    <thead>
+        <tr>
+            <th scope="col">#ID</th>
+            <th scope="col">标签名称</th>
+            <th scope="col">起始地址</th>
+            <th scope="col">寄存器数量</th>
+            <th scope="col">数据类型</th>
+            <th scope="col">数据格式</th>
+            <th scope="col">位号描述</th>
+
+        </tr>
+    </thead>
+    <tbody id='tags'>
+    </tbody>
+</table>
+
+<!-- 分页 -->
+<div class="row justify-content-md-end">
+    <div class="col-md-12 col-sm-12 ">
+        <nav>
+            <ul class="pagination justify-content-end">
+                <select class="form-control " name='pages' id="pages" onchange="pages(this)"
+                    style="width: fit-content;">
+                    <option selected>5</option>
+                    <option>10</option>
+                    <option>12</option>
+                    <option>20</option>
+                    <option>50</option>
+                </select>
+
+                <ul class="pagination  justify-content-end" id='page'>
+                    <li class="page-item "><a class="page-link form-control ">Pres</a></li>
+                    <li class="page-item"><a class="page-link form-control btn btn-info" id='page1'
+                            onclick="page(this)">1</a></li>
+                    <li class="page-item"><a class="page-link form-control" href="#">Next</a></li>
+                </ul>
+
+                <li class="page-item"><a class="page-link form-control">共</a></li>
+                <input id='total' name='total' class="form-control" style="width: 60px;" />
+                <li class="page-item"><a class="page-link form-control">条</a></li>
+                <li class="page-item"><a class="page-link form-control">共</a></li>
+                <input id='max_pages' name='max_pages' class="form-control" style="width: 60px;" />
+                <li class="page-item"><a class="page-link form-control">页</a></li>
+            </ul>
+        </nav>
+    </div>
+</div>
+
+
+<script>
+    var csrftoken = $("meta[name=csrf-token]").attr("content");
+
+    function opc_show() {
+        var module_name = $("#module").val()
+        $.ajax({
+            url: "{{url_for('cs.show_modbus')}}",
+            data: {
+                'module': module_name
+            },
+            type: 'post',
+            headers: {
+                "X-CSRFToken": csrftoken
+            },
+            dataType: 'json',
+            success: success,
+            error: function (data) {
+                console.log(data);
+            },
+        });
+    }
+
+    function get_config() {
+        var module_name = $("#module").val()
+        $.ajax({
+            url: "{{url_for('cs.get_config')}}",
+            data: {
+                'module': module_name
+            },
+            type: 'post',
+            headers: {
+                "X-CSRFToken": csrftoken
+            },
+            dataType: 'json',
+            success: success,
+            error: function (data) {
+                console.log(data);
+            },
+        });
+    }
+
+    function success(data) {
+        var $comm = '';
+        console.log(data)
+        for (msc in data.basic_config) {
+            $comm +=
+                '<tr>' +
+                '<td scope="row" class="table-info">' + msc.substring(1) + '</td>' +
+                '<td scope="row" class="table-success">' + data.basic_config[msc]+ '</td>' +
+                '<tr/>' 
+        }
+        var $opc_da_config = $('#opc_da_config');
+        $opc_da_config.html($comm)
+    }
+
+    function search(obj) {
+        var tagname = $("#tagname").val();
+        var module_name = $("#module_name").val();
+        $.ajax({
+            url: "{{url_for('cs.search')}}",
+            data: {
+                "module": module_name,
+                "tagname": tagname,
+            },
+            type: 'get',
+            dataType: 'json',
+            success: search_success,
+            error: function (data) {
+                console.log(data);
+            },
+            complete: function () {
+                console.log("提交完成！");
+            }
+        });
+        return false;
+    }
+
+    function page(obj) {
+        var pages = $("#pages").val();
+        var page = $(obj).text();
+        var module_name = $("#module_name").val();
+        $.ajax({
+            url: "{{url_for('cs.page')}}",
+            data: {
+                "module": module_name,
+                "group": 1,
+                "pages": pages,
+                "page": page,
+                "id": 1
+            },
+            type: 'get',
+            dataType: 'json',
+            success: page_success,
+            error: function (data) {
+                console.log(data);
+            },
+            complete: function () {
+                console.log("提交完成！");
+            }
+        });
+        return false;
+    }
+
+    function pages(obj) {
+        var pages = $(obj).val();
+        var module_name = $("#module_name").val();
+        $.ajax({
+            url: "{{url_for('cs.page')}}",
+            data: {
+                "module": module_name,
+                "pages": pages,
+                "group": 1,
+                "page": 1,
+                "id": 1
+            },
+            type: 'get',
+            dataType: 'json',
+            success: pages_success,
+            error: function (data) {
+                console.log(data);
+            },
+            complete: function () {
+                console.log("提交完成！");
+            }
+        });
+        return false;
+    }
+
+    function search_success(data) {
+        var $comm = '';
+        var count = data.tags.length
+        if (count > 0) {
+            for (var i = 0; i < count; i++) {
+                $comm += '<tr>' +
+                    '<td scope="row" class="table-light">' + i + '</td>' +
+                    '<td scope="row" class="table-success">' + data.tags[i].tag + '</td>' +
+                    '<td scope="row" class="table-info">' + data.tags[i].start + '</td>' +
+                    '<td scope="row" class="table-secondary">' + data.tags[i].register_number + '</td>' +
+                    '<td scope="row" class="table-danger">' + data.tags[i].data_type + '</td>' +
+                    '<td scope="row" class="table-primary">' + data.tags[i].data_format + '</td>' +
+                    '<td scope="row" class="table-warning">' + data.tags[i].desc + '</td>' +
+                    '</tr>'
+                var $subject_con = $('#tags');
+                $subject_con.html($comm)
+            }
+        } else {
+            $comm += '<tr>' + '<td scope="row" class="table-danger">' + '没有位号信息，请重新上传。。。' + '</td>' + '</tr>'
+            var $subject_con = $('#tags');
+            $subject_con.html($comm)
+        }
+    }
+
+    function page_success(data) {
+        var $comm = '';
+        var count = data.tags.length
+        $("#total").val(data.total)
+        $("#max_pages").val(data.max_pages)
+        if (count > 0) {
+            for (var i = 0; i < count; i++) {
+                $comm += '<tr>' +
+                    '<td scope="row" class="table-light">' + i + '</td>' +
+                    '<td scope="row" class="table-success">' + data.tags[i].tag + '</td>' +
+                    '<td scope="row" class="table-info">' + data.tags[i].start + '</td>' +
+                    '<td scope="row" class="table-secondary">' + data.tags[i].register_number + '</td>' +
+                    '<td scope="row" class="table-danger">' + data.tags[i].data_type + '</td>' +
+                    '<td scope="row" class="table-primary">' + data.tags[i].data_format + '</td>' +
+                    '<td scope="row" class="table-warning">' + data.tags[i].desc + '</td>' +
+                    '</tr>'
+                var $subject_con = $('#tags');
+                $subject_con.html($comm)
+            }
+        } else {
+            $comm += '<tr>' + '<td scope="row" class="table-danger">' + '没有位号信息，请重新上传。。。' + '</td>' + '</tr>'
+            var $subject_con = $('#tags');
+            $subject_con.html($comm)
+        }
+    }
+
+    function pages_success(data) {
+        var $comm = '';
+        var $lis = '';
+        var $lis1 = '';
+        var count = data.tags.length
+        $("#total").val(data.total)
+        $("#max_pages").val(data.max_pages)
+        if (count > 0) {
+            for (var i = 0; i < count; i++) {
+                $comm += '<tr>' +
+                    '<td scope="row" class="table-light">' + i + '</td>' +
+                    '<td scope="row" class="table-success">' + data.tags[i].tag + '</td>' +
+                    '<td scope="row" class="table-info">' + data.tags[i].start + '</td>' +
+                    '<td scope="row" class="table-secondary">' + data.tags[i].register_number + '</td>' +
+                    '<td scope="row" class="table-danger">' + data.tags[i].data_type + '</td>' +
+                    '<td scope="row" class="table-primary">' + data.tags[i].data_format + '</td>' +
+                    '<td scope="row" class="table-warning">' + data.tags[i].desc + '</td>' +
+                    '</tr>'
+                var $subject_con = $('#tags');
+                $subject_con.html($comm)
+            }
+        } else {
+            $comm += '<tr>' + '<td scope="row" class="table-danger">' + '没有位号信息，请重新上传。。。' + '</td>' + '</tr>'
+            var $subject_con = $('#tags');
+            $subject_con.html($comm)
+        }
+
+        var head = '<li class="page-item "><a class="page-link form-control">' + 'Pres' + '</a></li>'
+        var tail = '<li class="page-item "><a class="page-link form-control">' + 'Next' + '</a></li>'
+        if (data.max_pages > 0) {
+            for (var i = 1; i < data.max_pages + 1; i++) {
+                $lis +=
+                    '<li class="page-item"><a class="page-link form-control btn btn-info" id="page1" onclick="page(this)">' +
+                    i + '</a></li>'
+            }
+            $lis1 = head + $lis + tail
+            var $subject_con = $('#page');
+            $subject_con.html($lis1)
+        } else {
+            $lis1 +=
+                '<li class="page-item"><a class="page-link form-control btn btn-info" id="page1" onclick="page(this)">' +
+                '对不起，没有' + '</a></li>'
+            var $subject_con = $('#tags');
+            $subject_con.html($comm)
+        }
+    }
+
+    $(document).ready(function () {
+        page($("#page1"))
+    })
+</script>
+{% endblock %}

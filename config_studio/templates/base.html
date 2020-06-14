@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="cn">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="FLASK_DEMON">
+    <meta name="author" content="HYY, and Bootstrap contributors">
+    <meta name="generator" content="PRO_FLASK V1.0.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>{% block title %}{% endblock %}</title>
+    <script src="{{ url_for('static', filename='js/jquery-3.5.1.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/vue.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/axios.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/feather.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/alerts.js') }}"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}" />
+
+    {% block head %}{% endblock %}
+    <style>
+        #main {
+            margin-top: 16px;
+        }
+
+        a:hover {
+            color: greenyellow;
+        }
+
+        a:active {
+            color: red;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-md  sticky-top navbar-dark  bg-dark ">
+        <span data-feather="home" style="width: 16px; height: 16px;color: aliceblue;"></span>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse"
+            aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                    <a class="nav-link" href="{{url_for('index')}}">Home <span class="sr-only">(current)</span></a>
+                </li>
+
+            </ul>
+            <form class="form-inline mt-2 mt-md-0">
+                <input class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search">
+                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+                <button class="btn btn-outline-info my-2 my-sm-0" type="submit">Logout</button>
+            </form>
+        </div>
+    </nav>
+    <div class="container-fluid">
+        <div class="row">
+            <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
+                <div class="sidebar-sticky pt-3 h-100" style="background:rgba(129, 104, 104, 0.438);">
+                    <ul class="nav flex-column">
+                        <h2
+                            class="sidebar-heading d-flex justify-content-between align-items-center p-3 mt-4 mb-1 text-muted border-bottom ">
+                            <span>Home</span>
+                        </h2>
+                        <li class="nav-item" active>
+                            <a class="nav-link active border-bottom" href="{{url_for('index')}}"
+                                style="font-size: x-large;font-style: italic;font-family: cursive;">
+                                <span data-feather="home" style="width: 16px; height: 16px;color:black;"></span>
+                                home
+                            </a>
+                        </li>
+                        <h2
+                            class="sidebar-heading d-flex justify-content-between align-items-center p-3 mt-4 mb-1 text-muted border-bottom ">
+                            <span>config setting</span>
+                        </h2>
+
+                        <li class="nav-item">
+                            <a class="nav-link  border-bottom" href="{{url_for('cs.load_opc_se')}}"
+                                style="font-size: x-large;font-style: italic;font-family: cursive;">
+                                <span data-feather="anchor" style="width: 16px; height: 16px;color:black;"></span>
+                                opc_da_server
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link  border-bottom" href="{{url_for('cs.load_opc_da')}}"
+                                style="font-size: x-large;font-style: italic;font-family: cursive;">
+                                <span data-feather="anchor" style="width: 16px; height: 16px;color:black;"></span>
+                                opc_da_client
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link  border-bottom" href="{{url_for('cs.load_opc_ae')}}"
+                                style="font-size: x-large;font-style: italic;font-family: cursive;">
+                                <span data-feather="anchor" style="width: 16px; height: 16px;color:black;"></span>
+                                opc_ae_client
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link  border-bottom" href="{{url_for('cs.load_modbus')}}"
+                                style="font-size: x-large;font-style: italic;font-family: cursive;">
+                                <span data-feather="octagon" style="width: 16px; height: 16px;color:black;"></span>
+                                modbus_slave
+                            </a>
+                        </li>
+
+                        <h2
+                            class="sidebar-heading d-flex justify-content-between align-items-center p-3 mt-4 mb-1 text-muted border-bottom ">
+                            <span>config review</span>
+                        </h2>
+
+                        <li class="nav-item">
+                            <a class="nav-link border-bottom" href="{{url_for('cs.show_opc',module='s_opcda_client1')}} "
+                                style="font-size: x-large;font-style: italic;font-family: cursive;">
+                                <span data-feather="cpu" style="width: 16px; height: 16px;color:black;"></span>
+                                config_review
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link border-bottom" href="{{url_for('cs.opc_tags')}} "
+                                style="font-size: x-large;font-style: italic;font-family: cursive;">
+                                <span data-feather="cast" style="width: 16px; height: 16px;color:black;"></span>
+                                tags_review
+                            </a>
+                        </li>
+
+                        <h2
+                            class="sidebar-heading d-flex justify-content-between align-items-center p-3 mt-4 mb-1 text-muted border-bottom ">
+                            <span>log</span>
+                        </h2>
+                        <li class="nav-item">
+                            <a class="nav-link border-bottom" href="{{url_for('cs.log')}} "
+                                style="font-size: x-large;font-style: italic;font-family: cursive;">
+                                <span data-feather="hard-drive" style="width: 16px; height: 16px;color:black;"></span>
+                                log_audit
+                            </a>
+                        </li>
+                        <h2
+                            class="sidebar-heading d-flex justify-content-between align-items-center p-3 mt-4 mb-1 text-muted border-bottom ">
+                            <span>login</span>
+                        </h2>
+                        <li class="nav-item">
+                            <a class="nav-link border-bottom" href="{{url_for('auth.login')}} "
+                                style="font-size: x-large;font-style: italic;font-family: cursive;">
+                                <span data-feather="grid" style="width: 16px; height: 16px;color:black;"></span>
+                                login
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-md-4" id='main'>
+
+                {% block content %}{% endblock %}
+                <div style="position: fixed;top: 60px;right: 30px;" id='alarm'></div>
+            </main>
+        </div>
+    </div>
+    <script>
+        feather.replace()
+
+
+        var int = self.setInterval("auto_close()", 3000);
+
+        function clock() {
+            var d = new Date();
+            var t = d.toLocaleTimeString();
+            document.getElementById("clock").value = t;
+        }
+
+        function auto_close() {
+            $(".alert").alert('close');
+        }
+    </script>
+</body>
+
+</html>

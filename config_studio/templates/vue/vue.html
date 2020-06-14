@@ -1,0 +1,224 @@
+{% extends "base.html" %}
+{% block title %}Modbus参数配置{% endblock %}
+{% block head %}
+<style type="text/css">
+
+</style>
+{% endblock %}
+
+{% block content %}
+{% raw %}
+
+<div id="app">
+
+    <span v-bind:title="tips">鼠标悬停</span>
+    <p v-if="seen">ddddd</p>
+    <ol>
+        <li v-for="todo in todos">
+            {{todo.text}}
+        </li>
+    </ol>
+    <button v-on:click="reverseMessage" class="btn btn-outline-info">逆转小徐</button>
+    <button v-on:click="axios_get" class="btn btn-outline-danger">get请求</button>
+    <button v-on:click="axios_post" class="btn btn-outline-primary">post请求</button>
+    <table class="table table-border table-hover">
+        <thead>
+            <tr>
+                <th>#ID</th>
+                <th>name</th>
+                <th>age</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr v-for="item in models">
+                <td scope="row" class="table-success">{{item.id}}</td>
+                <td class="table-info">{{item.name}}</td>
+                <td class="table-danger">{{item.age}}</td>
+                <td class="table-danger">{{item.password}}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <input v-model="message" />
+
+    <ol>
+        <todo-item v-for="item in groceryList" v-bind:todo="item" v-bind:key="item.id"></todo-item>
+    </ol>
+
+    <p>Using mustaches: {{ rawHtml }}</p>
+    <p>Using v-html directive: <span v-html="rawHtml"></span></p>
+
+    <p>原始数据{{message}}</p>
+    <p>反转数据{{reversedMessage}}</p>
+
+    {{ fullName }}
+    <input v-model="message" placeholder="edit me">
+    <p>Message is: {{ message }}</p>
+
+    <button-counter></button-counter>
+    <button-counter></button-counter>
+
+    <div :style="{ fontSize: postFontSize + 'em' }">
+        <blog-post v-for="post in posts" v-bind:key="post.id" v-bind:post="post"
+            v-on:enlarge-text="postFontSize += 0.1"></blog-post>
+    </div>
+</div>
+</div>
+<script>
+    var csrftoken = $("meta[name=csrf-token]").attr("content");
+
+    function getCookie(name) {
+        var arr, reg = new RegExp("(^| )" + name + "=([^;]*)(;|$)");
+        return (arr = document.cookie.match(reg)) ? unescape(arr[2]) : null;
+    }
+
+    Vue.component('todo-item', {
+        props: ['todo'],
+        template: '<li>{{ todo.text }}</li>'
+    })
+
+    Vue.component('button-counter', {
+        data: function () {
+            return {
+                count: 0
+            }
+        },
+        template: '<button class="btn btn-info" v-on:click="count++">You clicked me {{ count }} times.</button>'
+    })
+
+
+    Vue.component('blog-post', {
+        props: ['post'],
+        template: `
+    <div class="blog-post">
+        <h3>{{ post.title }}</h3>
+        <button v-on:click="$emit('enlarge-text')">
+            Enlarge text
+        </button>
+        <div v-html="post.content"></div>
+    </div>
+  `
+    })
+
+
+    var vm = new Vue({
+
+        el: '#app',
+        data: {
+            tips: "页面加载：" + new Date().toLocaleString(),
+            message: "hello,world!",
+            seen: false,
+            todos: [{
+                    text: "学习java"
+                },
+                {
+                    text: "学习pgp"
+                },
+                {
+                    text: "学习c#"
+                }
+            ],
+            groceryList: [{
+                    id: 0,
+                    text: '蔬菜'
+                },
+                {
+                    id: 1,
+                    text: '奶酪'
+                },
+                {
+                    id: 2,
+                    text: '随便其它什么人吃的东西'
+                }
+            ],
+            rawHtml: '<span style="color:red">this should bu red</span>',
+            fristname: "hello",
+            lastname: "world",
+            posts: [{
+                    id: 1,
+                    title: 'My journey with Vue',
+                    content: "hahahha"
+                },
+                {
+                    id: 2,
+                    title: 'Blogging with Vue',
+                    content: "hahahha"
+                },
+                {
+                    id: 3,
+                    title: 'Why Vue is so fun',
+                    content: "hahahha"
+                }
+            ],
+            postFontSize: 1,
+            models: [{
+                    id: 1,
+                    name: "hyy",
+                    password: "123"
+                },
+                {
+                    id: 2,
+                    name: "xujing",
+                    password: "456"
+                },
+                {
+                    id: 3,
+                    name: "fangmeng",
+                    password: "789"
+                },
+            ],
+        },
+        computed: {
+            reversedMessage: function () {
+                return this.message.split("").reverse().join("")
+            },
+            fullName: function () {
+                return this.fristname + " " + this.lastname
+            }
+        },
+        methods: {
+            reverseMessage: function () {
+                this.message = this.message.split('').reverse().join('')
+            },
+            axios_get: function () {
+                axios({
+                        url: '/vue',
+                        method: 'get',
+                        params: {
+                            'id': 1,
+                            'name': "hyy"
+                        }
+                    }).then(function (response) {
+                        console.log(response);
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    })
+            },
+            axios_post: function () {
+                axios({
+                        url: '/vue',
+                        method: 'post',
+                        headers: {
+                            // "X-CSRFToken": csrftoken
+                            "X-CSRFToken": getCookie("csrf_token")
+                        },
+                        data: {
+                            'id': 1,
+                            'name': "hyy",
+                            'age': 18
+                        }
+                    }).then(res => {
+                        this.models = res.data.data
+                        console.log(res.data);
+                    })
+                    .catch(err => {
+                        console.log(err);
+                    })
+            }
+        }
+    })
+</script>
+
+{% endraw %}
+{% endblock %}

@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+{% block title %}OPC模块注册{% endblock %}
+{% block head %}
+<style type="text/css">
+
+</style>
+{% endblock %}
+{% block content %}
+<div class="row">
+    <div class="col-12">
+
+        <form action="{{url_for('cs.load_opc_se')}}" method="post" id='shen' enctype="multipart/form-data">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+            <fieldset disabled id='bj'>
+                <div class="form-group row">
+                    <label for="module" class="col-sm-2 col-form-label col-form-label-md">module_name</label>
+                    <div class="col-sm-4">
+                        <select class="form-control form-control-md " name='module' id="module">
+                            <option>s_opcda_server1</option>
+                            <option>s_opcda_server2</option>
+                            <option>s_opcda_server3</option>
+                        </select>
+                    </div>
+                    <label for="module" class="col-sm-2 col-form-label col-form-label-md">请选择模块名称</label>
+                </div>
+
+                <div class="form-group row">
+                    <label for="enAutoTag" class="col-sm-2 col-form-label col-form-label-md">加点模式</label>
+                    <div class="col-sm-4">
+                        <select class="form-control form-control-md " name='enAutoTag' id="enAutoTag"
+                            onchange="show_load()">
+                            <option>0</option>
+                            <option>1</option>
+                        </select>
+                    </div>
+                    <label for="module" class="col-sm-2 col-form-label col-form-label-md">请选择加点模式</label>
+
+                </div>
+                <div class="form-group row">
+                    <label for="isDataConvert" class="col-sm-2 col-form-label col-form-label-md">数据转换</label>
+                    <div class="col-sm-4">
+                        <select class="form-control form-control-md " name='isDataConvert' id="isDataConvert">
+                            <option>0</option>
+                            <option>1</option>
+                        </select>
+                    </div>
+                    <label for="module" class="col-sm-2 col-form-label col-form-label-md">请选择是否数据转换</label>
+
+                </div>
+                <div class="form-group row" id='load'>
+                    <label for="file" class="col-sm-1 col-form-label col-form-label-md">上传位号:</label>
+                    <div class="col-sm-4 offset-1">
+                        <input type="file" name='file' class="form-control form-control-md" id="file">
+                    </div>
+                    <label for="module" class="col-sm-2 col-form-label col-form-label-md">请选择位号上传</label>
+                    
+                </div>
+
+            </fieldset>
+
+
+            <div class="form-group row">
+                <div class="col-sm-4  offset-2">
+                    <button type="button" class="btn btn-info btn-block btn-md" id='alter1'
+                        onclick="edit()">edit</button>
+                    <button type="submit" class="btn btn-primary d-none btn-block btn-md" id='comm1'
+                        onclick="save()">save</button>
+                </div>
+            </div>
+        </form>
+
+    </div>
+</div>
+<script>
+    var csrftoken = $("meta[name=csrf-token]").attr("content");
+
+
+    function edit() {
+        $("#alter").addClass("d-none");
+        $("#comm1").removeClass("d-none");
+        $("#bj").removeAttr("disabled");;
+
+    }
+
+    function save() {
+        $("#alter").removeClass("d-none");
+        $("#comm1").addClass("d-none");
+        $("#bj").addAttr("disabled");
+    }
+
+
+    $(document).ready(function () {
+
+        $("#alter").click(function () {
+            $.ajax({
+                url: "{{url_for('cs.alter_opc_da')}}",
+                data: {
+                    'id': 1
+                },
+                type: 'get',
+                dataType: 'json',
+                success: success,
+                error: function (data) {
+                    console.log("请填写完全");
+                },
+            });
+            return false;
+        });
+    })
+
+    function success(data) {
+
+        $('#main_server_ip').val(data.opc.main_ip)
+        $('#main_server_progid').val(data.opc.main_progid)
+    }
+
+    function show_load() {
+
+        var auto = $("#enAutoTag").val()
+        if (auto == 0) {
+            $("#load").removeClass("d-none");
+        }
+        else if (auto == 1) {
+            $("#load").addClass("d-none");
+        }
+
+    }
+
+
+</script>
+{% endblock %}

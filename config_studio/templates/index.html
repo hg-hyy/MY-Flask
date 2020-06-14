@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+{% block head %}
+<style type="text/css"></style>
+{% endblock %}
+{% block content %}
+<div class="jumbotron">
+  <div class=" row justify-content-md-end ">
+
+    <img src="{{url_for('static',filename='pic/logo.png')}}" class="img-fluid" alt="Responsive image" />
+  </div>
+  <h1 class="display-3  py-3 my-3">Hello, OPCer! Welcome to <span class="badge badge-info">Configuration Studio.</span>
+  </h1>
+  <blockquote class="blockquote text-right ">
+
+
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+
+    {% for message in messages %}
+    <p class="mb-0">爱上一个地方，就应该背上包去旅行，走得更远。{{ message }}</p>
+
+    {% endfor %}
+
+    {% endif %}
+    {% endwith %}
+
+
+    <footer class="blockquote-footer">Power by <cite title="Source Title">冒险湾一狗</cite></footer>
+  </blockquote>
+  <hr class="my-4">
+  <h5 class="display-5 mb-3">——>点击下面的按钮开始配置之旅<——</h5> <p class="lead">
+      <a class="btn btn-info btn-lg" href="{{ url_for('cs.module_reg') }}" role="button"
+        onclick="alarm()">{{name}}の系统注册</a>
+      <a class="btn btn-success btn-lg" href="{{ url_for('cs.load_opc_da') }}" role="button">{{name}}のOPC配置</a>
+      <a class="btn btn-primary btn-lg" href="{{ url_for('cs.load_modbus') }}" role="button">{{name}}のModbus配置</a>
+      <a class="btn btn-danger btn-lg" href="{{ url_for('cs.load_modbus') }}" role="button">{{name}}の随便看看</a>
+      </p>
+
+      {% with errors = get_flashed_messages(category_filter=["error"]) %}
+      {% if errors %}
+      <div class="alert-message block-message error">
+        <a class="close" href="#">×</a>
+        <ul>
+          {%- for msg in errors %}
+          <li>{{ msg }}</li>
+          {% endfor -%}
+        </ul>
+      </div>
+      {% endif %}
+      {% endwith %}
+
+
+      <ul class="nav flex-column" id='es6'>
+
+      </ul>
+
+      <button onclick="error('hello')" class="btn btn-outline-info">alarm</button>
+      <button onclick="sus('hello')" class="btn btn-outline-info">success</button>
+</div>
+
+<script type="module">
+
+  import {route} from  "{{url_for('static',filename='js/route.js')}}"
+  var $comm=''
+route.map( (item,index) => {
+    console.log(item.url,index);
+    $comm+=
+    '<li class="nav-item">' +
+      '<a class="nav-link border-bottom" href="'+item.url+'"'+'"style="font-size: x-large;font-style: italic;font-family: cursive;">'+
+        '<span data-feather="grid" style="width: 24px; height: 24px;color:black;"></span>'+
+        item.name+
+        '</a></li>'
+
+  })
+    var $subject_con = $('#es6');
+    $subject_con.html($comm)
+
+
+
+
+</script>
+
+{% endblock %}
