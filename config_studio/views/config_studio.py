@@ -865,15 +865,21 @@ def set_config(cfg_msg, module):
 
 @ cs.route('/log', methods=['GET', 'POST'], endpoint='log')
 def logs():
-    logs_list = []
-    with open(log_path+'\\'+'{}.log'.format(time.strftime('%Y-%m-%d')), 'r', encoding='utf-8') as rf:
-        logs = rf.read().splitlines()
-    text = linecache.getline(
-        log_path+'\\'+'{}.log'.format(time.strftime('%Y-%m-%d')), 2)
-    print(text)
-    for log in logs:
-        logs_list.append(log.rsplit(' '))
-    return render_template('log/log.html', logs=logs_list)
+    if request.method == 'POST':
+        logs_list = []
+        log_level = request.form['log_level']
+        log_day_start = request.form['log_day_start']
+        log_day_end = request.form['log_day_end']
+        log_name = log_path+'\\'+log_level+'-{}.log'.format(time.strftime('%Y-%m-%d'))
+        print(log_level, log_day_start, log_day_end)
+        with open(log_name, 'r', encoding='utf-8') as lg:
+            logs = lg.read().splitlines()
+        text = linecache.getline(log_name, 2)
+        print(text)
+        for log in logs:
+            logs_list.append(log.rsplit(' '))
+        return {'logs_list': log_day_end}
+    return render_template('log/log.html')
 
 
 @ cs.route('/log1', methods=['GET', 'POST'], endpoint='log1')

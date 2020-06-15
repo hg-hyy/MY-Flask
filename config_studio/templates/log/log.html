@@ -7,43 +7,49 @@
 {% endblock %}
 
 {% block content %}
-<div class="row justify-content-between">
-    <div class="col-xl-5 col-lg-12 col-md-12 col-sm-12 col-12">
-        <h1>操作日志</h1>
+<div class="jumbotron p-4">
+    <div class="row justify-content-between">
+        <div class="col-xl-5 col-lg-12 col-md-12 col-sm-12 col-12">
+            <h1>操作日志</h1>
+        </div>
     </div>
-</div>
 
-<div class="row">
-    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 text-center">
-        <!-- 参数表 -->
-        <form role="form" method='GET' action="#" id='checklog'>
-            
+    <div class="row">
+        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 text-center">
+            <!-- 参数表 -->
+            <form id='log_form'>
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                <div class=" justify-content-between flex-wrap flex-md-nowrap align-items-center mb-3">
+                    <div class="form-group form-inline mb-0">
+                        <label class="form-input-label mr-1" for="log_level">日志级别:</label>
+                        <select class="form-control mr-1 col-2" id="log_level" name='log_level'>
+                            <option selected>INFO</option>
+                            <option>ERROR</option>
+                            <option>DEBUG</option>
+                        </select>
+                        <label class="form-input-label mr-1" for="log_day_start">开始日期:</label>
+                        <input class="form-control col-2" type="text" name="log_day_start" id="log_day_start" value="">
 
-            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mb-3">
-                <div class="form-group form-inline mb-0">
-                    <label class="form-input-label mr-1" for="log_level1">日志级别:</label>
-                    <select class="form-control mr-1 col-3" id="log_level1" name='log_level'>
-                        <option selected>info</option>
-                        <option>error</option>
-                        <option>all</option>
-                    </select>
-                    <label class="form-input-label mr-1" for="log_day">日期:</label>
-                    <input class="form-control col-3" type="text" name="log_day" id="log_day" value="">
-                    <a class="btn btn-outline-success ml-1" onclick="selectlog()">提交</a>
-                </div>
-                <div class="btn-toolbar ">
-                    <div class="btn-group mr-2">
-                        <button type="button" class="btn btn-sm btn-outline-secondary">Share</button>
-                        <button type="button" class="btn btn-sm btn-outline-secondary">Export</button>
+                        <label class="form-input-label mr-1" for="log_day_end">结束日期:</label>
+                        <input class="form-control col-2" type="text" name="log_day_end" id="log_day_end" value="">
+                        <!-- <a class="btn btn-outline-success ml-1" onclick="selectlog()">查询</a> -->
+
+                        <button type="button" class="btn btn-outline-info ml-1 " onclick="select_log()">
+                            <span data-feather="upload"></span>
+                            开始查询
+                        </button>
+                        <button type="button" class="btn btn-outline-success ml-1 ">
+                            <span data-feather="upload"></span>
+                            导出配置
+                        </button>
+                        <button type="button" class="btn btn-outline-danger ml-1 ">
+                            <span data-feather="calendar"></span>
+                            This week
+                        </button>
                     </div>
-                    <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle">
-                        <span data-feather="calendar"></span>
-                        This week
-                    </button>
                 </div>
-            </div>
-        </form>
-        <div class="input-group mb-3">
+            </form>
+            <!-- <div class="input-group mb-3">
             <div class="input-group-prepend">
                 <span class="input-group-text">日志时间</span>
             </div>
@@ -62,77 +68,78 @@
             <div class="input-group-append">
                 <button class="btn btn-outline-info" type="button" id='search' onclick="Search()">查询</button>
             </div>
+        </div> -->
+
+            <!-- 标签表 -->
+            <table id='table' class="table table-bordered table-hover">
+                <caption>List of log</caption>
+                <thead>
+                    <tr>
+                        <th scope="col">#ID</th>
+                        <th scope="col">日志时间</th>
+                        <th scope="col">日志级别</th>
+                        <th scope="col">日志内容</th>
+
+
+                    </tr>
+                </thead>
+                <tbody id='tags'>
+                    {% for log in logs %}
+                    <tr id='tags'>
+                        <td scope="row" class="table-light">{{loop.index}}</td>
+                        <td scope="row" class="table-success">{{log[0]+' '+log[1]}}</td>
+                        <td class="table-info">{{log[2]}}</td>
+                        <td class="table-secondary">{{log[3]}}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
         </div>
-
-        <!-- 标签表 -->
-        <table id='table' class="table table-bordered table-hover">
-            <caption>List of log</caption>
-            <thead>
-                <tr>
-                    <th scope="col">#ID</th>
-                    <th scope="col">日志时间</th>
-                    <th scope="col">日志级别</th>
-                    <th scope="col">日志内容</th>
-
-
-                </tr>
-            </thead>
-            <tbody id='tags'>
-                {% for log in logs %}
-                <tr id='tags'>
-                    <td scope="row" class="table-light">{{loop.index}}</td>
-                    <td scope="row" class="table-success">{{log[0]+' '+log[1]}}</td>
-                    <td class="table-info">{{log[2]}}</td>
-                    <td class="table-secondary">{{log[3]}}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-
     </div>
-</div>
 
-<!-- 分页 -->
-<div class="row">
-    <div class="col-md-12 col-sm-12 ">
-        <nav>
-            <ul class="pagination justify-content-end">
-                <select class="form-control " name='pages' id="pages" onchange="pages(this)"
-                    style="width: fit-content;">
-                    <option selected>5</option>
-                    <option>10</option>
-                    <option>12</option>
-                    <option>20</option>
-                    <option>50</option>
-                </select>
+    <!-- 分页 -->
+    <div class="row">
+        <div class="col-md-12 col-sm-12 ">
+            <nav>
+                <ul class="pagination justify-content-end">
+                    <select class="form-control " name='pages' id="pages" onchange="pages(this)"
+                        style="width: fit-content;">
+                        <option selected>5</option>
+                        <option>10</option>
+                        <option>12</option>
+                        <option>20</option>
+                        <option>50</option>
+                    </select>
 
-                <ul class="pagination  justify-content-end" id='page'>
-                    <li class="page-item "><a class="page-link form-control ">Pres</a></li>
-                    <li class="page-item"><a class="page-link form-control btn btn-info" id='page1'
-                            onclick="page(this)">1</a></li>
-                    <li class="page-item"><a class="page-link form-control" href="#">Next</a></li>
+                    <ul class="pagination  justify-content-end" id='page'>
+                        <li class="page-item "><a class="page-link form-control ">Pres</a></li>
+                        <li class="page-item"><a class="page-link form-control btn btn-info" id='page1'
+                                onclick="page(this)">1</a></li>
+                        <li class="page-item"><a class="page-link form-control" href="#">Next</a></li>
+                    </ul>
+
+                    <li class="page-item"><a class="page-link form-control">共</a></li>
+                    <input id='total' name='total' class="form-control" style="width: 60px;" />
+                    <li class="page-item"><a class="page-link form-control">条</a></li>
+                    <li class="page-item"><a class="page-link form-control">共</a></li>
+                    <input id='max_pages' name='max_pages' class="form-control" style="width: 60px;" />
+                    <li class="page-item"><a class="page-link form-control">页</a></li>
                 </ul>
-
-                <li class="page-item"><a class="page-link form-control">共</a></li>
-                <input id='total' name='total' class="form-control" style="width: 60px;" />
-                <li class="page-item"><a class="page-link form-control">条</a></li>
-                <li class="page-item"><a class="page-link form-control">共</a></li>
-                <input id='max_pages' name='max_pages' class="form-control" style="width: 60px;" />
-                <li class="page-item"><a class="page-link form-control">页</a></li>
-            </ul>
-        </nav>
+            </nav>
+        </div>
     </div>
-</div>
 
 
 </div>
+</div>
+
+
 <script>
     var csrftoken = $("meta[name=csrf-token]").attr("content");
 
-
-
     $(function () {
-        $("#log_day").datetimepicker({
+        $("#log_day_start").datetimepicker({
             timepicker: false,
             format: 'Y-m-d',
             theme: 'dark',
@@ -140,6 +147,47 @@
         });
         // $.datetimepicker.setLocale('zh');
     });
+    $(function () {
+        $("#log_day_end").datetimepicker({
+            timepicker: false,
+            format: 'Y-m-d',
+            theme: 'dark',
+            lang: 'zh',
+        });
+        // $.datetimepicker.setLocale('zh');
+    });
+
+
+    function select_log() {
+
+        var log_level = $("#log_level").val();
+        var log_day_start = $("#log_day_start").val();
+        var log_day_end = $("#log_day_end").val();
+
+        console.log(log_day_start, log_day_end);
+        $.ajax({
+                url: "{{url_for('cs.log')}}",
+                data: $('#log_form').serialize(),
+                // contentType: "application/json;charset=utf-8",
+                type: 'post',
+                dataType: 'json',
+                headers: {
+                    "X-CSRFToken": csrftoken
+                },
+                success: function success(data) {
+                    console.log(data);
+                    alarms(data.msg)
+                },
+                error: function (data) {
+                    console.log(data);
+                },
+            });
+            return false;
+
+
+
+    }
+
 
 
 
