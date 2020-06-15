@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}OPC模块注册{% endblock %}
+{% block title %}模块 注册/注销{% endblock %}
 {% block head %}
 <style type="text/css">
 
@@ -8,14 +8,13 @@
 {% block content %}
 <div class="row">
     <div class="col-12">
-
         <form method="post" id='shen'>
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
             <fieldset id='bj'>
                 <div class="form-group row">
                     <label for="module" class="col-sm-2 col-form-label col-form-label-md">module_name</label>
                     <div class="col-sm-4">
-                        <select class="form-control form-control-md " name='module' id="module">
+                        <select class="form-control form-control-md " name='module' id="module" onchange="opc_server()">
                             <option>s_opcda_server1</option>
                             <option>s_opcda_server2</option>
                             <option>s_opcda_server3</option>
@@ -74,48 +73,64 @@
                         <small id="emailHelp" class="form-text text-muted">请选择模块名称</small>
                     </div>
                 </div>
-                <div class="form-group row">
-                    <label for="enAutoTag" class="col-sm-2 col-form-label col-form-label-md">enAutoTag</label>
-                    <div class="col-sm-4">
-                        <input type="text" name="enAutoTag" class="form-control form-control-md" id="enAutoTag"
-                            placeholder="OPC login name">
+                <div id='opc_server'>
+                    <div class="form-group row">
+                        <label for="enAutoTag" class="col-sm-2 col-form-label col-form-label-md">enAutoTag</label>
+                        <div class="col-sm-4">
+                            <input type="text" name="enAutoTag" class="form-control form-control-md" id="enAutoTag"
+                                placeholder="OPC login name">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="isDataConvert"
+                            class="col-sm-2 col-form-label col-form-label-md">isDataConvert</label>
+                        <div class="col-sm-4">
+                            <input type="text" name="isDataConvert" class="form-control form-control-md"
+                                id="isDataConvert" placeholder="OPC login name">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="tags" class="col-sm-2 col-form-label col-form-label-md">tags</label>
+                        <div class="col-sm-4">
+                            <input type="text" name="tags" class="form-control form-control-md" id="tags"
+                                placeholder="OPC login name">
+                        </div>
                     </div>
                 </div>
-                <div class="form-group row">
-                    <label for="isDataConvert" class="col-sm-2 col-form-label col-form-label-md">isDataConvert</label>
-                    <div class="col-sm-4">
-                        <input type="text" name="isDataConvert" class="form-control form-control-md" id="isDataConvert"
-                            placeholder="OPC login name">
-                    </div>
-                </div>
-                <div class="form-group row">
-                    <label for="tags" class="col-sm-2 col-form-label col-form-label-md">tags</label>
-                    <div class="col-sm-4">
-                        <input type="text" name="tags" class="form-control form-control-md" id="tags"
-                            placeholder="OPC login name">
-                    </div>
-                </div>
-
             </fieldset>
+
+            <div class="form-group row">
+                <div class="col-sm-2  offset-2">
+                    <button type="button" class="btn btn-info btn-block btn-md" id='regist'>regist</button>
+                </div>
+                <div class="col-sm-2">
+                    <button type="button" class="btn btn-danger btn-block btn-md" id='unregist'>unregist</button>
+                </div>
+            </div>
+
         </form>
-
-        <div class="form-group row">
-            <div class="col-sm-2  offset-2">
-                <button type="button" class="btn btn-info btn-block btn-md" id='regist'>regist</button>
-            </div>
-            <div class="col-sm-2">
-                <button type="button" class="btn btn-danger btn-block btn-md" id='unregist'>unregist</button>
-            </div>
-        </div>
-
-
     </div>
 </div>
 
 <script>
-        var csrftoken = $("meta[name=csrf-token]").attr("content");
+    var csrftoken = $("meta[name=csrf-token]").attr("content");
+
+    function opc_server() {
+        var opc_server = ['s_opcda_server1', 's_opcda_server2', 's_opcda_server3']
+        var module_name = $("#module").val()
+        console.log(module_name)
+        //  if (opc_server.indexOf(module_name)>=0)
+        if (opc_server.includes(module_name)) {
+
+            $("#opc_server").removeClass("d-none")
+        } else {
+            $("#opc_server").addClass("d-none")
+        }
+    }
+
 
     $(document).ready(function () {
+
 
         $("#regist").click(function () {
             var module_name = $("#module").val();
@@ -124,9 +139,8 @@
             var enAutoTag = $("#enAutoTag").val();
             var isDataConvert = $("#isDataConvert").val();
             var tags = $("#tags").val();
-            var data = {}
 
-            var data = {
+            var json_data = {
                 "module": module_name,
                 "url": resful_url,
                 "config": {
@@ -137,36 +151,41 @@
                     }
                 }
             };
-            console.log(data)
+
             $.ajax({
                 url: "{{url_for('cs.regist')}}",
-                data: JSON.stringify(data),
-                contentType: "application/json;charset=utf-8",
+                // data: JSON.stringify(json_data),
+                // data: $('#shen').serializeArray(),
+                data: $('#shen').serialize(),
+                // contentType: "application/json;charset=utf-8",
                 type: 'post',
                 dataType: 'json',
                 headers: {
                     "X-CSRFToken": csrftoken
                 },
                 success: function success(data) {
-                    console.log(data)
+                    console.log(data);
+                    alarms(data.msg)
                 },
                 error: function (data) {
-                    console.log(data)
+                    console.log(data);
                 },
             });
             return false;
         });
+
         $("#unregist").click(function () {
             var module_name = $("#module").val();
             var config = $("#config_name").val();
 
-            var data = {
+            var json_data = {
                 "module": module_name,
                 "config": config
-                };
+            };
+
             $.ajax({
                 url: "{{url_for('cs.unregist')}}",
-                data: JSON.stringify(data),
+                data: JSON.stringify(json_data),
                 contentType: "application/json;charset=utf-8",
                 type: 'post',
                 dataType: 'json',
@@ -175,6 +194,7 @@
                 },
                 success: function success(data) {
                     console.log(data)
+                    error(data.msg)
                 },
                 error: function (data) {
                     console.log(data)
@@ -182,16 +202,6 @@
             });
             return false;
         });
-
-
-
-
     });
-
-
-
-
-    
-
 </script>
 {% endblock %}

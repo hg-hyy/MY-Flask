@@ -50,16 +50,16 @@
             </thead>
             <tbody id='opc_da_config'>
                 {% for k,v in basic_config.items()%}
-                  <tr>
-                      
-                      <td class="table-info">
-                          {{k}}
-                      </td>
-                      <td class="table-success">
-                          {{v}}
-                      </td>
-                  </tr>
-                  {%endfor%}
+                <tr>
+
+                    <td class="table-info">
+                        {{k}}
+                    </td>
+                    <td class="table-success">
+                        {{v}}
+                    </td>
+                </tr>
+                {%endfor%}
             </tbody>
         </table>
     </div>
@@ -134,14 +134,15 @@
             },
         });
     }
-    
-    
+
+
     function get_config() {
-        var modlue = $("#module").val()
+        var module_name = $("#module").val()
+
         $.ajax({
             url: "{{url_for('cs.get_config')}}",
             data: {
-                'modlue': modlue
+                'module': module_name
             },
             type: 'post',
             headers: {
@@ -159,7 +160,7 @@
         console.log(data)
         var $comm = '';
         for (odc in data.basic_config) {
-            $comm += 
+            $comm +=
                 '<tr>' +
                 '<td scope="row" class="table-info">' + odc.substring(0) + '</td>' +
                 '<td scope="row" class="table-success">' + data.basic_config[odc] + '</td>' +

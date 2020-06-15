@@ -4,11 +4,11 @@
 <style type="text/css"></style>
 {% endblock %}
 {% block content %}
-<div class="jumbotron">
+<div class="jumbotron p-4">
   <div class=" row justify-content-md-end ">
-
-    <img src="{{url_for('static',filename='pic/logo.png')}}" class="img-fluid" alt="Responsive image" />
+    <img src="{{url_for('static',filename='pic/logo.png')}}" class="img-fluid p-0 m-0" alt="Responsive image" />
   </div>
+
   <h1 class="display-3  py-3 my-3">Hello, OPCer! Welcome to <span class="badge badge-info">Configuration Studio.</span>
   </h1>
   <blockquote class="blockquote text-right ">
@@ -28,14 +28,17 @@
 
     <footer class="blockquote-footer">Power by <cite title="Source Title">冒险湾一狗</cite></footer>
   </blockquote>
+
   <hr class="my-4">
-  <h5 class="display-5 mb-3">——>点击下面的按钮开始配置之旅<——</h5> <p class="lead">
-      <a class="btn btn-info btn-lg" href="{{ url_for('cs.module_reg') }}" role="button"
-        onclick="alarm()">{{name}}の系统注册</a>
-      <a class="btn btn-success btn-lg" href="{{ url_for('cs.load_opc_da') }}" role="button">{{name}}のOPC配置</a>
-      <a class="btn btn-primary btn-lg" href="{{ url_for('cs.load_modbus') }}" role="button">{{name}}のModbus配置</a>
-      <a class="btn btn-danger btn-lg" href="{{ url_for('cs.load_modbus') }}" role="button">{{name}}の随便看看</a>
-      </p>
+
+  <h5 class="display-5 mb-3"> ——>点击下面的按钮开始配置之旅<—— </h5> <a class="btn btn-info btn-lg"
+      href="{{ url_for('cs.module_reg') }}" role="button">の系统注册</a>
+      <a class="btn btn-success btn-lg" href="{{ url_for('cs.load_opc_da') }}" role="button">のOPC配置</a>
+      <a class="btn btn-primary btn-lg" href="{{ url_for('cs.load_modbus') }}" role="button">のModbus配置</a>
+      <a class="btn btn-danger btn-lg" onclick="error('hello,world!')" role="button">の随便看看</a>
+      <a class="btn btn-danger btn-lg" href="{{ url_for('auth.comment') }}" role="button">我の吐槽</a>
+      <a class="btn btn-danger btn-lg" href="{{ url_for('auth.sign') }}">sign</a>
+
 
       {% with errors = get_flashed_messages(category_filter=["error"]) %}
       {% if errors %}
@@ -50,21 +53,44 @@
       {% endif %}
       {% endwith %}
 
+      <!-- <ul class="nav flex-column" id='es6'>
+      </ul> -->
 
-      <ul class="nav flex-column" id='es6'>
-
-      </ul>
-
-      <button onclick="error('hello')" class="btn btn-outline-info">alarm</button>
-      <button onclick="sus('hello')" class="btn btn-outline-info">success</button>
 </div>
 
+
+
+<script>
+  var csrftoken = $("meta[name=csrf-token]").attr("content");
+
+  function regoogle() {
+    console.log('开始请求');
+    $.ajax({
+      url: "https://www.google.com/recaptcha/api/siteverify",
+      data: {
+        'secret': '6LfGgaQZAAAAALFg29Ktye6qiinyqwIhj-xqmYO5',
+        'response': 'srrbrebntrntrnrntntntnt'
+      },
+      type: 'post',
+      headers: {
+        "X-CSRFToken": csrftoken,
+        'Access-Control-Allow-Origin':'*'
+      },
+      dataType: 'json',
+      success: function (ata) {
+        console.log(data)
+      },
+      error: function (data) {
+        console.log(data);
+      },
+    });
+  }
+</script>
 <script type="module">
 
   import {route} from  "{{url_for('static',filename='js/route.js')}}"
   var $comm=''
-route.map( (item,index) => {
-    console.log(item.url,index);
+    route.map( (item,index) => {
     $comm+=
     '<li class="nav-item">' +
       '<a class="nav-link border-bottom" href="'+item.url+'"'+'"style="font-size: x-large;font-style: italic;font-family: cursive;">'+

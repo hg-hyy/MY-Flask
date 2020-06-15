@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% block title %}Home{% endblock %}
 {% block head %}
+
 <style>
   .text-center {
     margin-top: 65px;
@@ -20,6 +21,7 @@
       <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
       {{form.username}}
       {{form.password}}
+      {{ form.recaptcha }}
       {{form.remember_me}}
       {{form.remember_me.label}}
       <p class="text-danger">{{error_msg}}</p>

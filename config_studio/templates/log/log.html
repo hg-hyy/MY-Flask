@@ -16,7 +16,33 @@
 <div class="row">
     <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 text-center">
         <!-- 参数表 -->
+        <form role="form" method='GET' action="#" id='checklog'>
+            
 
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mb-3">
+                <div class="form-group form-inline mb-0">
+                    <label class="form-input-label mr-1" for="log_level1">日志级别:</label>
+                    <select class="form-control mr-1 col-3" id="log_level1" name='log_level'>
+                        <option selected>info</option>
+                        <option>error</option>
+                        <option>all</option>
+                    </select>
+                    <label class="form-input-label mr-1" for="log_day">日期:</label>
+                    <input class="form-control col-3" type="text" name="log_day" id="log_day" value="">
+                    <a class="btn btn-outline-success ml-1" onclick="selectlog()">提交</a>
+                </div>
+                <div class="btn-toolbar ">
+                    <div class="btn-group mr-2">
+                        <button type="button" class="btn btn-sm btn-outline-secondary">Share</button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary">Export</button>
+                    </div>
+                    <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle">
+                        <span data-feather="calendar"></span>
+                        This week
+                    </button>
+                </div>
+            </div>
+        </form>
         <div class="input-group mb-3">
             <div class="input-group-prepend">
                 <span class="input-group-text">日志时间</span>
@@ -102,6 +128,20 @@
 </div>
 <script>
     var csrftoken = $("meta[name=csrf-token]").attr("content");
+
+
+
+    $(function () {
+        $("#log_day").datetimepicker({
+            timepicker: false,
+            format: 'Y-m-d',
+            theme: 'dark',
+            lang: 'zh',
+        });
+        // $.datetimepicker.setLocale('zh');
+    });
+
+
 
     function Search(obj) {
         var tagname = $("#tagname").val();

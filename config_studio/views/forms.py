@@ -5,13 +5,15 @@ from pathlib import Path
 from werkzeug.utils import secure_filename
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileRequired, FileAllowed
+from flask_wtf.recaptcha import RecaptchaField
 from wtforms import widgets
 from wtforms import StringField
-from wtforms.validators import DataRequired, Regexp, Length, IPAddress, ValidationError
+from wtforms.validators import DataRequired, Regexp, Length, IPAddress, ValidationError,InputRequired,Email 
 from wtforms import PasswordField, SubmitField, RadioField
 from wtforms import BooleanField
 from wtforms.fields import core
-
+from wtforms import TextAreaField
+from wtforms.fields.html5 import EmailField
 
 
 
@@ -53,21 +55,21 @@ class UserForm(FlaskForm):
                                'class': 'offset-1 form-control form-control-lg mb-3 w-50 ', 'placeholder': 'foo@example.com'}
                            )
     gender = core.RadioField(
-            label="性别",
-            choices=(
-                (1,"男"),
-                (2,"女"),
-            ),
-            coerce=int,  #限制是int类型的
-            default = [1]
-        )
+        label="性别",
+        choices=(
+                (1, "男"),
+                (2, "女"),
+        ),
+        coerce=int,  # 限制是int类型的
+        default=[1]
+    )
     city = core.SelectField(
-            label="城市",
-            choices=(
-                ("bj","北京"),
-                ("sh","上海"),
-            )
+        label="城市",
+        choices=(
+                ("bj", "北京"),
+                ("sh", "上海"),
         )
+    )
     # def validate_email(self, field):
     #     if User.objects.filter(email=field.data).count() > 0:
     #         raise ValidationError('Email already registered')
@@ -76,17 +78,20 @@ class UserForm(FlaskForm):
     #     if User.objects.filter(username=field.data).count() > 0:
     #         raise ValidationError('Username has exist')
 
-#自定义验证
-def my_length_check(form, field):
-    if len(field.data) > 10:
+# 自定义验证
+
+
+def username_length_check(form, field):
+    if len(field.data) > 50:
         raise ValidationError('Field must be less than 50 characters')
 
 
 class LoginForm(FlaskForm):
     username = StringField('name',
-                           validators=[DataRequired(),my_length_check],
+                           validators=[DataRequired(), username_length_check],
                            widget=widgets.TextInput(),
-                           render_kw={'class': 'form-control form-control-lg','placeholder':'Email address','required':'required'}
+                           render_kw={'class': 'form-control form-control-lg',
+                                      'placeholder': 'Email address', 'required': 'required'}
                            )
     password = PasswordField('password',
                              validators=[DataRequired(),
@@ -96,8 +101,10 @@ class LoginForm(FlaskForm):
                                          #          message='密码至少8个字符，至少1个大写字母，1个小写字母，1个数字和1个特殊字符')
                                          ],
                              widget=widgets.PasswordInput(),
-                             render_kw={'class': 'form-control form-control-lg my-3','placeholder':'password', 'required':'required'}
+                             render_kw={'class': 'form-control form-control-lg my-3',
+                                        'placeholder': 'password', 'required': 'required'}
                              )
+    recaptcha = RecaptchaField()
 
     remember_me = BooleanField(label='remember me')
 
@@ -121,3 +128,21 @@ class OpcForm(FileForm):
                          render_kw={
                              'class': 'offset-1 form-control form-control-lg mb-1 w-50', 'placeholder': 'foo'}
                          )
+
+
+class CommentForm(FlaskForm):
+
+    comment = TextAreaField("Comment", validators=[DataRequired()])
+    recaptcha = RecaptchaField()
+
+class ContactForm(FlaskForm):
+    name = StringField("Name", validators=[
+                       InputRequired('Please enter your name.')])
+    email = EmailField("Email", validators=[InputRequired(
+        "Please enter your email address."), Email("Please enter your email address.")])
+    subject = StringField("Subject", validators=[
+                          InputRequired("Please enter the subject.")])
+    message = TextAreaField("Message", validators=[
+                            InputRequired("Please enter your message.")])
+    recaptcha = RecaptchaField()
+    submit = SubmitField("Send")

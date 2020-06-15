@@ -15,8 +15,11 @@
     <script src="{{ url_for('static', filename='js/axios.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/feather.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/alerts.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/jquery.datetimepicker.full.min.js') }}"></script>
+    <script src='//recaptcha.net/recaptcha/api.js'></script> 
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.css') }}" />
     <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/jquery.datetimepicker.min.css') }}">
 
     {% block head %}{% endblock %}
     <style>
@@ -136,6 +139,13 @@
                                 log
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link border-bottom" href="{{url_for('cs.log1')}} "
+                                style="font-size: x-large;font-style: italic;font-family: cursive;">
+                                <span data-feather="hard-drive" style="width: 16px; height: 16px;color:black;"></span>
+                                log1
+                            </a>
+                        </li>
                         <h2
                             class="sidebar-heading d-flex justify-content-between align-items-center p-3 mt-4 mb-1 text-muted border-bottom ">
                             <span>login</span>
@@ -155,9 +165,138 @@
 
                 {% block content %}{% endblock %}
                 <div style="position: fixed;top: 60px;right: 30px;" id='alarm'></div>
+        <!--页脚-->
+        <div class="container-fluid">
+
+            <footer class="pt-5 mt-5  border-top ">
+                <div class="row">
+                    <div class="col-12 col-md">
+                        <img class="mb-2"   src="{{url_for('static',filename='pic/CL1.jpg')}}" alt="" width="200" height="200">
+                        <!-- <small class="d-block mb-3 text-muted">&copy; 2019-10-03</small> -->
+                    </div>
+                    <div class="col-6 col-md">
+                        <h5>Features</h5>
+                        <ul class="list-unstyled text-small">
+                            <li><a class="text-muted" href="#">Cool stuff</a></li>
+                            <li><a class="text-muted" href="#">Random feature</a></li>
+                            <li><a class="text-muted" href="#">Team feature</a></li>
+                            <li><a class="text-muted" href="#">Stuff for developers</a></li>
+                            <li><a class="text-muted" href="#">Another one</a></li>
+                            <li><a class="text-muted" href="#">Last time</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-6 col-md">
+                        <h5>Resources</h5>
+                        <ul class="list-unstyled text-small">
+                            <li><a class="text-muted" href="#">Resource</a></li>
+                            <li><a class="text-muted" href="#">Resource name</a></li>
+                            <li><a class="text-muted" href="#">Another resource</a></li>
+                            <li><a class="text-muted" href="#">Final resource</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-6 col-md">
+                        <h5>About</h5>
+                        <ul class="list-unstyled text-small">
+                            <li><a class="text-muted" href="#">Team</a></li>
+                            <li><a class="text-muted" href="#">Locations</a></li>
+                            <li><a class="text-muted" href="#">Privacy</a></li>
+                            <li><a class="text-muted" href="#">Terms</a></li>
+                        </ul>
+                    </div>
+                </div>
+    
+                <div class="row p-2" style="background:linear-gradient(to right,#BFF098, #6FD6FF);">
+                    <div class="mx-auto w-auto">
+                        <span>Copyright © <a href="http://www.youzhan.org">天使精选</a></span> |
+                        <span><a href="http://www.miibeian.gov.cn/" target="_blank">ICP备11008151号</a></span>
+                    </div>
+                </div>
+    
+            </footer>
+    
+        </div>
+
             </main>
         </div>
     </div>
+
+
+
+        <!--modal-FAQ-->
+        <div class="helper" id='helper'>
+            <a href="#FAQ" data-toggle="modal">
+                <span class="fas fa-comments-dollar fa-3x" style="color:dodgerblue;"></span>
+            </a>
+        </div>
+        <div class="modal fade in " id="FAQ" tabindex="-1" role="dialog" aria-labelledby="FAQ">
+            <div class="modal-dialog modal-sm" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="myModalLabel">Can I help U ?</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <textarea class="form-control" rows="10" placeholder="Do you have some FAQ ?"></textarea>
+                    </div>
+    
+                    <div class="modal-footer ">
+                        <button class="btn btn-primary" type="submit">Send</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--model-登录框-->
+        <div class="modal fade in " id="loginModal" tabindex="-1" role="dialog" aria-labelledby="loginModal">
+            <div class="modal-dialog modal-dialog-centered " role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="myModalLabel">请登录~</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span class="fas fa-power-off"></span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+    
+                        <form class="form-signin" action="" method="post">
+                            
+                            <div class="text-center mb-4">
+                                <img width="72" height="72" class="mb-4" alt=""
+                                    src="{{url_for('static',filename='pic/bootstrap-solid.svg')}}">
+                                <h1 class="h3 mb-3 font-weight-normal">Floating labels</h1>
+                                <p>Build form controls with floating labels via the <code>:placeholder-shown</code>
+                                    pseudo-element. <a href="https://caniuse.com/#feat=css-placeholder-shown">Works in
+                                        latest Chrome, Safari, and
+                                        Firefox.</a></p>
+                            </div>
+    
+                            <div class="form-label-group" style="margin-bottom:1rem">
+                                <input class="form-control form-control-lg" id="username1" autofocus="" required=""
+                                    type="text" placeholder="Username" name="username">
+                                <label for="username" style="display: none">Username</label>
+                            </div>
+    
+                            <div class="form-label-group" style="margin-bottom:1rem">
+                                <input class="form-control form-control-lg" id="password1" required="" type="password"
+                                    placeholder="Password" name="password">
+                                <label for="password" style="display: none">Password</label>
+                            </div>
+    
+                            <div class="checkbox mb-3">
+                                <label>
+                                    <input type="checkbox" value="remember-me"> Remember me
+                                    <a href="{{url_for('auth.login')}}">忘记密码?</a>
+                                </label>
+                            </div>
+                            <input class="btn btn-lg btn-primary btn-block" type="submit" value="Submit">
+                            <input type="hidden" name="next" value="" />
+                        </form>
+                    </div>
+                    <div class="modal-footer">欢迎登机</div>
+                </div>
+            </div>
+        </div>
     <script>
         feather.replace()
 
@@ -174,6 +313,13 @@
             $(".alert").alert('close');
         }
     </script>
+
+
+
+
+
+
+
 </body>
 
 </html>

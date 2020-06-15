@@ -21,7 +21,8 @@ import linecache
 import requests
 from flask import Blueprint
 from config_studio import conf_path, log_path, log
-
+import jwt
+import datetime
 
 """
 ##################################### 基础配置 #########################################
@@ -34,10 +35,10 @@ cs = Blueprint("cs", __name__)
 p = Path(conf_path)
 
 
-regist_url = 'http://192.168.20.114/s_config/v1.0/regist'
-unregist_url = 'http://192.168.20.114/s_config/v1.0/unregist'
-getconfig_url = 'http://192.168.20.114/s_config/v1.0/get_config'
-setconfig_url = 'http://192.168.20.114/s_config/v1.0/set_config'
+regist_url = 'http://127.0.0.1:40200/s_config/v1.0/regist_config'
+unregist_url = 'http://127.0.0.1:40200/s_config/v1.0/unregist_config'
+getconfig_url = 'http://127.0.0.1:40200/s_config/v1.0/get_configs'
+setconfig_url = 'http://127.0.0.1:40200/s_config/v1.0/set_configs'
 
 client = [
     's_opcda_client1',
@@ -48,7 +49,9 @@ client = [
     's_opcae_client3'
 ]
 
-
+server = ['s_opcda_server1',
+          's_opcda_server2',
+          's_opcda_server3']
 opc = [
     's_opcda_server1',
     's_opcda_server2',
@@ -60,6 +63,7 @@ opc = [
     's_opcae_client2',
     's_opcae_client3'
 ]
+
 modbus = ['modbus1', 'modbus2']
 
 
@@ -206,55 +210,62 @@ def read_opc_config(cfg_msg, module):
 
 
 def decode_config(cfg_msg, module):
+    if cfg_msg:
+        tag_list = []
 
-    tag_list = []
-    if module in ['s_opcda_client1', 's_opcda_client1', 's_opcda_client1']:
-        groups = cfg_msg['data'][module+'.groups']
-        group_id = groups['group_id']
-        group_name = groups['group_name']
-        collect_cycle = groups['collect_cycle']
-        tag_list.append(groups['tags'])
+        header = cfg_msg[module[:-1]+'_run_config.json']
+        if module in ['s_opcda_client1', 's_opcda_client2', 's_opcda_client3']:
 
-        main_server_ip = cfg_msg[module+'.main_server_ip']
-        main_server_prgid = cfg_msg[module+'.main_server_prgid']
-        main_server_clsid = cfg_msg[module+'.main_server_clsid']
-        main_server_domain = cfg_msg[module+'.main_server_domain']
-        main_server_user = cfg_msg[module+'.main_server_user']
-        main_server_password = cfg_msg[module+'.main_server_password']
-        bak_server_ip = cfg_msg[module+'.bak_server_ip']
-        bak_server_prgid = cfg_msg[module+'.bak_server_prgid']
-        bak_server_clsid = cfg_msg[module+'.bak_server_clsid']
-        bak_server_domain = cfg_msg[module+'.bak_server_domain']
-        bak_server_username = cfg_msg[module+'.bak_server_user']
-        bak_server_password = cfg_msg[module+'.bak_server_password']
+            groups = header['groups']
+            if groups:
+                for g in eval(groups):
+                    group_id = g['group_id']
+                    group_name = g['group_name']
+                    collect_cycle = g['collect_cycle']
+                    tag_list.append(g['tags'])
 
-        opc_config = {
-            'main_server_ip': main_server_ip,
-            'main_server_progid': main_server_prgid,
-            'main_server_classid': main_server_clsid,
-            'main_server_domain': main_server_domain,
-            'main_server_username': main_server_user,
-            'main_server_password': main_server_password,
-            'bak_server_ip': bak_server_ip,
-            'bak_server_prgid': bak_server_prgid,
-            'bak_server_clsid': bak_server_clsid,
-            'bak_server_domain': bak_server_domain,
-            'bak_server_username': bak_server_username,
-            'bak_server_password': bak_server_password
-        }
+            main_server_ip = header['main_server_ip']
+            main_server_prgid = header['main_server_prgid']
+            main_server_clsid = header['main_server_clsid']
+            main_server_domain = header['main_server_domain']
+            main_server_user = header['main_server_user']
+            main_server_password = header['main_server_password']
+            bak_server_ip = header['bak_server_ip']
+            bak_server_prgid = header['bak_server_prgid']
+            bak_server_clsid = header['bak_server_clsid']
+            bak_server_domain = header['bak_server_domain']
+            bak_server_username = header['bak_server_user']
+            bak_server_password = header['bak_server_password']
 
-        return {'tag_list': tag_list, 'opc_config': opc_config}
+            opc_config = {
+                'main_server_ip': main_server_ip,
+                'main_server_progid': main_server_prgid,
+                'main_server_classid': main_server_clsid,
+                'main_server_domain': main_server_domain,
+                'main_server_username': main_server_user,
+                'main_server_password': main_server_password,
+                'bak_server_ip': bak_server_ip,
+                'bak_server_prgid': bak_server_prgid,
+                'bak_server_clsid': bak_server_clsid,
+                'bak_server_domain': bak_server_domain,
+                'bak_server_username': bak_server_username,
+                'bak_server_password': bak_server_password,
+                'groups': groups
+            }
 
-    else:
-        enAutoTag = cfg_msg['data']['enAutoTag']
-        isDataConvert = cfg_msg['data']['isDataConvert']
-        tag_list = cfg_msg['data'][module+'.tags']
-        opc_config = {
-            'enAutoTag': enAutoTag,
-            'isDataConvert': isDataConvert
-        }
+            return {'tag_list': tag_list, 'basic_config': opc_config}
 
-        return {'tag_list': tag_list, 'opc_config': opc_config}
+        else:
+            enAutoTag = header['enAutoTag']
+            isDataConvert = header['isDataConvert']
+            tag_list.append(header['tags'])
+            opc_config = {
+                'enAutoTag': enAutoTag,
+                'isDataConvert': isDataConvert
+            }
+
+            return {'tags': tag_list, 'basic_config': opc_config}
+    return {'tags': {}, 'basic_config': {}}
 
 
 def call_s_config(ref_url, json_data):
@@ -265,9 +276,9 @@ def call_s_config(ref_url, json_data):
             url=ref_url, data=data, headers=headers, timeout=5)
         stu = False
         res = {}
-        if response.status_code == 200 and json.loads(response.text)["code"] == 1000:
+        if response.status_code == 200 and response.json()["code"] == 1000:
             stu = True
-            res = json.loads(response.text)["data"]
+            res = response.json()['data']
             return res, stu
         else:
             res, stu
@@ -327,7 +338,7 @@ def search():
 
 
 """
-##################################### config_setting ########################################
+##################################### config_setting ###############################
 
 """
 
@@ -377,7 +388,7 @@ def load_opc_sev():
         with open(conf_path+"s_opcda_server_run_config.json", 'w', encoding='utf-8') as f:
             f.write(json.dumps(res, ensure_ascii=False,
                                sort_keys=False, indent=4))
-        log.debug(f'保存{module}配置成功')
+        set_config(res, module)
         return render_template("opc/opc_show.html", basic_config=basic_config)
     return render_template("opc/opc_se_index.html")
 
@@ -468,7 +479,7 @@ def load_opc_da():
         with open(conf_path+"s_opcda_client_run_config.json", 'w', encoding='utf-8') as f:
             f.write(json.dumps(res, ensure_ascii=False,
                                sort_keys=False, indent=4))
-        log.debug(f'保存{module}配置成功')
+        set_config(res, module)
         return render_template("opc/opc_show.html", basic_config=dict1)
     return render_template("opc/opc_da_index.html")
 
@@ -572,7 +583,7 @@ def load_modbus():
             ncols = st.ncols
             d_type_1 = ['INT16', 'UINT16']
             d_type_2 = ['INT32', 'UINT32', 'FLOAT', 'DOUBLE']
-            
+
             data_dict = {}
             block = []
             block_dict = {}
@@ -607,9 +618,9 @@ def load_modbus():
             f.write(json.dumps(res, ensure_ascii=False,
                                sort_keys=False, indent=4))
         cfg_msg = read_json(module)
-        tags, basic_config = read_modbus_config(cfg_msg,module)
+        tags, basic_config = read_modbus_config(cfg_msg, module)
         log.debug(f'保存{module}配置成功')
-        return render_template('opc/opc_show.html',basic_config=basic_config)
+        return render_template('opc/opc_show.html', basic_config=basic_config)
     return render_template('modbus/modbus_index.html')
 
 
@@ -626,32 +637,125 @@ def module_reg():
 
 @ cs.route('/regist', methods=['GET', 'POST'], endpoint='regist')
 def regist():
-    if requests.method == 'POST':
-        module = requests.json.get['module']
-        res, stu = call_s_config(unregist_url, module)
+    if request.method == 'POST':
+        print(request.form)
+        # json_data = request.json
+        # module = json_data['module']
+        module = request.form['module']
+
+        opc_server_config = {
+            module[:-1]+"_run_config.json": {
+                "enAutoTag": "int",
+                "isDataConvert": "int",
+                "tags": "list"
+            }
+        }
+        opc_da_client_config = {
+            module[:-1]+"_run_config.json": {
+                "main_server_ip": "string",
+                "main_server_prgid": "string",
+                "main_server_clsid": "string",
+                "main_server_domain": "string",
+                "main_server_user": "string",
+                "main_server_password": "string",
+                "bak_server_ip": "string",
+                "bak_server_prgid": "string",
+                "bak_server_clsid": "string",
+                "bak_server_domain": "string",
+                "bak_server_user": "string",
+                "bak_server_password": "string",
+                "groups": "list"
+            }
+        }
+        opc_ae_client_config = {
+            module[:-1]+"_run_config.json": {
+                "main_server_ip": "string",
+                "main_server_prgid": "string",
+                "main_server_clsid": "string",
+                "main_server_domain": "string",
+                "main_server_user": "string",
+                "main_server_password": "string",
+                "bak_server_ip": "string",
+                "bak_server_prgid": "string",
+                "bak_server_clsid": "string",
+                "bak_server_domain": "string",
+                "bak_server_user": "string",
+                "bak_server_password": "string",
+                "subscriptions": "list"
+            }
+        }
+        modbus_config = {
+            module[:-1]+"_run_config.json": {
+                "dev_id": "string",
+                "Coll_Type": "string",
+                "TCP": {
+                    "host": "string",
+                    "port": "string"
+                },
+                "RTU": {
+                    "serial": "string",
+                    "baud": "string",
+                    "data_bit": "string",
+                    "stop_bit": "string",
+                    "parity": "string"
+                },
+                "data": "list",
+            }
+        }
+        modules = {'s_opcda_server': opc_server_config,
+                   's_opcae_server': '',
+                   's_opcda_client': opc_da_client_config,
+                   's_opcae_client': opc_ae_client_config,
+                   'modbus': modbus_config}
+        config = modules.get(module[:-1], '')
+        print(config)
+        # if module in server:
+
+        #     json_data = {
+        #         "module": request.form['module'],
+        #         "url": request.form['resful_url'],
+        #         "config":  opc_server_config
+        #     }
+        # else:
+        #     json_data = {
+        #         "module": request.form['module'],
+        #         "url": request.form['resful_url'],
+        #         "config":  opc_da_client_config
+        #     }
+        json_data = {
+            "module": request.form['module'],
+            "url": request.form['resful_url'],
+            "config":  config
+        }
+        res, stu = call_s_config(regist_url, json_data)
         if stu:
             log.debug(f'{module}模块注册成功')
+            return {'success': True, 'msg': f'{module}模块注册成功'}
         else:
             log.debug(f'{module}模块注册失败')
+            return {'success': True, 'msg': f'{module}模块注册失败'}
 
     return render_template('reg/register.html')
 
 
 @ cs.route('/unregist', methods=['GET', 'POST'], endpoint='unregist')
 def unregist():
-    if requests.method == 'POST':
-        module = requests.json.get['module']
-        res, stu = call_s_config(regist_url, module)
+    if request.method == 'POST':
+        json_data = request.json
+        module = json_data['module']
+        res, stu = call_s_config(unregist_url, json_data)
         if stu:
             log.debug(f'{module}模块注销成功')
+            return {'success': True, 'msg': f'{module}模块注销成功'}
         else:
             log.debug(f'{module}模块注销失败')
+            return {'success': True, 'msg': f'{module}模块注销失败'}
 
     return render_template('reg/register.html')
 
 
 """
-##################################### review_config ########################################
+##################################### review_config ################################
 
 """
 
@@ -718,31 +822,33 @@ def tags_review():
 @ cs.route('/get_config', methods=['GET', 'POST'], endpoint='get_config')
 def get_config():
     if request.method == 'POST':
+        res_msg = {}
         module = request.form['module']
-        res, stu = call_s_config(getconfig_url, module)
+        json_data = {'module': module}
+        res, stu = call_s_config(getconfig_url, json_data)
         if stu:
             res_msg = decode_config(res, module)
-            log.debug(f'获取{module}模块配置成功')
+            log.debug(f'获取{module}模块配置成功{res_msg}')
+            return res_msg
         else:
             log.debug(f'获取{module}模块配置失败{res}')
+            return res_msg
 
     return '不支持的方法'
 
 
-@ cs.route('/set_config', methods=['GET', 'POST'], endpoint='set_config')
-def set_config():
+def set_config(cfg_msg, module):
     if request.method == 'POST':
-        module = request.json.get('module')
-        res, stu = call_s_config(setconfig_url, module)
+        res, stu = call_s_config(setconfig_url, cfg_msg)
         if stu:
-            log.debug(f'获取{module}模块配置成功')
+            log.debug(f'{module}模块配置成功')
         else:
-            log.debug(f'获取{module}模块配置失败{res}')
+            log.debug(f'{module}模块配置失败{res}')
     return '不支持的方法'
 
 
 """
-##################################### 日志查询 #########################################
+##################################### 日志 ###########################################
 
 """
 
@@ -752,6 +858,9 @@ def logs():
     logs_list = []
     with open(log_path+'\\'+'{}.log'.format(time.strftime('%Y-%m-%d')), 'r', encoding='utf-8') as rf:
         logs = rf.read().splitlines()
+    text = linecache.getline(
+        log_path+'\\'+'{}.log'.format(time.strftime('%Y-%m-%d')), 2)
+    print(text)
     for log in logs:
         logs_list.append(log.rsplit(' '))
     return render_template('log/log.html', logs=logs_list)
@@ -766,11 +875,10 @@ def log1():
         loglevel.append(lv.split('-')[0])
     dicts = dict(zip(loglevel, loglist))
     log.debug('注意!'+'在' + time.strftime('%Y-%m-%d %H:%M:%S')+'访问日志系统.')
-    return render_template('log/log.html', **{'dicts': dicts, 'log_level': loglevel})
+    return render_template('log/logs.html', **{'dicts': dicts, 'log_level': loglevel})
+
 
 # 日志查询
-
-
 @ cs.route('/check_log', methods=['GET', 'POST'], endpoint='check_log')
 def check_log():
     if request.method == "GET":
@@ -784,26 +892,7 @@ def check_log():
                 log_list.append(lv)
             elif lv.split('-')[0] == log_level and log_day == '':
                 log_list.append(lv)
-        # print(log_list)
-        log.debug('注意!'+time.strftime('%Y-%m-%d')+'查询日志系统.')
-        # response = {}
-        mydata = [
-            {
-                "ID": 1,
-                "key": 1,
-                "日志级别": log_level,
-                "日志时间": log_day,
-                "详情": '正常',
-            },
-            {
-                "ID": 2,
-                "key": 2,
-                "日志级别": log_level,
-                "日志时间": log_day,
-                "详情": '出错啦',
-            }
-        ]
-        return {'log_level': log_level, 'log_list': log_list, "mydata": mydata}
+        return {'log_level': log_level, 'log_list': log_list}
 
 
 # 日志展示
@@ -830,7 +919,6 @@ def show_log():
         except Exception as e:
             response['msg'] = str(e)
             response['error_num'] = 1000
-        log.debug('日志查询完成')
         return response
 
 

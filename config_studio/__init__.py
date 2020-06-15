@@ -5,12 +5,17 @@ from .views.forms import UserForm
 import logging
 from logging.config import dictConfig
 from flask import g
+from flask_mail import Mail,Message
 import os,time
 from pathlib import Path
 from flask_cors import CORS
 from flask_wtf.csrf import generate_csrf
+import  jwt,datetime
+from flask_wtf.recaptcha import RecaptchaField
 
 
+
+mail = Mail() 
 BASE_DIR = Path(__file__).resolve().parent.parent
 log_path = os.path.join(BASE_DIR, 'logs')
 conf_path = os.path.join(BASE_DIR, 'conf', '')
@@ -20,6 +25,18 @@ if not os.path.exists(log_path):
 
 
 app = Flask(__name__)
+mail.init_app(app) 
+app.config['RECAPTCHA_USE_SSL'] = False 
+app.config['RECAPTCHA_PUBLIC_KEY'] = '6LfGgaQZAAAAAKDGl49W3MUM4EuMRVn4DW17mAdx' 
+app.config['RECAPTCHA_PRIVATE_KEY'] = '6LfGgaQZAAAAALFg29Ktye6qiinyqwIhj-xqmYO5' 
+app.config['RECAPTCHA_OPTIONS'] = {'theme': 'white'} 
+
+
+app.config["MAIL_SERVER"] = "smtp.gmail.com" 
+app.config["MAIL_PORT"] = 465 
+app.config["MAIL_USE_SSL"] = True 
+app.config["MAIL_USERNAME"] = '[email protected]' 
+app.config["MAIL_PASSWORD"] = 'password' 
 
 
 app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
@@ -30,6 +47,7 @@ db = SQLAlchemy(app)
 
 CSRFProtect(app)
 CORS(app)
+
 
 
 dictConfig({
@@ -48,7 +66,7 @@ dictConfig({
         'file': {
             'level': 'DEBUG',
             'class': 'logging.handlers.RotatingFileHandler',
-            'filename': os.path.join(log_path, '{}.log'.format(time.strftime('%Y-%m-%d'))),
+            'filename': os.path.join(log_path, 'DEBUG-{}.log'.format(time.strftime('%Y-%m-%d'))),
             'maxBytes': 1024 * 1024 * 5,  # 文件大小
             'backupCount': 5,  # 备份数
             'formatter': 'default',  # 输出格式
@@ -116,3 +134,36 @@ def login_required(view):
 
     return wrapped_view
 
+
+
+def encode_auth_token(email):
+        # 申请Token,参数为自定义,user_id不必须,此处为以后认证作准备,程序员可以根据情况自定义不同参数
+    """
+    生成认证Token
+    :param user_id: int
+    :param login_time: int(timestamp)
+    :return: string
+    """
+    try:
+
+        headers = {
+            # "typ": "JWT",
+            # "alg": "HS256",
+            "email": email
+        }
+
+        playload = {
+            "headers": headers,
+            "iss": 'hyy',
+            "exp": datetime.datetime.utcnow() + datetime.timedelta(days=0, hours=0, minutes=30, seconds=0),
+            'iat': datetime.datetime.utcnow()
+        }
+
+        signature = jwt.encode(
+            playload, app.secret_key, algorithm='HS256')
+
+        return signature
+    except Exception as e:
+        return e
+
+token = str(encode_auth_token('hyy'), encoding='utf-8')

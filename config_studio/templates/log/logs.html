@@ -1,0 +1,243 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container-fluid">
+
+    <div class="jumbotron py-5 mb-0">
+        <form role="form" method='GET' action="#" id='checklog'>
+        
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mb-3">
+                <div class="form-group form-inline mb-0">
+                    <label class="form-input-label mr-1" for="log_level1">日志级别:</label>
+                    <select class="form-control mr-1 col-3" id="log_level1" name='log_level'>
+                        <option selected>DEBUG</option>
+                        <option>ERROR</option>
+                        <option>INFO</option>
+                    </select>
+                    <label class="form-input-label mr-1" for="log_day">日期:</label>
+                    <input class="form-control col-3" type="text" name="log_day" id="log_day" value="">
+                    <a class="btn btn-outline-success ml-1" onclick="selectlog()">提交</a>
+                </div>
+                <div class="btn-toolbar ">
+                    <div class="btn-group mr-2">
+                        <button type="button" class="btn btn-sm btn-outline-secondary">Share</button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary">Export</button>
+                    </div>
+                    <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle">
+                        <span data-feather="calendar"></span>
+                        This week
+                    </button>
+                </div>
+            </div>
+        </form>
+
+        <table class="table">
+            <thead class="thead-dark">
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">日志级别</th>
+                    <th scope="col">日志时间</th>
+                    <th scope="col">操作</th>
+                </tr>
+            </thead>
+            <tbody id='tbody'>
+                {% if dicts %}
+                {% for key,value in dicts.items() %}
+                <tr>
+                    <th scope="row">1</th>
+                    <td>{{key}}</td>
+                    <td id='info'>{{value}}</td>
+                    <td>
+                        <div class="m-2">
+                            <a id="showLogModel1" href="javascript:void(0)"
+                                onclick="showLogModel('{{key}}','{{value}}')">查看
+
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+                {%else%}
+                {% for log_list in log_list %}
+                <tr>
+                    <th scope="row">1</th>
+                    <td>{{log_level}}</td>
+                    <td id='info'>{{log_list}}</td>
+                    <td>
+                        <div class="m-2">
+                            <a id="showLogModel1" href="javascript:void(0)"
+                                onclick="showLogModel('{{log_level}}','{{log_list}}')">查看
+
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+                {%endif%}
+            </tbody>
+        </table>
+    </div>
+</div>
+<!--日志展示-->
+<div class="modal fade" id="LogModel" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog  modal-sm modal-dialog-centered" style="max-width:1000px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="myModalLabel">
+                    <p style="font-size: medium">日志详情</p>
+                </h3>
+            </div>
+            <div class="modal-body">
+                <form role="form" method='POST' action="#" id='showlog'>
+                    
+                    <div class="form-group form-inline">
+                        <label class="form-input-label mr-1" for="log_level">日志级别：</label>
+                        <input id="log_level" type="text"
+                            class=" form-control col-1 {% if log_level == 'error'%} text-danger  {%else%} text-{{log_level}} bg-{{log_level}} {%endif%}"
+                            name="log_level">
+                    </div>
+                    <div class="form-group">
+                        <textarea id="log_text" rows="20" type="text" class="form-control text-{{log_level}}"
+                            name="log_text" placeholder="" spellcheck="false">
+                        </textarea>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-success" onclick="hideLogModel()">
+                            关闭
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>
+
+<script>
+    $(function () {
+        $("#log_day").datetimepicker({
+            timepicker: false,
+            format: 'Y-m-d',
+            theme: 'dark',
+            lang: 'zh',
+        });
+        // $.datetimepicker.setLocale('zh');
+    });
+
+    //显示日志模态框
+    function showLogModel(key, value) {
+        $('#LogModel').modal("show");
+        showLog(key, value);
+
+    }
+
+    function hideLogModel() {
+        $('#LogModel').modal("hide");
+    }
+
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie != '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = jQuery.trim(cookies[i]);
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    function csrfSafeMethod(method) {
+        // these HTTP methods do not require CSRF protection
+        return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+    }
+    // 日志展示
+
+    function showLog(log_level, log_name) {
+        $.ajax({
+            url: "{{url_for('cs.show_log')}}",
+            type: 'GET',
+            data: {
+                log_level: log_level,
+                log_name: log_name
+            },
+            dataType: 'json',
+            // async:false,
+            beforeSend: function (xhr, settings) {
+                var csrftoken = getCookie('csrftoken');
+                if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                }
+            },
+            success: function (data) {
+                // var parseJson = $.parseJSON(data)
+                // var parseJson = JSON.parse(data)
+                // var log_level = parseJson.log_level
+                // var log_text = parseJson.log_text
+                $("#log_level").val(data.log_level);
+                $("#log_text").val(data.log_text);
+                var ta = document.getElementById('log_text');
+                ta.scrollTop = ta.scrollHeight; //定位到最后
+                return false;
+            },
+            error: function (data) {
+                alert("查询失败");
+            },
+            complete: function () {
+                hideLogModel()
+                return false;
+            },
+        });
+
+    }
+
+
+    function selectlog() {
+        $.ajax({
+            url: "{{url_for('cs.check_log')}}",
+            type: 'GET',
+            data: $('#checklog').serialize(),
+            dataType: 'json',
+            // async:false,
+            beforeSend: function (xhr, settings) {
+                var csrftoken = getCookie('csrftoken');
+                if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                }
+            },
+            success: function (data) {
+                var $comm = '';
+                console.log(data)
+                var count = data.log_list.length
+                if (count > 0) {
+                    for (var i = 1; i < count+1; i++) {
+                        $comm +=
+                            '<tr> ' +
+                            '<th> ' + i +
+                            '<td> ' + data.log_level +
+                            '</td>' +
+                            '<td> ' + data.log_list[i-1] +
+                            '</td>' +
+                            '<td> ' + `<a href="javascript:void(0)" onclick="showLogModel('${data.log_level}','${data.log_list[i-1]}')">
+                                      查看</a>`+
+                            '</td>' +
+                        '</tr>'
+                        var $subject_con = $('#tbody');
+                        $subject_con.html($comm)
+                    }
+                }
+            },
+            error: function (data) {
+                alert("查询失败");
+            },
+            complete: function () {
+                hideLogModel()
+                return false;
+            },
+        });
+
+    }
+</script>
+{% endblock %}
