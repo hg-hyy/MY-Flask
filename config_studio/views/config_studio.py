@@ -35,10 +35,15 @@ cs = Blueprint("cs", __name__)
 p = Path(conf_path)
 
 
-regist_url = 'http://127.0.0.1:40200/s_config/v1.0/regist_config'
-unregist_url = 'http://127.0.0.1:40200/s_config/v1.0/unregist_config'
-getconfig_url = 'http://127.0.0.1:40200/s_config/v1.0/get_configs'
-setconfig_url = 'http://127.0.0.1:40200/s_config/v1.0/set_configs'
+# regist_url = 'http://127.0.0.1:40200/s_config/v1.0/regist_config'
+# unregist_url = 'http://127.0.0.1:40200/s_config/v1.0/unregist_config'
+# getconfig_url = 'http://127.0.0.1:40200/s_config/v1.0/get_configs'
+# setconfig_url = 'http://127.0.0.1:40200/s_config/v1.0/set_configs'
+
+regist_url = 'http://192.168.20.213:40200/s_config/v1.0/regist_config'
+unregist_url = 'http://192.168.20.213:40200/s_config/v1.0/unregist_config'
+getconfig_url = 'http://192.168.20.213:40200/s_config/v1.0/get_configs'
+setconfig_url = 'http://192.168.20.213:40200/s_config/v1.0/set_configs'
 
 client = [
     's_opcda_client1',
@@ -281,7 +286,8 @@ def call_s_config(ref_url, json_data):
             res = response.json()['data']
             return res, stu
         else:
-            res, stu
+            log.debug(response.json()["msg"])
+            return res, stu
     except Exception as error:
         log.error(f'配置异常!原因:{error}')
 
@@ -479,6 +485,8 @@ def load_opc_da():
         with open(conf_path+"s_opcda_client_run_config.json", 'w', encoding='utf-8') as f:
             f.write(json.dumps(res, ensure_ascii=False,
                                sort_keys=False, indent=4))
+        cfg_msg = read_json(module)
+        tags, basic_config = read_modbus_config(cfg_msg, module)
         set_config(res, module)
         return render_template("opc/opc_show.html", basic_config=dict1)
     return render_template("opc/opc_da_index.html")
@@ -537,7 +545,9 @@ def load_opc_ae():
         with open(conf_path+"s_opcae_client_run_config.json", 'w', encoding='utf-8') as f:
             f.write(json.dumps(res, ensure_ascii=False,
                                sort_keys=False, indent=4))
-        log.debug(f'保存{module}配置成功')
+        cfg_msg = read_json(module)
+        tags, basic_config = read_modbus_config(cfg_msg, module)
+        set_config(res, module)
         return render_template("opc/opc_show.html", basic_config=dict1)
     return render_template("opc/opc_ae_index.html")
 
@@ -619,7 +629,7 @@ def load_modbus():
                                sort_keys=False, indent=4))
         cfg_msg = read_json(module)
         tags, basic_config = read_modbus_config(cfg_msg, module)
-        log.debug(f'保存{module}配置成功')
+        set_config(res, module)
         return render_template('opc/opc_show.html', basic_config=basic_config)
     return render_template('modbus/modbus_index.html')
 

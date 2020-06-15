@@ -2,14 +2,14 @@
     "module": "local",
     "data": {
         "s_opcda_client1.main_server_ip": "192.168.31.17",
-        "s_opcda_client1.main_server_prgid": "Kepware.KEPServerEX.V6",
-        "s_opcda_client1.main_server_clsid": "3C5702A2-EB8E-11D4-83A4-00105A984CBD",
+        "s_opcda_client1.main_server_prgid": "OPCSystems.NET.1",
+        "s_opcda_client1.main_server_clsid": "32FB9E42-29D6-4841-9218-9DA5E1515623",
         "s_opcda_client1.main_server_domain": "OPC",
         "s_opcda_client1.main_server_user": "administrator",
         "s_opcda_client1.main_server_password": "12!@QWqw",
         "s_opcda_client1.bak_server_ip": "",
-        "s_opcda_client1.bak_server_prgid": "Intellution.OPCiFIX.1",
-        "s_opcda_client1.bak_server_clsid": "3C5702A2-EB8E-11D4-83A4-00105A984CBD",
+        "s_opcda_client1.bak_server_prgid": "Kepware.KEPServerEX.V6",
+        "s_opcda_client1.bak_server_clsid": "7BC0CC8E-482C-47CA-ABDC-0FE7F9C6E729",
         "s_opcda_client1.bak_server_domain": "OPC1",
         "s_opcda_client1.bak_server_user": "administrator",
         "s_opcda_client1.bak_server_password": "12!@QWqw",
@@ -17,200 +17,84 @@
             {
                 "group_id": "1",
                 "group_name": "group1",
-                "collect_cycle": "15",
+                "collect_cycle": "10",
                 "tags": [
                     {
                         "tag_id": 0,
-                        "publish_tag_name": "FIX.F_1.F_CV",
-                        "source_tag_name": "FIX.F_1.F_CV",
+                        "publish_tag_name": "Local.Test.TagBool.Value",
+                        "source_tag_name": "Local.Test.TagBool.Value",
                         "data_type": "ENUM_INT32"
                     },
                     {
                         "tag_id": 1,
-                        "publish_tag_name": "FIX.F_2.F_CV",
-                        "source_tag_name": "FIX.F_2.F_CV",
+                        "publish_tag_name": "Local.Test.TagByte.Value",
+                        "source_tag_name": "Local.Test.TagByte.Value",
                         "data_type": "ENUM_INT32"
                     },
                     {
                         "tag_id": 2,
-                        "publish_tag_name": "FIX.F_3.F_CV",
-                        "source_tag_name": "FIX.F_3.F_CV",
+                        "publish_tag_name": "Local.Test.TagBytes.Value",
+                        "source_tag_name": "Local.Test.TagBytes.Value",
                         "data_type": "ENUM_INT32"
                     },
                     {
                         "tag_id": 3,
-                        "publish_tag_name": "FIX.F_4.F_CV",
-                        "source_tag_name": "FIX.F_4.F_CV",
+                        "publish_tag_name": "Local.Test.TagDouble.Value",
+                        "source_tag_name": "Local.Test.TagDouble.Value",
                         "data_type": "ENUM_INT32"
                     },
                     {
                         "tag_id": 4,
-                        "publish_tag_name": "FIX.F_5.F_CV",
-                        "source_tag_name": "FIX.F_5.F_CV",
+                        "publish_tag_name": "Local.Test.TagFloat.Value",
+                        "source_tag_name": "Local.Test.TagFloat.Value",
                         "data_type": "ENUM_INT32"
                     },
                     {
                         "tag_id": 5,
-                        "publish_tag_name": "FIX.F_6.F_CV",
-                        "source_tag_name": "FIX.F_6.F_CV",
+                        "publish_tag_name": "Local.Test.TagInt32.Value",
+                        "source_tag_name": "Local.Test.TagInt32.Value",
                         "data_type": "ENUM_INT32"
                     },
                     {
                         "tag_id": 6,
-                        "publish_tag_name": "FIX.F_7.F_CV",
-                        "source_tag_name": "FIX.F_7.F_CV",
+                        "publish_tag_name": "Local.Test.TagLong.Value",
+                        "source_tag_name": "Local.Test.TagLong.Value",
                         "data_type": "ENUM_INT32"
                     },
                     {
                         "tag_id": 7,
-                        "publish_tag_name": "FIX.F_8.F_CV",
-                        "source_tag_name": "FIX.F_8.F_CV",
+                        "publish_tag_name": "Local.Test.TagSByte.Value",
+                        "source_tag_name": "Local.Test.TagSByte.Value",
                         "data_type": "ENUM_INT32"
                     },
                     {
                         "tag_id": 8,
-                        "publish_tag_name": "FIX.F_9.F_CV",
-                        "source_tag_name": "FIX.F_9.F_CV",
+                        "publish_tag_name": "Local.Test.TagShort.Value",
+                        "source_tag_name": "Local.Test.TagShort.Value",
                         "data_type": "ENUM_INT32"
                     },
                     {
                         "tag_id": 9,
-                        "publish_tag_name": "FIX.F_10.F_CV",
-                        "source_tag_name": "FIX.F_10.F_CV",
+                        "publish_tag_name": "Local.Test.TagString.Value",
+                        "source_tag_name": "Local.Test.TagString.Value",
                         "data_type": "ENUM_INT32"
-                    }
-                ]
-            },
-            {
-                "group_id": "2",
-                "group_name": "group2",
-                "collect_cycle": "10",
-                "tags": [
+                    },
                     {
                         "tag_id": 10,
-                        "publish_tag_name": "FIX.F_11.F_CV",
-                        "source_tag_name": "FIX.F_11.F_CV",
+                        "publish_tag_name": "Local.Test.TagUInt32.Value",
+                        "source_tag_name": "Local.Test.TagUInt32.Value",
                         "data_type": "ENUM_INT32"
                     },
                     {
                         "tag_id": 11,
-                        "publish_tag_name": "FIX.F_12.F_CV",
-                        "source_tag_name": "FIX.F_12.F_CV",
+                        "publish_tag_name": "Local.Test.TagULong.Value",
+                        "source_tag_name": "Local.Test.TagULong.Value",
                         "data_type": "ENUM_INT32"
                     },
                     {
                         "tag_id": 12,
-                        "publish_tag_name": "FIX.F_13.F_CV",
-                        "source_tag_name": "FIX.F_13.F_CV",
-                        "data_type": "ENUM_INT32"
-                    },
-                    {
-                        "tag_id": 13,
-                        "publish_tag_name": "FIX.F_14.F_CV",
-                        "source_tag_name": "FIX.F_14.F_CV",
-                        "data_type": "ENUM_INT32"
-                    },
-                    {
-                        "tag_id": 14,
-                        "publish_tag_name": "FIX.F_15.F_CV",
-                        "source_tag_name": "FIX.F_15.F_CV",
-                        "data_type": "ENUM_INT32"
-                    },
-                    {
-                        "tag_id": 15,
-                        "publish_tag_name": "FIX.F_16.F_CV",
-                        "source_tag_name": "FIX.F_16.F_CV",
-                        "data_type": "ENUM_INT32"
-                    },
-                    {
-                        "tag_id": 16,
-                        "publish_tag_name": "FIX.F_17.F_CV",
-                        "source_tag_name": "FIX.F_17.F_CV",
-                        "data_type": "ENUM_INT32"
-                    },
-                    {
-                        "tag_id": 17,
-                        "publish_tag_name": "FIX.F_18.F_CV",
-                        "source_tag_name": "FIX.F_18.F_CV",
-                        "data_type": "ENUM_INT32"
-                    },
-                    {
-                        "tag_id": 18,
-                        "publish_tag_name": "FIX.F_19.F_CV",
-                        "source_tag_name": "FIX.F_19.F_CV",
-                        "data_type": "ENUM_INT32"
-                    },
-                    {
-                        "tag_id": 19,
-                        "publish_tag_name": "FIX.F_20.F_CV",
-                        "source_tag_name": "FIX.F_20.F_CV",
-                        "data_type": "ENUM_INT32"
-                    }
-                ]
-            },
-            {
-                "group_id": "3",
-                "group_name": "group3",
-                "collect_cycle": "10",
-                "tags": [
-                    {
-                        "tag_id": 20,
-                        "publish_tag_name": "FIX.F_21.F_CV",
-                        "source_tag_name": "FIX.F_21.F_CV",
-                        "data_type": "ENUM_INT32"
-                    },
-                    {
-                        "tag_id": 21,
-                        "publish_tag_name": "FIX.F_22.F_CV",
-                        "source_tag_name": "FIX.F_22.F_CV",
-                        "data_type": "ENUM_INT32"
-                    },
-                    {
-                        "tag_id": 22,
-                        "publish_tag_name": "FIX.F_23.F_CV",
-                        "source_tag_name": "FIX.F_23.F_CV",
-                        "data_type": "ENUM_INT32"
-                    },
-                    {
-                        "tag_id": 23,
-                        "publish_tag_name": "FIX.F_24.F_CV",
-                        "source_tag_name": "FIX.F_24.F_CV",
-                        "data_type": "ENUM_INT32"
-                    },
-                    {
-                        "tag_id": 24,
-                        "publish_tag_name": "FIX.F_25.F_CV",
-                        "source_tag_name": "FIX.F_25.F_CV",
-                        "data_type": "ENUM_INT32"
-                    },
-                    {
-                        "tag_id": 25,
-                        "publish_tag_name": "FIX.F_26.F_CV",
-                        "source_tag_name": "FIX.F_26.F_CV",
-                        "data_type": "ENUM_INT32"
-                    },
-                    {
-                        "tag_id": 26,
-                        "publish_tag_name": "FIX.F_27.F_CV",
-                        "source_tag_name": "FIX.F_27.F_CV",
-                        "data_type": "ENUM_INT32"
-                    },
-                    {
-                        "tag_id": 27,
-                        "publish_tag_name": "FIX.F_28.F_CV",
-                        "source_tag_name": "FIX.F_28.F_CV",
-                        "data_type": "ENUM_INT32"
-                    },
-                    {
-                        "tag_id": 28,
-                        "publish_tag_name": "FIX.F_29.F_CV",
-                        "source_tag_name": "FIX.F_29.F_CV",
-                        "data_type": "ENUM_INT32"
-                    },
-                    {
-                        "tag_id": 29,
-                        "publish_tag_name": "FIX.F_30.F_CV",
-                        "source_tag_name": "FIX.F_30.F_CV",
+                        "publish_tag_name": "Local.Test.TagUShort.Value",
+                        "source_tag_name": "Local.Test.TagUShort.Value",
                         "data_type": "ENUM_INT32"
                     }
                 ]
