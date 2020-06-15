@@ -54,7 +54,7 @@ dictConfig({
     'version': 1,
     'formatters': {'default': {
         # 'format': '[%(asctime)s] [%(name)-8s] [%(levelname)-8s]: %(filename)s line:%(lineno)d %(message)s',
-        'format': '[%(asctime)s] [%(levelname)-5s] [%(message)s]',
+        'format': '[%(asctime)s]  [%(levelname)-5s]  [%(message)s]',
         'datefmt': '%Y-%m-%d %H:%M:%S'
     }},
     'handlers': {

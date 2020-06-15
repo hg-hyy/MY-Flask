@@ -23,9 +23,9 @@
                     <div class="form-group form-inline mb-0">
                         <label class="form-input-label mr-1" for="log_level">日志级别:</label>
                         <select class="form-control mr-1 col-2" id="log_level" name='log_level'>
-                            <option selected>INFO</option>
+                            <option>INFO</option>
                             <option>ERROR</option>
-                            <option>DEBUG</option>
+                            <option selected>DEBUG</option>
                         </select>
                         <label class="form-input-label mr-1" for="log_day_start">开始日期:</label>
                         <input class="form-control col-2" type="text" name="log_day_start" id="log_day_start" value="">
@@ -83,13 +83,13 @@
 
                     </tr>
                 </thead>
-                <tbody id='tags'>
-                    {% for log in logs %}
+                <tbody id='logs'>
+                    {% for log in logs_list %}
                     <tr id='tags'>
                         <td scope="row" class="table-light">{{loop.index}}</td>
-                        <td scope="row" class="table-success">{{log[0]+' '+log[1]}}</td>
-                        <td class="table-info">{{log[2]}}</td>
-                        <td class="table-secondary">{{log[3]}}</td>
+                        <td scope="row" class="table-success">{{log[0]}}</td>
+                        <td class="table-info">{{log[1]}}</td>
+                        <td class="table-secondary">{{log[2]}}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -131,6 +131,11 @@
     </div>
 
 
+    <label>开始时间：</label>
+    <input id="startdate" type="text" />
+    <label>结束时间</label>
+    <input id="enddate" type="text" />
+
 </div>
 </div>
 
@@ -140,21 +145,20 @@
 
     $(function () {
         $("#log_day_start").datetimepicker({
-            timepicker: false,
-            format: 'Y-m-d',
-            theme: 'dark',
+            timepicker: true,
+            format: 'Y-m-d H:m:s',
+            theme: 'light',
             lang: 'zh',
         });
-        // $.datetimepicker.setLocale('zh');
+        $.datetimepicker.setLocale('zh');
     });
     $(function () {
         $("#log_day_end").datetimepicker({
-            timepicker: false,
-            format: 'Y-m-d',
-            theme: 'dark',
-            lang: 'zh',
+            timepicker: true,
+            format: 'Y-m-d H:m:s',
+            theme: 'light',
         });
-        // $.datetimepicker.setLocale('zh');
+
     });
 
 
@@ -163,33 +167,37 @@
         var log_level = $("#log_level").val();
         var log_day_start = $("#log_day_start").val();
         var log_day_end = $("#log_day_end").val();
-
-        console.log(log_day_start, log_day_end);
+        var $subject_con = $('#logs');
+        $subject_con.html('')
         $.ajax({
-                url: "{{url_for('cs.log')}}",
-                data: $('#log_form').serialize(),
-                // contentType: "application/json;charset=utf-8",
-                type: 'post',
-                dataType: 'json',
-                headers: {
-                    "X-CSRFToken": csrftoken
-                },
-                success: function success(data) {
-                    console.log(data);
-                    alarms(data.msg)
-                },
-                error: function (data) {
-                    console.log(data);
-                },
-            });
-            return false;
-
-
-
+            url: "{{url_for('cs.log')}}",
+            data: $('#log_form').serialize(),
+            // contentType: "application/json;charset=utf-8",
+            type: 'post',
+            dataType: 'json',
+            headers: {
+                "X-CSRFToken": csrftoken
+            },
+            success: function success(data) {
+                console.log(data.logs_list)
+                var $comm = '';
+                for (var i = 0; i < data.logs_list.length; i++) {
+                    var $td = ''
+                    for (var j = 0; j < data.logs_list[i].length; j++) {
+                        $td +=
+                            '<td scope="row" class="table-warning">' + data.logs_list[i][j] + '</td>'
+                    };
+                    $comm += '<tr>' + '<td scope="row" class="table-info">' + i + '</td>' + $td + '</tr>'
+                    $subject_con.html($comm)
+                }
+                alarms(data.msg)
+            },
+            error: function (data) {
+                console.log(data);
+            },
+        });
+        return false;
     }
-
-
-
 
     function Search(obj) {
         var tagname = $("#tagname").val();
@@ -358,5 +366,46 @@
     $(document).ready(function () {
 
     })
+
+    // var modal = (function () {
+    //     var initDate = function (startDateTimeId, endDateTimeId) {
+    //         var startDate;
+    //         var endDate;
+    //         startDateTimeId = "#" + startDateTimeId;
+    //         endDateTimeId = "#" + endDateTimeId;
+    //         $(startDateTimeId).datetimepicker({
+    //             format: 'Y-m-d H:m:s',
+    //             minDate: 0,
+    //             onChangeDateTime: function (dp, $input) {
+    //                 startDate = $(startDateTimeId).val();
+    //             },
+    //             onClose: function (current_time, $input) {
+    //                 if (startDate > endDate) {
+    //                     $(startDateTimeId).val(endDate);
+    //                     startDate = endDate;
+    //                 }
+    //             }
+    //         });
+    //         $(endDateTimeId).datetimepicker({
+    //             format: 'Y-m-d H:m:s',
+    //             onClose: function (current_time, $input) {
+    //                 endDate = $(endDateTimeId).val();
+    //                 if (startDate > endDate) {
+    //                     $(endDateTimeId).val(startDate);
+    //                     endDate = startDate;
+    //                 }
+    //             }
+    //         });
+    //     };
+    //     return {
+    //         initDate: initDate
+    //     };
+    //     34
+    // })();
+
+
+    // modal.initDate("startdate","enddate");
+
+
 </script>
 {% endblock %}

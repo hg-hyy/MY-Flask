@@ -77,6 +77,21 @@ modbus = ['modbus1', 'modbus2']
 """
 
 
+def check_day_log(start, end, logs):
+    log_list = []
+    log_day_start = datetime.datetime.strptime(start, "%Y-%m-%d %H:%M:%S")
+    log_day_end = datetime.datetime.strptime(end, "%Y-%m-%d %H:%M:%S")
+    if end > start:
+        for l in logs:
+            log_day = datetime.datetime.strptime(
+                l.rsplit('  ')[0][1:-1], "%Y-%m-%d %H:%M:%S")
+            if log_day > log_day_start and log_day < log_day_end:
+                log_list.append(l.rsplit('  '))
+        return log_list
+    else:
+        return log_list
+
+
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in {'xls', 'xlsx'}
@@ -838,7 +853,7 @@ def get_config():
         res, stu = call_s_config(getconfig_url, json_data)
         if stu:
             res_msg = decode_config(res, module)
-            log.debug(f'获取{module}模块配置成功{res_msg}')
+            log.debug(f'获取{module}模块配置成功')
             return res_msg
         else:
             log.debug(f'获取{module}模块配置失败{res}')
@@ -870,16 +885,33 @@ def logs():
         log_level = request.form['log_level']
         log_day_start = request.form['log_day_start']
         log_day_end = request.form['log_day_end']
-        log_name = log_path+'\\'+log_level+'-{}.log'.format(time.strftime('%Y-%m-%d'))
-        print(log_level, log_day_start, log_day_end)
+        pages = int(request.form['pages'])
+        page = int(request.form['page'])
+        log_name = log_path+'\\'+log_level + \
+            '-{}.log'.format(time.strftime('%Y-%m-%d'))
+
         with open(log_name, 'r', encoding='utf-8') as lg:
             logs = lg.read().splitlines()
-        text = linecache.getline(log_name, 2)
-        print(text)
-        for log in logs:
-            logs_list.append(log.rsplit(' '))
-        return {'logs_list': log_day_end}
-    return render_template('log/log.html')
+        text = linecache.getline(log_name, 2)[1:-1]
+        logs_list = check_day_log(log_day_start, log_day_end, logs)
+
+        if logs_list:
+            total = len(logs_list)  # 总计条目数
+            max_pages, a = divmod(total, pages)
+            if a > 0:
+                max_pages = max_pages + 1
+            print(pages, page, total, max_pages)
+            start = (page-1) * pages
+            end = page*pages
+            data = logs_list[start:end]
+        return {'logs_list': logs_list, 'total': total, 'max_page': max_pages, 'msg': f'查询到{len(logs_list)}条日志'}
+    else:
+        logs_list=[]
+        with open(log_path+'\\'+'DEBUG-{}.log'.format(time.strftime('%Y-%m-%d')), 'r', encoding='utf-8') as lg:
+            logs = lg.read().splitlines()
+        for l in logs:
+            logs_list.append(l.rsplit('  '))
+        return render_template('log/log.html',logs_list=logs_list)
 
 
 @ cs.route('/log1', methods=['GET', 'POST'], endpoint='log1')
