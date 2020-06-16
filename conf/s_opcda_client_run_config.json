@@ -3,16 +3,16 @@
     "data": {
         "s_opcda_client1.main_server_ip": "192.168.31.17",
         "s_opcda_client1.main_server_prgid": "OPCSystems.NET.1",
-        "s_opcda_client1.main_server_clsid": "32FB9E42-29D6-4841-9218-9DA5E1515623",
+        "s_opcda_client1.main_server_clsid": "3C5702A2-EB8E-11D4-83A4-00105A984CBD",
         "s_opcda_client1.main_server_domain": "OPC",
         "s_opcda_client1.main_server_user": "administrator",
         "s_opcda_client1.main_server_password": "12!@QWqw",
-        "s_opcda_client1.bak_server_ip": "",
-        "s_opcda_client1.bak_server_prgid": "Kepware.KEPServerEX.V6",
-        "s_opcda_client1.bak_server_clsid": "7BC0CC8E-482C-47CA-ABDC-0FE7F9C6E729",
+        "s_opcda_client1.bak_server_ip": "172.16.2.101",
+        "s_opcda_client1.bak_server_prgid": "Intellution.OPCiFIX.1",
+        "s_opcda_client1.bak_server_clsid": "3C5702A2-EB8E-11D4-83A4-00105A984CBD",
         "s_opcda_client1.bak_server_domain": "OPC1",
         "s_opcda_client1.bak_server_user": "administrator",
-        "s_opcda_client1.bak_server_password": "12!@QWqw",
+        "s_opcda_client1.bak_server_password": "111",
         "s_opcda_client1.groups": [
             {
                 "group_id": "1",

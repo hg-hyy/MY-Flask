@@ -12,7 +12,7 @@ from flask_cors import CORS
 from flask_wtf.csrf import generate_csrf
 import  jwt,datetime
 from flask_wtf.recaptcha import RecaptchaField
-
+from .views.model import db
 
 
 mail = Mail() 
@@ -43,10 +43,45 @@ app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
 
 app.config.from_object('settings.DevelopmentConfig')
 
-db = SQLAlchemy(app)
+# db = SQLAlchemy(app)
+db.init_app(app)
 
 CSRFProtect(app)
 CORS(app)
+
+
+
+aa = {'APPLICATION_ROOT': '/',
+           'DEBUG': None,
+           'ENV': None,
+           'EXPLAIN_TEMPLATE_LOADING': False,
+           'JSONIFY_MIMETYPE': 'application/json',
+           'JSONIFY_PRETTYPRINT_REGULAR': False,
+           'JSON_AS_ASCII': True,
+           'JSON_SORT_KEYS': True,
+           'MAX_CONTENT_LENGTH': None,
+           'MAX_COOKIE_SIZE': 4093,
+           'PERMANENT_SESSION_LIFETIME': datetime.timedelta(days=31),
+           'PREFERRED_URL_SCHEME': 'http',
+           'PRESERVE_CONTEXT_ON_EXCEPTION': None,
+           'PROPAGATE_EXCEPTIONS': None,
+           'SECRET_KEY': None,
+           'SEND_FILE_MAX_AGE_DEFAULT': datetime.timedelta(seconds=43200),
+           'SERVER_NAME': None,
+           'SESSION_COOKIE_DOMAIN': None,
+           'SESSION_COOKIE_HTTPONLY': True,
+           'SESSION_COOKIE_NAME': 'session',
+           'SESSION_COOKIE_PATH': None,
+           'SESSION_COOKIE_SAMESITE': None,
+           'SESSION_COOKIE_SECURE': False,
+           'SESSION_REFRESH_EACH_REQUEST': True,
+           'TEMPLATES_AUTO_RELOAD': None,
+           'TESTING': False,
+           'TRAP_BAD_REQUEST_ERRORS': None,
+           'TRAP_HTTP_EXCEPTIONS': False,
+           'USE_X_SENDFILE': False
+           }
+
 
 
 

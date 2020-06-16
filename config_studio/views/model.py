@@ -6,10 +6,14 @@ from werkzeug.utils import secure_filename
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileRequired, FileAllowed
 from wtforms import widgets
-from .forms import FileForm, PhotoForm,OpcForm
-from flask_wtf.csrf import CSRFProtect,CSRFError
-from config_studio import db
 
+from flask_wtf.csrf import CSRFProtect,CSRFError
+
+from flask_sqlalchemy import SQLAlchemy
+
+
+
+db = SQLAlchemy()
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -23,6 +27,8 @@ class User(db.Model):
 
     def __str__(self):
         return self.username
+
+
 
 class Opc(db.Model):
     id = db.Column(db.Integer, primary_key=True)

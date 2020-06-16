@@ -1,7 +1,7 @@
 from flask import Blueprint,render_template
-from config_studio import db
+# from config_studio import db
 from .forms import UserForm
-from .model import User
+from .model import User,db
 
 user = Blueprint('user',__name__)
 

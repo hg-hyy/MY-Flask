@@ -68,7 +68,32 @@ def login():
     form = LoginForm()
     if request.method == 'POST':
         try:
-            # if form.validate_on_submit():
+            if form.validate_on_submit():
+                username = request.form['username']
+                password = request.form['password']
+                user = User.query.filter_by(username=username).first_or_404(
+                    description='THE {} is not found'.format(username))
+                if user.username == username and user.password == password:
+                    session['username'] = request.form['username']
+                    flash('You were successfully logged in', 'sucess')
+                    return redirect(url_for('index'))
+                else:
+                    error_msg = '登陆失败!用户名或密码错误'
+                    return render_template('auth/login.html', error_msg=error_msg, form=form)
+
+        except Exception as e:
+            error_msg = '验证失败'
+            print(str(e), '-----------')
+            return render_template('auth/login.html', form=form, error_msg=error_msg)
+    return render_template('auth/login.html', form=form)
+
+
+@auth.route('/login11', methods=['GET', 'POST'], endpoint='login11')
+def login11():
+    form = LoginForm()
+    if request.method == 'POST':
+        try:
+            if form.validate_on_submit():
                 username = request.form['username']
                 password = request.form['password']
                 user = User.query.filter_by(username=username).first_or_404(
@@ -95,24 +120,6 @@ def login():
             return render_template('auth/login.html', form=form, error_msg=error_msg)
     return render_template('auth/login.html', form=form)
 
-
-@auth.route('/sign', methods=['GET', 'POST'], endpoint='sign')
-def sign():
-    if request.method == 'POST':
-        response = request.form['g-recaptcha-response']
-        data = {
-            'secret': GOOGLE_RECAPTCHA_SECRET_KEY,
-            'response': response,
-        }
-        r = requests.post(
-            URL,
-            data=data
-        )
-        result = r.json()
-        print(response, result)
-        return 'hello'
-
-    return render_template('auth/sign.html')
 
 
 @auth.route('/logout', endpoint='logout')

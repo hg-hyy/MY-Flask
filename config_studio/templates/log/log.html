@@ -46,29 +46,19 @@
                             <span data-feather="calendar"></span>
                             导出配置
                         </button>
+                        <label class="form-input-label mr-1" for="key"></label>
+                        <input class="form-control col-2" type="text" name="key" id="key"" value="">
+                        
+
+                        <button type="button" class="btn btn-outline-success ml-1 " onclick="search()">
+                        <span data-feather="calendar"></span>搜索日志
+                        </button>
+
+
                     </div>
                 </div>
             </form>
-            <!-- <div class="input-group mb-3">
-            <div class="input-group-prepend">
-                <span class="input-group-text">日志时间</span>
-            </div>
-            <input type="text" id='tagname' class="form-control" placeholder="search by tag name">
 
-
-            <div class="input-group-prepend">
-                <span class="input-group-text">日志级别</span>
-            </div>
-            <select class="form-control">
-                <option selected>INFO</option>
-                <option>ERROR</option>
-                <option>DEBUG</option>
-            </select>
-
-            <div class="input-group-append">
-                <button class="btn btn-outline-info" type="button" id='search' onclick="Search()">查询</button>
-            </div>
-        </div> -->
 
             <!-- 标签表 -->
             <table id='table' class="table table-bordered table-hover">
@@ -85,7 +75,7 @@
                 </thead>
                 <tbody id='logs'>
                     {% for log in logs_list %}
-                    <tr id='tags'>
+                    <tr>
                         <td scope="row" class="table-light">{{loop.index}}</td>
                         <td scope="row" class="table-success">{{log[0]}}</td>
                         <td class="table-info">{{log[1]}}</td>
@@ -191,20 +181,93 @@
     function select_log() {
 
         var log_level = $("#log_level").val();
+        var log_day = $("#log_day").val();
         var log_day_start = $("#log_day_start").val();
         var log_day_end = $("#log_day_end").val();
+        var pages = $("#pages").val();
         var $subject_con = $('#logs');
         $subject_con.html('')
         $.ajax({
             url: "{{url_for('cs.log')}}",
-            data: $('#log_form').serialize(),
+            // data: $('#log_form').serialize(),
+            data: {
+                "log_level": log_level,
+                "log_day": log_day,
+                "log_day_start": log_day_start,
+                "log_day_end": log_day_end,
+                "pages": pages,
+                "page": 1,
+            },
             // contentType: "application/json;charset=utf-8",
             type: 'post',
             dataType: 'json',
             headers: {
                 "X-CSRFToken": csrftoken
             },
-            success: select_log_success,
+            success: pages_success,
+            error: function (data) {
+                console.log(data);
+            },
+        });
+        return false;
+    }
+
+    function search(obj) {
+        var log_level = $("#log_level").val();
+        var log_day = $("#log_day").val();
+        var log_day_start = $("#log_day_start").val();
+        var log_day_end = $("#log_day_end").val();
+        var pages = $("#pages").val();
+        var key = $("#key").val();
+        // var $subject_con = $('#logs');
+        // $subject_con.html('')
+        $.ajax({
+            url: "{{url_for('cs.log')}}",
+            data: {
+                "key": key,
+                "log_level": log_level,
+                "log_day": log_day,
+                "log_day_start": log_day_start,
+                "log_day_end": log_day_end,
+                "pages": pages,
+                "page": 1,
+            },
+            type: 'post',
+            headers: {
+                "X-CSRFToken": csrftoken
+            },
+            dataType: 'json',
+            success: pages_success,
+            error: function (data) {
+                console.log(data);
+            },
+        });
+        return false;
+    }
+
+    function page(obj) {
+        var log_level = $("#log_level").val();
+        var log_day = $("#log_day").val();
+        var log_day_start = $("#log_day_start").val();
+        var log_day_end = $("#log_day_end").val();
+        var pages = $("#pages").val();
+        var page = $(obj).text();
+        $.ajax({
+            url: "{{url_for('cs.log')}}",
+            data: {
+                "log_level": log_level,
+                "log_day": log_day,
+                "log_day_start": log_day_start,
+                "log_day_end": log_day_end,
+                "pages": pages,
+                "page": page,
+            },
+            type: 'post',
+            headers: {
+                "X-CSRFToken": csrftoken
+            },
+            dataType: 'json',
+            success: page_success,
             error: function (data) {
                 console.log(data);
             },
@@ -241,149 +304,11 @@
         return false;
     }
 
-    function select_log_success(data) {
-
-        var $comm = '';
-        for (var i = 0; i < data.logs_list.length; i++) {
-            var $td = ''
-            for (var j = 0; j < data.logs_list[i].length; j++) {
-                $td +=
-                    '<td scope="row" class="table-warning">' + data.logs_list[i][j] + '</td>'
-            };
-            $comm += '<tr>' + '<td scope="row" class="table-info">' + i + '</td>' + $td + '</tr>'
-            var $subject_con = $('#logs');
-            $subject_con.html($comm)
-        }
-        alarms(data.msg)
-    };
-
-
-
-    function Search(obj) {
-        var tagname = $("#tagname").val();
-        $.ajax({
-            url: "{{url_for('cs.search')}}",
-            data: {
-                "tagname": tagname,
-            },
-            type: 'get',
-            dataType: 'json',
-            success: search_success,
-            error: function (data) {
-                console.log(data);
-            },
-            complete: function () {
-                console.log("提交完成！");
-            }
-        });
-        return false;
-    }
-
-    function search_success(data) {
-        var $comm = '';
-        var count = data.tags.length
-        if (count > 0) {
-            for (var i = 0; i < count; i++) {
-                $comm += '<tr>' +
-                    '<td scope="row" class="table-light">' + i + '</td>' +
-                    '<td scope="row" class="table-success">' + data.tags[i].tag + '</td>' +
-                    '<td scope="row" class="table-info">' + data.tags[i].start + '</td>' +
-                    '<td scope="row" class="table-secondary">' + data.tags[i].register_number + '</td>' +
-                    '<td scope="row" class="table-danger">' + data.tags[i].data_type + '</td>' +
-                    '<td scope="row" class="table-primary">' + data.tags[i].data_format + '</td>' +
-                    '<td scope="row" class="table-warning">' + data.tags[i].desc + '</td>' +
-                    '</tr>'
-                var $subject_con = $('#tags');
-                $subject_con.html($comm)
-            }
-        } else {
-            $comm += '<tr>' + '<td scope="row" class="table-danger">' + '没有位号信息，请重新上传。。。' + '</td>' + '</tr>'
-            var $subject_con = $('#tags');
-            $subject_con.html($comm)
-        }
-    }
-
-    function page(obj) {
-        var log_level = $("#log_level").val();
-        var log_day = $("#log_day").val();
-        var log_day_start = $("#log_day_start").val();
-        var log_day_end = $("#log_day_end").val();
-        var pages = $("#pages").val();
-        var page = $(obj).text();
-        $.ajax({
-            url: "{{url_for('cs.log')}}",
-            data: {
-                "log_level": log_level,
-                "log_day": log_day,
-                "log_day_start": log_day_start,
-                "log_day_end": log_day_end,
-                "pages": pages,
-                "page": 1,
-            },
-            type: 'get',
-            headers: {
-                "X-CSRFToken": csrftoken
-            },
-            dataType: 'json',
-            success: select_log_success,
-            error: function (data) {
-                console.log(data);
-            },
-            complete: function () {
-                console.log("提交完成！");
-            }
-        });
-        return false;
-    }
-
-
     function page_success(data) {
         var $comm = '';
         // var $td = '';
         var $option = '';
-        var count = data.tags.length //组数
-        var groups = data.groups
-        $("#total").val(count)
-        $("#max_pages").val(data.max_pages)
-        if (count > 0) {
-            for (i in data.tags) {
-                var $td = ''
-                for (t in data.tags[i]) {
-
-                    $td +=
-                        // '<td scope="row" class="table-success">' + data.tags[i].tag_id + '</td>' +
-                        // '<td scope="row" class="table-info">' + data.tags[i].publish_tag_name + '</td>' +
-                        // '<td scope="row" class="table-secondary">' + data.tags[i].source_tag_name + '</td>' +
-                        // '<td scope="row" class="table-danger">' + data.tags[i].data_type + '</td>' +
-                        '<td scope="row" class="table-danger">' + data.tags[i][t] + '</td>'
-
-                };
-                $comm += '<tr>' + $td + '</tr>'
-                var $subject_con = $('#tags');
-                $subject_con.html($comm)
-
-            }
-
-
-            for (var g = 1; g < groups + 1; g++) {
-                $option += '<option>' + g + '</option>'
-                var $groups = $('#groups');
-                $groups.html($option)
-            }
-        } else {
-            $comm += '<tr>' + '<td scope="row" class="table-danger">' + '没有位号信息，请重新上传。。。' + '</td>' + '</tr>'
-            var $subject_con = $('#tags');
-            $subject_con.html($comm)
-        }
-    }
-
-    function pages_success(data) {
-        var $comm = '';
-        var $lis = '';
-        var $lis1 = '';
-        var count = data.total //条数
-        var groups = data.groups //组数
-        console.log(data.logs_list)
+        var count = data.total //组数
         $("#total").val(count)
         $("#max_pages").val(data.max_pages)
         if (count > 0) {
@@ -398,12 +323,39 @@
                 var $subject_con = $('#logs');
                 $subject_con.html($comm)
             }
-            alarms(data.msg);
-        }
-        else {
+
+        } else {
             $comm += '<tr>' + '<td scope="row" class="table-danger">' + '没有位号信息，请重新上传。。。' + '</td>' + '</tr>'
             var $subject_con = $('#tags');
             $subject_con.html($comm)
+        }
+    }
+
+    function pages_success(data) {
+        var $comm = '';
+        var $lis = '';
+        var $lis1 = '';
+        var count = data.total //条数
+        console.log(data.logs_list, data.total, data.max_pages,data.msg)
+        $("#total").val(count)
+        $("#max_pages").val(data.max_pages)
+        if (count > 0) {
+            var $comm = '';
+            for (var i = 0; i < data.logs_list.length; i++) {
+                var $td = ''
+                for (var j = 0; j < data.logs_list[i].length; j++) {
+                    $td +=
+                        '<td scope="row" class="table-warning">' + data.logs_list[i][j] + '</td>'
+                };
+                $comm += '<tr>' + '<td scope="row" class="table-info">' + i + '</td>' + $td + '</tr>'
+                var $subject_con = $('#logs');
+                $subject_con.html($comm)
+            }
+        } else {
+            $comm += '<tr>' + '<td scope="row" class="table-danger">' + '没有找到搜索的信息。。。' + '</td>' + '</tr>'
+            var $subject_con = $('#logs');
+            $subject_con.html($comm)
+            alarms(data.msg)
         }
 
         var head = '<li class="page-item "><a class="page-link form-control">' + 'Pres' + '</a></li>'
@@ -417,11 +369,12 @@
             $lis1 = head + $lis + tail
             var $subject_con = $('#page');
             $subject_con.html($lis1)
+            alarms(data.msg);
         } else {
             $lis1 +=
                 '<li class="page-item"><a class="page-link form-control btn btn-info" id="page1" onclick="page(this)">' +
                 '对不起，没有' + '</a></li>'
-            var $subject_con = $('#tags');
+            var $subject_con = $('#logs');
             $subject_con.html($comm)
         }
     }

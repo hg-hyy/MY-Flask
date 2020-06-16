@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% block title %}OPC参数配置{% endblock %}
+{% block head %}
+<style type="text/css">
+
+</style>
+{% endblock %}
+{% block content %}
+<div class="jumbotron p-4">
+    <div class="row">
+        <div class="col-12">
+            <p>opc client参数配置</p>
+            <hr />
+            <form action="{{ url_for('cs.load_opc_da') }}" method="post" id='shen' enctype="multipart/form-data">
+                <fieldset disabled id='bj'>
+                    {%for f in form%}
+                        {%if f.name == 'csrf_token' %}
+                            <div class="form-group row">
+                                <div class="col-sm-4">
+                                    {{f}}
+                                </div>
+                            </div>
+                        {%else%}
+                            <div class="form-group row">
+                                {{f.label(class='col-sm-2 col-form-label col-form-label-md')}}
+                                <div class="col-sm-4">
+                                    {{f}}
+                                </div>
+                                {{f.label(class='col-sm-2 col-form-label col-form-label-md')}}
+                            </div>
+                        {%endif%}
+                    {%endfor%}
+                </fieldset>
+                <div class="form-group row">
+                    <div class="col-sm-4  offset-2">
+                        <button type="button" class="btn btn-info btn-block btn-md" id='alter'
+                            onclick="edit()">edit</button>
+                        <button type="submit" class="btn btn-primary d-none btn-block btn-md" id='comm1'
+                            onclick="save()">save</button>
+                            {{form.save}}
+                    </div>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    var csrftoken = $("meta[name=csrf-token]").attr("content");
+
+
+    function edit() {
+        var module_name = $("#module").val()
+        alarms('开始编辑' + module_name)
+        $("#alter").addClass("d-none");
+        $("#comm1").removeClass("d-none");
+        $("#bj").removeAttr("disabled");;
+
+    }
+
+    function save() {
+        $("#alter").removeClass("d-none");
+        $("#comm1").addClass("d-none");
+        $("#bj").addAttr("disabled");
+    }
+
+
+    $(document).ready(function () {
+
+        $("#alter").click(function () {
+            var module_name = $("#module").val()
+            $.ajax({
+                url: "{{url_for('cs.alter_module')}}",
+                data: {
+                    'module': module_name
+                },
+                type: 'get',
+                dataType: 'json',
+                success: success,
+                error: function (data) {
+                    console.log("请填写完全");
+                },
+            });
+            return false;
+        });
+    })
+
+    function success(data) {
+        console.log(data.basic_config)
+        $('#main_server_ip').val(data.basic_config.main_server_ip)
+        $('#main_server_progid').val(data.basic_config.main_server_progid)
+        $('#main_server_classid').val(data.basic_config.main_server_classid)
+        $('#main_server_domain').val(data.basic_config.main_server_domain)
+        $('#main_server_username').val(data.basic_config.main_server_username)
+        $('#main_server_password').val(data.basic_config.main_server_password)
+        $('#back_server_ip').val(data.basic_config.back_server_ip)
+        $('#back_server_progid').val(data.basic_config.bak_server_prgid)
+        $('#back_server_classid').val(data.basic_config.bak_server_clsid)
+        $('#back_server_domain').val(data.basic_config.bak_server_domain)
+        $('#back_server_username').val(data.basic_config.bak_server_username)
+        $('#back_server_password').val(data.basic_config.bak_server_password)
+
+
+    }
+</script>
+{% endblock %}

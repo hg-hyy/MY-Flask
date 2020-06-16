@@ -23,7 +23,7 @@ from flask import Blueprint
 from config_studio import conf_path, log_path, log
 import jwt
 import datetime
-
+from .forms import OpcForm
 """
 ##################################### 基础配置 #########################################
 """
@@ -77,28 +77,50 @@ modbus = ['modbus1', 'modbus2']
 """
 
 
-def check_day_log(start, end, logs,level):
+def check_day_log(start, end, logs, level, key):
     log_list = []
     log_day_start = datetime.datetime.strptime(start, "%Y-%m-%d %H:%M:%S")
     log_day_end = datetime.datetime.strptime(end, "%Y-%m-%d %H:%M:%S")
-    if end > start:
-        for l in logs:
-            log_day = datetime.datetime.strptime(
-                l.rsplit('  ')[0][1:-1], "%Y-%m-%d %H:%M:%S")
-            log_level = l.rsplit('  ')[1][1:-1].strip(' ')
-            # print(log_day_start,log_day,log_day_end,log_level,level)
-            if log_day > log_day_start and log_day < log_day_end and log_level ==level:
-                log_list.append(l.rsplit('  '))
-            elif log_day > log_day_start and log_day < log_day_end and level =='ALL':
-                log_list.append(l.rsplit('  '))
+    if key:
+        log_list = search_log(key,logs)
         return log_list
+        
     else:
-        return log_list
+        if end > start:
+            for l in logs:
+                log_day = datetime.datetime.strptime(
+                    l.rsplit('  ')[0][1:-1], "%Y-%m-%d %H:%M:%S")
+                log_level = l.rsplit('  ')[1][1:-1].strip(' ')
+                # print(log_day_start,log_day,log_day_end,log_level,level)
+                if log_day > log_day_start and log_day < log_day_end and log_level == level:
+                    log_list.append(l.rsplit('  '))
+                elif log_day > log_day_start and log_day < log_day_end and level == 'ALL':
+                    log_list.append(l.rsplit('  '))
+            return log_list
+        else:
+            return log_list
 
 
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in {'xls', 'xlsx'}
+
+
+def search_log(key, logs,):
+    logs_list = []
+    if key[-1] == "*":
+        for l in logs:
+            print(key[:-1],l.rsplit('  ')[2][1:-1],)
+            m = re.search('('+key[:-1]+')?', l.rsplit('  ')[2][1:-1])
+            aa = m.group(0)
+            if aa:
+                logs_list.append(l.rsplit('  '))
+        return logs_list
+    else:
+        for l in logs:
+            if l.rsplit('  ')[2][1:-1] == key:
+                logs_list.append(l.rsplit('  '))
+        return logs_list
 
 
 def search_tag(tagname, source, tag_list):
@@ -366,6 +388,13 @@ def search():
 ##################################### config_setting ###############################
 
 """
+@cs.route('/opc', methods=['GET', 'POST'], endpoint='opc')
+def da_client():
+    form = OpcForm()
+    print(form)
+    for f in form:
+        print(f.label)
+    return render_template('opc/da_ae_client.html',form=form)
 
 
 @cs.route('/load_opc_se', methods=['GET', 'POST'], endpoint='load_opc_se')
@@ -420,6 +449,7 @@ def load_opc_sev():
 
 @cs.route('/load_opc_da', methods=['GET', 'POST'], endpoint='load_opc_da')
 def load_opc_da():
+    form = OpcForm()
     if request.method == 'POST':
         module = request.form['module']
         main_server_ip = request.form['main_server_ip']
@@ -508,7 +538,7 @@ def load_opc_da():
         tags, basic_config = read_modbus_config(cfg_msg, module)
         set_config(res, module)
         return render_template("opc/opc_show.html", basic_config=dict1)
-    return render_template("opc/opc_da_index.html")
+    return render_template("opc/opc_da_index.html",form=form)
 
 
 @ cs.route('/load_opc_ae', methods=['GET', 'POST'], endpoint='load_opc_ae')
@@ -886,44 +916,47 @@ def set_config(cfg_msg, module):
 def logs():
     if request.method == 'POST':
         logs_list = []
-        log_level = request.form.get('log_level','ALL')
-        log_day = request.form.get('log_day',time.strftime('%Y-%m-%d'))
-        log_day_start = log_day+' '+request.form.get('log_day_start','00:00:00')
-        log_day_end = log_day+' '+request.form.get("log_day_end","23:59:59")
-        pages = int(request.form.get('pages',5))
-        page = int(request.form.get('page',1))
-
+        log_level = request.form.get('log_level', 'ALL')
+        log_day = request.form.get('log_day', time.strftime('%Y-%m-%d'))
+        log_day_start = log_day+' ' + \
+            request.form.get('log_day_start', '00:00:00')
+        log_day_end = log_day+' '+request.form.get("log_day_end", "23:59:59")
+        pages = int(request.form.get('pages', 5))
+        page = int(request.form.get('page', 1))
+        key = request.form.get('key')
         log_name = log_path+'\\'+'{}.log'.format(log_day)
-        if not all ((log_day,log_day_start,log_day_end)):
-            return {'logs_list': [], 'total': 0, 'max_page': 0, 'msg': f'请输入查询日期和时间'}
+        if not all((log_day, log_day_start, log_day_end)):
+            return {'logs_list': [], 'total': 0, 'max_pages': 0, 'msg': f'请输入查询日期和时间'}
         try:
             with open(log_name, 'r', encoding='utf-8') as lg:
-             logs = lg.read().splitlines()
+                logs = lg.read().splitlines()
         except Exception as e:
             return {'logs_list': [], 'total': 0, 'max_page': 0, 'msg': f'OOOPS..[{log_day}]没有日志,被外星人偷走了？？'}
         text = linecache.getline(log_name, 2)[1:-1]
-        logs_list = check_day_log(log_day_start, log_day_end, logs,log_level)
-        data,total,max_pages = [],0,0
+        logs_list = check_day_log(
+            log_day_start, log_day_end, logs, log_level, key)
+        data, total, max_pages = [], 0, 0
+        # print(len(logs_list))
         if logs_list:
             total = len(logs_list)  # 总计条目数
             max_pages, a = divmod(total, pages)
             if a > 0:
                 max_pages = max_pages + 1
-            print(pages, page, total, max_pages)
+            # print(pages, page, total, max_pages)
             start = (page-1) * pages
             end = page*pages
             data = logs_list[start:end]
-            return {'logs_list': data, 'total': total, 'max_page': max_pages, 'msg': f'查询到{len(data)}条日志'}
+            return {'logs_list': data, 'total': total, 'max_pages': max_pages, 'msg': f'查询到{total}条日志'}
         else:
-            return {'logs_list': data, 'total': total, 'max_page': max_pages, 'msg': f'查询到{len(data)}条日志'}
-            
+            return {'logs_list': data, 'total': total, 'max_pages': max_pages, 'msg': f'查询到{total}条日志'}
+
     else:
-        logs_list=[]
+        logs_list = []
         with open(log_path+'\\'+'{}.log'.format(time.strftime('%Y-%m-%d')), 'r', encoding='utf-8') as lg:
             logs = lg.read().splitlines()
         for l in logs:
             logs_list.append(l.rsplit('  '))
-        return render_template('log/log.html',logs_list=logs_list[:4])
+        return render_template('log/log.html', logs_list=logs_list[:4])
 
 
 @ cs.route('/log1', methods=['GET', 'POST'], endpoint='log1')

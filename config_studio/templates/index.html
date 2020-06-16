@@ -36,8 +36,7 @@
       <a class="btn btn-success btn-lg" href="{{ url_for('cs.load_opc_da') }}" role="button">のOPC配置</a>
       <a class="btn btn-primary btn-lg" href="{{ url_for('cs.load_modbus') }}" role="button">のModbus配置</a>
       <a class="btn btn-danger btn-lg" onclick="error('hello,world!')" role="button">の随便看看</a>
-      <a class="btn btn-danger btn-lg" href="{{ url_for('auth.comment') }}" role="button">我の吐槽</a>
-      <a class="btn btn-danger btn-lg" href="{{ url_for('auth.sign') }}">sign</a>
+      <a class="btn btn-danger btn-lg" href="{{ url_for('auth.comment') }}" role="button">の我要吐槽</a>
 
 
       {% with errors = get_flashed_messages(category_filter=["error"]) %}
