@@ -66,7 +66,7 @@ dictConfig({
         'file': {
             'level': 'DEBUG',
             'class': 'logging.handlers.RotatingFileHandler',
-            'filename': os.path.join(log_path, 'DEBUG-{}.log'.format(time.strftime('%Y-%m-%d'))),
+            'filename': os.path.join(log_path, '{}.log'.format(time.strftime('%Y-%m-%d'))),
             'maxBytes': 1024 * 1024 * 5,  # 文件大小
             'backupCount': 5,  # 备份数
             'formatter': 'default',  # 输出格式

@@ -77,7 +77,7 @@ modbus = ['modbus1', 'modbus2']
 """
 
 
-def check_day_log(start, end, logs):
+def check_day_log(start, end, logs,level):
     log_list = []
     log_day_start = datetime.datetime.strptime(start, "%Y-%m-%d %H:%M:%S")
     log_day_end = datetime.datetime.strptime(end, "%Y-%m-%d %H:%M:%S")
@@ -85,7 +85,11 @@ def check_day_log(start, end, logs):
         for l in logs:
             log_day = datetime.datetime.strptime(
                 l.rsplit('  ')[0][1:-1], "%Y-%m-%d %H:%M:%S")
-            if log_day > log_day_start and log_day < log_day_end:
+            log_level = l.rsplit('  ')[1][1:-1].strip(' ')
+            # print(log_day_start,log_day,log_day_end,log_level,level)
+            if log_day > log_day_start and log_day < log_day_end and log_level ==level:
+                log_list.append(l.rsplit('  '))
+            elif log_day > log_day_start and log_day < log_day_end and level =='ALL':
                 log_list.append(l.rsplit('  '))
         return log_list
     else:
@@ -882,19 +886,24 @@ def set_config(cfg_msg, module):
 def logs():
     if request.method == 'POST':
         logs_list = []
-        log_level = request.form['log_level']
-        log_day_start = request.form['log_day_start']
-        log_day_end = request.form['log_day_end']
-        pages = int(request.form['pages'])
-        page = int(request.form['page'])
-        log_name = log_path+'\\'+log_level + \
-            '-{}.log'.format(time.strftime('%Y-%m-%d'))
+        log_level = request.form.get('log_level','ALL')
+        log_day = request.form.get('log_day',time.strftime('%Y-%m-%d'))
+        log_day_start = log_day+' '+request.form.get('log_day_start','00:00:00')
+        log_day_end = log_day+' '+request.form.get("log_day_end","23:59:59")
+        pages = int(request.form.get('pages',5))
+        page = int(request.form.get('page',1))
 
-        with open(log_name, 'r', encoding='utf-8') as lg:
-            logs = lg.read().splitlines()
+        log_name = log_path+'\\'+'{}.log'.format(log_day)
+        if not all ((log_day,log_day_start,log_day_end)):
+            return {'logs_list': [], 'total': 0, 'max_page': 0, 'msg': f'请输入查询日期和时间'}
+        try:
+            with open(log_name, 'r', encoding='utf-8') as lg:
+             logs = lg.read().splitlines()
+        except Exception as e:
+            return {'logs_list': [], 'total': 0, 'max_page': 0, 'msg': f'OOOPS..[{log_day}]没有日志,被外星人偷走了？？'}
         text = linecache.getline(log_name, 2)[1:-1]
-        logs_list = check_day_log(log_day_start, log_day_end, logs)
-
+        logs_list = check_day_log(log_day_start, log_day_end, logs,log_level)
+        data,total,max_pages = [],0,0
         if logs_list:
             total = len(logs_list)  # 总计条目数
             max_pages, a = divmod(total, pages)
@@ -904,14 +913,17 @@ def logs():
             start = (page-1) * pages
             end = page*pages
             data = logs_list[start:end]
-        return {'logs_list': logs_list, 'total': total, 'max_page': max_pages, 'msg': f'查询到{len(logs_list)}条日志'}
+            return {'logs_list': data, 'total': total, 'max_page': max_pages, 'msg': f'查询到{len(data)}条日志'}
+        else:
+            return {'logs_list': data, 'total': total, 'max_page': max_pages, 'msg': f'查询到{len(data)}条日志'}
+            
     else:
         logs_list=[]
-        with open(log_path+'\\'+'DEBUG-{}.log'.format(time.strftime('%Y-%m-%d')), 'r', encoding='utf-8') as lg:
+        with open(log_path+'\\'+'{}.log'.format(time.strftime('%Y-%m-%d')), 'r', encoding='utf-8') as lg:
             logs = lg.read().splitlines()
         for l in logs:
             logs_list.append(l.rsplit('  '))
-        return render_template('log/log.html',logs_list=logs_list)
+        return render_template('log/log.html',logs_list=logs_list[:4])
 
 
 @ cs.route('/log1', methods=['GET', 'POST'], endpoint='log1')

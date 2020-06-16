@@ -22,29 +22,29 @@
                 <div class=" justify-content-between flex-wrap flex-md-nowrap align-items-center mb-3">
                     <div class="form-group form-inline mb-0">
                         <label class="form-input-label mr-1" for="log_level">日志级别:</label>
-                        <select class="form-control mr-1 col-2" id="log_level" name='log_level'>
+                        <select class="form-control mr-1 col-1" id="log_level" name='log_level'>
                             <option>INFO</option>
                             <option>ERROR</option>
-                            <option selected>DEBUG</option>
+                            <option>DEBUG</option>
+                            <option selected>ALL</option>
                         </select>
-                        <label class="form-input-label mr-1" for="log_day_start">开始日期:</label>
-                        <input class="form-control col-2" type="text" name="log_day_start" id="log_day_start" value="">
+                        <label class="form-input-label mr-1" for="log_day">日志日期:</label>
+                        <input class="form-control col-1" type="text" name="log_day" id="log_day" value="">
 
-                        <label class="form-input-label mr-1" for="log_day_end">结束日期:</label>
-                        <input class="form-control col-2" type="text" name="log_day_end" id="log_day_end" value="">
-                        <!-- <a class="btn btn-outline-success ml-1" onclick="selectlog()">查询</a> -->
+                        <label class="form-input-label mr-1" for="log_day_start">开始时间:</label>
+                        <input class="form-control col-1" type="text" name="log_day_start" id="log_day_start" value="">
+
+                        <label class="form-input-label mr-1" for="log_day_end">结束时间:</label>
+                        <input class="form-control col-1" type="text" name="log_day_end" id="log_day_end" value="">
+
 
                         <button type="button" class="btn btn-outline-info ml-1 " onclick="select_log()">
                             <span data-feather="upload"></span>
                             开始查询
                         </button>
                         <button type="button" class="btn btn-outline-success ml-1 ">
-                            <span data-feather="upload"></span>
-                            导出配置
-                        </button>
-                        <button type="button" class="btn btn-outline-danger ml-1 ">
                             <span data-feather="calendar"></span>
-                            This week
+                            导出配置
                         </button>
                     </div>
                 </div>
@@ -131,11 +131,6 @@
     </div>
 
 
-    <label>开始时间：</label>
-    <input id="startdate" type="text" />
-    <label>结束时间</label>
-    <input id="enddate" type="text" />
-
 </div>
 </div>
 
@@ -143,23 +138,54 @@
 <script>
     var csrftoken = $("meta[name=csrf-token]").attr("content");
 
-    $(function () {
-        $("#log_day_start").datetimepicker({
+    jQuery(function () {
+        jQuery('#log_day').datetimepicker({
+            format: 'Y-m-d',
+            timepicker: false,
+            validateOnBlur: true,
+            closeOnDateSelect: true,
+        });
+        jQuery('#log_day_start').datetimepicker({
+            format: 'H:i:s',
+            startDate: new Date(),
+            datepicker: false,
             timepicker: true,
-            format: 'Y-m-d H:m:s',
-            theme: 'light',
-            lang: 'zh',
+            todayButton: true,
+            defaultTime: true,
+            validateOnBlur: true,
+            closeOnDateSelect: true,
+            onShow: function (ct) {
+                this.setOptions({
+                    // maxDate: jQuery('#log_day_end').val() ? jQuery(
+                    //     '#log_day_end').val() : false,
+                    maxTime: jQuery('#log_day_end').val() ? jQuery(
+                        '#log_day_end').val() : false
+                })
+            },
+        });
+        jQuery('#log_day_end').datetimepicker({
+            format: 'H:i:s',
+            datepicker: false,
+            timepicker: true,
+            todayButton: true,
+            minTime: new Date(),
+            defaultTime: true,
+            validateOnBlur: true,
+            closeOnDateSelect: true,
+            onShow: function (ct) {
+                this.setOptions({
+                    // minDate: jQuery('#log_day_start').val() ? jQuery(
+                    //     '#log_day_start').val() : false,
+                    minTime: jQuery('#log_day_start').val() ? jQuery(
+                        '#log_day_start').val() : false
+                })
+            },
         });
         $.datetimepicker.setLocale('zh');
     });
-    $(function () {
-        $("#log_day_end").datetimepicker({
-            timepicker: true,
-            format: 'Y-m-d H:m:s',
-            theme: 'light',
-        });
 
-    });
+
+    $(document).ready(function () {})
 
 
     function select_log() {
@@ -178,26 +204,60 @@
             headers: {
                 "X-CSRFToken": csrftoken
             },
-            success: function success(data) {
-                console.log(data.logs_list)
-                var $comm = '';
-                for (var i = 0; i < data.logs_list.length; i++) {
-                    var $td = ''
-                    for (var j = 0; j < data.logs_list[i].length; j++) {
-                        $td +=
-                            '<td scope="row" class="table-warning">' + data.logs_list[i][j] + '</td>'
-                    };
-                    $comm += '<tr>' + '<td scope="row" class="table-info">' + i + '</td>' + $td + '</tr>'
-                    $subject_con.html($comm)
-                }
-                alarms(data.msg)
-            },
+            success: select_log_success,
             error: function (data) {
                 console.log(data);
             },
         });
         return false;
     }
+
+    function pages(obj) {
+        var log_level = $("#log_level").val();
+        var log_day = $("#log_day").val();
+        var log_day_start = $("#log_day_start").val();
+        var log_day_end = $("#log_day_end").val();
+        var pages = $(obj).val();
+        $.ajax({
+            url: "{{url_for('cs.log')}}",
+            data: {
+                "log_level": log_level,
+                "log_day": log_day,
+                "log_day_start": log_day_start,
+                "log_day_end": log_day_end,
+                "pages": pages,
+                "page": 1,
+            },
+            headers: {
+                "X-CSRFToken": csrftoken
+            },
+            type: 'post',
+            dataType: 'json',
+            success: pages_success,
+            error: function (data) {
+                console.log(data);
+            },
+        });
+        return false;
+    }
+
+    function select_log_success(data) {
+
+        var $comm = '';
+        for (var i = 0; i < data.logs_list.length; i++) {
+            var $td = ''
+            for (var j = 0; j < data.logs_list[i].length; j++) {
+                $td +=
+                    '<td scope="row" class="table-warning">' + data.logs_list[i][j] + '</td>'
+            };
+            $comm += '<tr>' + '<td scope="row" class="table-info">' + i + '</td>' + $td + '</tr>'
+            var $subject_con = $('#logs');
+            $subject_con.html($comm)
+        }
+        alarms(data.msg)
+    };
+
+
 
     function Search(obj) {
         var tagname = $("#tagname").val();
@@ -217,79 +277,6 @@
             }
         });
         return false;
-    }
-
-    function page(obj) {
-        var pages = $("#pages").val();
-        var page = $(obj).text();
-        $.ajax({
-            url: "{{url_for('cs.page')}}",
-            // data: "pages=10&page=1" ,
-            data: {
-                "pages": pages,
-                "page": page,
-                "id": 1
-            },
-            type: 'get',
-            dataType: 'json',
-            success: success,
-            error: function (data) {
-                console.log(data);
-            },
-            complete: function () {
-                console.log("提交完成！");
-            }
-        });
-        return false;
-    }
-
-    function pages(obj) {
-        var pages = $(obj).val();
-        $.ajax({
-            url: "{{url_for('cs.page')}}",
-            // data: "pages=10&page=1" ,
-            data: {
-                "pages": pages,
-                "page": 1,
-                "id": 1
-            },
-            type: 'get',
-            dataType: 'json',
-            success: success1,
-            error: function (data) {
-                console.log(data);
-            },
-            complete: function () {
-                console.log("提交完成！");
-            }
-        });
-        return false;
-    }
-
-    function success(data) {
-        var $comm = '';
-        var count = data.tags.length
-        $("#total").val(data.total)
-        $("#max_pages").val(data.max_pages)
-        if (count > 0) {
-            for (var i = 0; i < count; i++) {
-                $comm += '<tr>' +
-                    '<td scope="row" class="table-light">' + i + '</td>' +
-                    '<td scope="row" class="table-success">' + data.tags[i].tag + '</td>' +
-                    '<td scope="row" class="table-info">' + data.tags[i].start + '</td>' +
-                    '<td scope="row" class="table-secondary">' + data.tags[i].register_number + '</td>' +
-                    '<td scope="row" class="table-danger">' + data.tags[i].data_type + '</td>' +
-                    '<td scope="row" class="table-primary">' + data.tags[i].data_format + '</td>' +
-                    '<td scope="row" class="table-warning">' + data.tags[i].desc + '</td>' +
-                    '</tr>'
-                var $subject_con = $('#tags');
-                $subject_con.html($comm)
-            }
-        } else {
-            $comm += '<tr>' + '<td scope="row" class="table-danger">' + '没有位号信息，请重新上传。。。' + '</td>' + '</tr>'
-            var $subject_con = $('#tags');
-            $subject_con.html($comm)
-        }
     }
 
     function search_success(data) {
@@ -316,28 +303,104 @@
         }
     }
 
-    function success1(data) {
+    function page(obj) {
+        var log_level = $("#log_level").val();
+        var log_day = $("#log_day").val();
+        var log_day_start = $("#log_day_start").val();
+        var log_day_end = $("#log_day_end").val();
+        var pages = $("#pages").val();
+        var page = $(obj).text();
+        $.ajax({
+            url: "{{url_for('cs.log')}}",
+            data: {
+                "log_level": log_level,
+                "log_day": log_day,
+                "log_day_start": log_day_start,
+                "log_day_end": log_day_end,
+                "pages": pages,
+                "page": 1,
+            },
+            type: 'get',
+            headers: {
+                "X-CSRFToken": csrftoken
+            },
+            dataType: 'json',
+            success: select_log_success,
+            error: function (data) {
+                console.log(data);
+            },
+            complete: function () {
+                console.log("提交完成！");
+            }
+        });
+        return false;
+    }
+
+
+    function page_success(data) {
+        var $comm = '';
+        // var $td = '';
+        var $option = '';
+        var count = data.tags.length //组数
+        var groups = data.groups
+        $("#total").val(count)
+        $("#max_pages").val(data.max_pages)
+        if (count > 0) {
+            for (i in data.tags) {
+                var $td = ''
+                for (t in data.tags[i]) {
+
+                    $td +=
+                        // '<td scope="row" class="table-success">' + data.tags[i].tag_id + '</td>' +
+                        // '<td scope="row" class="table-info">' + data.tags[i].publish_tag_name + '</td>' +
+                        // '<td scope="row" class="table-secondary">' + data.tags[i].source_tag_name + '</td>' +
+                        // '<td scope="row" class="table-danger">' + data.tags[i].data_type + '</td>' +
+                        '<td scope="row" class="table-danger">' + data.tags[i][t] + '</td>'
+
+                };
+                $comm += '<tr>' + $td + '</tr>'
+                var $subject_con = $('#tags');
+                $subject_con.html($comm)
+
+            }
+
+
+            for (var g = 1; g < groups + 1; g++) {
+                $option += '<option>' + g + '</option>'
+                var $groups = $('#groups');
+                $groups.html($option)
+            }
+        } else {
+            $comm += '<tr>' + '<td scope="row" class="table-danger">' + '没有位号信息，请重新上传。。。' + '</td>' + '</tr>'
+            var $subject_con = $('#tags');
+            $subject_con.html($comm)
+        }
+    }
+
+    function pages_success(data) {
         var $comm = '';
         var $lis = '';
         var $lis1 = '';
-        var count = data.tags.length
-        $("#total").val(data.total)
+        var count = data.total //条数
+        var groups = data.groups //组数
+        console.log(data.logs_list)
+        $("#total").val(count)
         $("#max_pages").val(data.max_pages)
         if (count > 0) {
-            for (var i = 0; i < count; i++) {
-                $comm += '<tr>' +
-                    '<td scope="row" class="table-light">' + i + '</td>' +
-                    '<td scope="row" class="table-success">' + data.tags[i].tag + '</td>' +
-                    '<td scope="row" class="table-info">' + data.tags[i].start + '</td>' +
-                    '<td scope="row" class="table-secondary">' + data.tags[i].register_number + '</td>' +
-                    '<td scope="row" class="table-danger">' + data.tags[i].data_type + '</td>' +
-                    '<td scope="row" class="table-primary">' + data.tags[i].data_format + '</td>' +
-                    '<td scope="row" class="table-warning">' + data.tags[i].desc + '</td>' +
-                    '</tr>'
-                var $subject_con = $('#tags');
+            var $comm = '';
+            for (var i = 0; i < data.logs_list.length; i++) {
+                var $td = ''
+                for (var j = 0; j < data.logs_list[i].length; j++) {
+                    $td +=
+                        '<td scope="row" class="table-warning">' + data.logs_list[i][j] + '</td>'
+                };
+                $comm += '<tr>' + '<td scope="row" class="table-info">' + i + '</td>' + $td + '</tr>'
+                var $subject_con = $('#logs');
                 $subject_con.html($comm)
             }
-        } else {
+            alarms(data.msg);
+        }
+        else {
             $comm += '<tr>' + '<td scope="row" class="table-danger">' + '没有位号信息，请重新上传。。。' + '</td>' + '</tr>'
             var $subject_con = $('#tags');
             $subject_con.html($comm)
@@ -362,50 +425,5 @@
             $subject_con.html($comm)
         }
     }
-
-    $(document).ready(function () {
-
-    })
-
-    // var modal = (function () {
-    //     var initDate = function (startDateTimeId, endDateTimeId) {
-    //         var startDate;
-    //         var endDate;
-    //         startDateTimeId = "#" + startDateTimeId;
-    //         endDateTimeId = "#" + endDateTimeId;
-    //         $(startDateTimeId).datetimepicker({
-    //             format: 'Y-m-d H:m:s',
-    //             minDate: 0,
-    //             onChangeDateTime: function (dp, $input) {
-    //                 startDate = $(startDateTimeId).val();
-    //             },
-    //             onClose: function (current_time, $input) {
-    //                 if (startDate > endDate) {
-    //                     $(startDateTimeId).val(endDate);
-    //                     startDate = endDate;
-    //                 }
-    //             }
-    //         });
-    //         $(endDateTimeId).datetimepicker({
-    //             format: 'Y-m-d H:m:s',
-    //             onClose: function (current_time, $input) {
-    //                 endDate = $(endDateTimeId).val();
-    //                 if (startDate > endDate) {
-    //                     $(endDateTimeId).val(startDate);
-    //                     endDate = startDate;
-    //                 }
-    //             }
-    //         });
-    //     };
-    //     return {
-    //         initDate: initDate
-    //     };
-    //     34
-    // })();
-
-
-    // modal.initDate("startdate","enddate");
-
-
 </script>
 {% endblock %}
