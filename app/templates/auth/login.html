@@ -4,42 +4,43 @@
 
 <style>
   .text-center {
-    margin-top: 65px;
+    margin-top: 16px;
   }
 </style>
 {% endblock %}
 {% block content %}
 
+<div class="row">
+  <div class="col-9">
+    <img src="{{url_for('static',filename='pic/adam.jpg')}}" alt="ycmn" class="img-fluid " style="height: 560px;" />
+  </div>
+  <div class="text-center col-3" id='login'>
+    <form class="form-signin" action="{{url_for('auth.login')}}" method="POST">
+      {{ form.csrf_token }}
+      <img class="mb-4" src="{{ url_for( 'static', filename='pic/bootstrap-solid.svg' ) }}" alt="" width="72"
+        height="72">
+      <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
+      {{form.username}}
+      {{form.password}}
+      {{form.recaptcha }}
+      {{form.remember_me}}
+      {{form.remember_me.label}}
 
-<div class="text-center col-8">
-  <img src="{{url_for('static',filename='pic/adam.jpg')}}" alt="ycmn" class="img-fluid " style="height: 750px;" />
+      {% with errors = get_flashed_messages(category_filter=["error"]) %}
+      {% if errors %}
+      {% for msg in errors %}
+      <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>{{ msg }}</strong>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      {% endfor %}
+      {% endif %}
+      {% endwith %}
+      {{form.submit}}
+      <p class="mt-5 mb-3 text-muted">&copy; 2017-2020</p>
+    </form>
+  </div>
 </div>
-<div class="text-center col-3 ml-5" id='login'>
-  <form class="form-signin" action="{{url_for('auth.login')}}" method="POST">
-    {{ form.csrf_token }}
-    <img class="mb-4" src="{{ url_for( 'static', filename='pic/bootstrap-solid.svg' ) }}" alt="" width="72" height="72">
-    <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
-    {{form.username}}
-    {{form.password}}
-    {{form.recaptcha }}
-    {{form.remember_me}}
-    {{form.remember_me.label}}
-
-    {% with errors = get_flashed_messages(category_filter=["error"]) %}
-    {% if errors %}
-    {% for msg in errors %}
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-      <strong>{{ msg }}</strong>
-      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
-      </button>
-    </div>
-    {% endfor %}
-    {% endif %}
-    {% endwith %}
-    {{form.submit}}
-    <p class="mt-5 mb-3 text-muted">&copy; 2017-2020</p>
-  </form>
-</div>
-
 {% endblock %}

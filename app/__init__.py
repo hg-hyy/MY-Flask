@@ -93,10 +93,10 @@ def create_app():
     """
     蓝图注册
     """
-    from config_studio import config_studio, user, auth, issue
+    from app import opc, user, auth, issue
     app.register_blueprint(auth.auth)
     app.register_blueprint(user.user)
-    app.register_blueprint(config_studio.cs)
+    app.register_blueprint(opc.cs)
     app.register_blueprint(issue.issue)
 
     def make_toke():

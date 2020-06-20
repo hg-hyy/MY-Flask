@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, flash, session, url_for,abort
 from .forms import RegisterForm, LoginForm
 from .model import User, db
-from config_studio.config_studio import login_required
+from app.opc import login_required
 from werkzeug.security import generate_password_hash,check_password_hash
 
 

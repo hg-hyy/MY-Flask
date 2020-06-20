@@ -7,22 +7,22 @@
 @desc:
 
 """
+import jwt
+import datetime
+import os
+import time
 import xlrd
 import json
 import re,functools
-from pathlib import Path
-from flask import Flask, request, render_template, Blueprint,session,url_for
-from flask import Markup, make_response, jsonify, flash,current_app,redirect,g
-from werkzeug.utils import secure_filename
-import os
-import time
-from flask_wtf.csrf import generate_csrf
-from uuid import uuid4
 import linecache
 import requests
-from flask import Blueprint
-import jwt
-import datetime
+
+from pathlib import Path
+from flask import request, render_template, Blueprint,session,url_for
+from flask import Markup, make_response, jsonify, flash,current_app,redirect,g
+from werkzeug.utils import secure_filename
+from flask_wtf.csrf import generate_csrf
+from uuid import uuid4
 from .forms import OpcForm,LoginForm,OpcdaForm
 from instance.config import  client,server,opc,modbus,URL
 from .model import User
@@ -30,7 +30,6 @@ from .model import User
 """
 ##################################### 基础配置 #########################################
 """
-
 
 cs = Blueprint("cs", __name__)
 

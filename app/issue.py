@@ -3,7 +3,7 @@ from .model import User, Issue, db, Category
 from .forms import LoginForm, CategoryForm, ContactForm, IssueForm
 from flask import g
 from flask_mail import Message, Mail
-from config_studio.config_studio import login_required
+from app.opc import login_required
 import math
 import markdown2 as Markdown
 import bleach
