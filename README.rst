@@ -49,7 +49,6 @@ Run
 
     $ export FLASK_APP=config_studio
     $ export FLASK_ENV=development
-    $ flask init-db
     $ flask run
 
 Or on Windows cmd::
@@ -57,9 +56,10 @@ Or on Windows cmd::
     > set FLASK_APP=config_studio
     > set FLASK_ENV=development
     > flask run
+
     > `waitress-serve --port=80  --call app:create_app`
 
-Open http://127.0.0.1:5000 in a browser.
+Open http://127.0.0.1 in a browser.
 
 
 Test

@@ -2,7 +2,6 @@ venv/
 *.pyc
 __pycache__/
 instance/
-conf/
 .cache/
 .pytest_cache/
 .coverage
@@ -10,6 +9,7 @@ conf/
 htmlcov/
 dist/
 logs/
+conf/
 build/
 *.egg-info/
 .idea/
