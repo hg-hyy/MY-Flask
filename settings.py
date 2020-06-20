@@ -18,6 +18,7 @@ class ProductionConfig(Config):
     SQLALCHEMY_DATABASE_URI = 'mysql://user@localhost/hyy:'
 
 class DevelopmentConfig(Config):
+    import os
     DEBUG = True
     # SQLALCHEMY_DATABASE_URI = 'postgresql://postgres:postgres@127.0.0.1:5432/pro_flask'
     ALLOW_UPLOAD_TYPE = ["image/jpeg", "image/png", "image/gif"]
@@ -26,11 +27,11 @@ class DevelopmentConfig(Config):
     RECAPTCHA_PRIVATE_KEY='6LfGgaQZAAAAALFg29Ktye6qiinyqwIhj-xqmYO5'
 
 
-    MAIL_SERVER = "smtp.qq.com"
+    MAIL_SERVER = os.getenv('MAIL_SERVER'),
     MAIL_PORT = 465
     MAIL_USE_SSL = True
-    MAIL_USERNAME = '1021509854@qq.com'
-    MAIL_PASSWORD = 'oocxmmpozlctbgad'
+    MAIL_USERNAME =  os.getenv('MAIL_USERNAME'),
+    MAIL_PASSWORD = os.getenv('MAIL_PASSWORD'),
     MAIL_DEFAULT_SENDER='1021509854@qq.com'
 
 
