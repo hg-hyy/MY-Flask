@@ -15,7 +15,7 @@ from flask_wtf.csrf import generate_csrf
 import jwt
 import datetime
 from .model import db
-from instance.settings import Config
+from .settings import Config
 
 
 def create_log(log_path,log_level):
@@ -61,11 +61,11 @@ def create_log(log_path,log_level):
 
 
 def create_app(test_config=None):
-    app = Flask(__name__, instance_relative_config=True)
+    app = Flask(__name__)
 
     if test_config is None:
         # load the instance config, if it exists, when not testing
-        app.config.from_object('instance.settings.DevelopmentConfig')
+        app.config.from_object('app.settings.DevelopmentConfig')
     else:
         # load the test config if passed in
         app.config.from_mapping(test_config)

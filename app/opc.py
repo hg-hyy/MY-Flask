@@ -25,9 +25,9 @@ from werkzeug.utils import secure_filename
 from flask_wtf.csrf import generate_csrf
 from uuid import uuid4
 from .forms import OpcForm, LoginForm, OpcdaForm
-from instance.config import client, server, opc, modbus, URL
+from .config import client, server, opc, modbus, URL
 from .model import User
-from instance.settings import Config
+from .settings import Config
 
 conf_path = Config.conf_path
 log_path = Config.log_path
