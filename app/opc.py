@@ -24,21 +24,11 @@ from werkzeug.utils import secure_filename
 from flask_wtf.csrf import generate_csrf
 from uuid import uuid4
 from .forms import OpcForm,LoginForm,OpcdaForm
-from instance.config import  client,server,opc,modbus,URL
+from instance.config import  client,server,opc,modbus,URL,BASE_DIR,log_path,conf_path,p
 from .model import User
 
-"""
-##################################### 基础配置 #########################################
-"""
 
 cs = Blueprint("cs", __name__)
-
-BASE_DIR = Path(__file__).resolve().parent.parent
-log_path = os.path.join(BASE_DIR, 'logs')
-conf_path = os.path.join(BASE_DIR, 'conf', '')
-
-p = Path(conf_path)
-
 
 """
 ##################################### 公用方法 #########################################
@@ -51,8 +41,6 @@ def login_required(view):
         if g.user is None:
             form = LoginForm()
             return redirect(url_for('auth.login'))
-            # return render_template('auth/login.html',form=form)
-
         return view(**kwargs)
 
     return wrapped_view
@@ -840,7 +828,7 @@ def config_review():
         cfg_msg = read_json(module)
         if module in opc:
             tags, basic_config = read_opc_config(cfg_msg, module)
-            current_app.logger.debug(f'查看{module}基础配置')
+            current_app.logger.info(f'查看{module}基础配置')
         else:
             tags, basic_config = read_modbus_config(cfg_msg, module)
             current_app.logger.debug(f'查看{module}基础配置')

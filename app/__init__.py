@@ -15,18 +15,11 @@ from flask_wtf.csrf import generate_csrf
 import jwt
 import datetime
 from .model import db
-from flask_script import Manager
+from instance.config import BASE_DIR,log_path
 
 
+def create_log(log_name,log_level):
 
-
-
-
-
-def create_log(log_name):
-
-    BASE_DIR = Path(__file__).resolve().parent.parent
-    log_path = os.path.join(BASE_DIR, 'logs')
     if not os.path.exists(log_path):
         os.mkdir(log_path)
 
@@ -58,8 +51,8 @@ def create_log(log_name):
                 'level': 'INFO',
                 'handlers': ['wsgi']
             },
-            'config_studio': {
-                'level': 'DEBUG',
+            'app': {
+                'level': log_level,
                 'handlers': ['file']
             }}
     })
@@ -67,7 +60,7 @@ def create_log(log_name):
     logging.getLogger('log_name')
 
 
-def create_app():
+def create_app(config):
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_mapping(
         # a default secret that should be overridden by instance config
@@ -87,8 +80,9 @@ def create_app():
     mail.init_app(app)
     CSRFProtect(app)
     CORS(app)
-    manager = Manager(app)
-    create_log('config_studio')
+    app.config['log']
+    create_log('app','')
+
 
     """
     蓝图注册
@@ -116,7 +110,6 @@ def create_app():
         return wrapped_view
 
     @app.route('/', methods=['GET'], endpoint='index')
-    @manager.command
     @login_required
     def index():
         flash('爱上一个地方，就应该背上包去旅行，走得更远。大家都在等你，还不快过来。。。玩耍！！！')
@@ -131,6 +124,7 @@ def create_app():
     @app.before_first_request
     def before_first():
         app.logger.debug("config_studio 重新启动...")
+
 
     def encode_auth_token(email):
         # 申请Token,参数为自定义,user_id不必须,此处为以后认证作准备,程序员可以根据情况自定义不同参数
