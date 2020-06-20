@@ -6,6 +6,11 @@ class Config(object):
     db_path = os.path.join(BASE_DIR, 'instance', '')
     SQLALCHEMY_DATABASE_URI = 'sqlite:///'+db_path+'cs.db'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    log_path = os.path.join(BASE_DIR, 'logs')
+    log_level = 'DEBUG'
+    conf_path = os.path.join(BASE_DIR, 'conf', '')
+
+    p = Path(conf_path)
 
 
 class ProductionConfig(Config):

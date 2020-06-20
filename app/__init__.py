@@ -15,10 +15,10 @@ from flask_wtf.csrf import generate_csrf
 import jwt
 import datetime
 from .model import db
-from instance.config import BASE_DIR,log_path
+from settings import config
 
 
-def create_log(log_name,log_level):
+def create_log(log_path,log_level):
 
     if not os.path.exists(log_path):
         os.mkdir(log_path)
@@ -60,7 +60,7 @@ def create_log(log_name,log_level):
     logging.getLogger('log_name')
 
 
-def create_app(config):
+def create_app(config_name):
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_mapping(
         # a default secret that should be overridden by instance config
@@ -68,7 +68,8 @@ def create_app(config):
         # store the database in the instance folder
         DATABASE=os.path.join(app.instance_path, "cs.sqlite"),
     )
-    app.config.from_object('settings.DevelopmentConfig')
+    # app.config.from_object('settings.DevelopmentConfig')
+    app.config.from_object(config[config_name])
     try:
         os.makedirs(app.instance_path)
     except OSError:
@@ -80,8 +81,7 @@ def create_app(config):
     mail.init_app(app)
     CSRFProtect(app)
     CORS(app)
-    app.config['log']
-    create_log('app','')
+    create_log(config[config_name].log_path,config[config_name].log_level)
 
 
     """

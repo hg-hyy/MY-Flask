@@ -13,26 +13,34 @@ import os
 import time
 import xlrd
 import json
-import re,functools
+import re
+import functools
 import linecache
 import requests
 
 from pathlib import Path
-from flask import request, render_template, Blueprint,session,url_for
-from flask import Markup, make_response, jsonify, flash,current_app,redirect,g
+from flask import request, render_template, Blueprint, session, url_for
+from flask import Markup, make_response, jsonify, flash, current_app, redirect, g
 from werkzeug.utils import secure_filename
 from flask_wtf.csrf import generate_csrf
 from uuid import uuid4
-from .forms import OpcForm,LoginForm,OpcdaForm
-from instance.config import  client,server,opc,modbus,URL,BASE_DIR,log_path,conf_path,p
+from .forms import OpcForm, LoginForm, OpcdaForm
+from instance.config import client, server, opc, modbus, URL
 from .model import User
+from settings import config
 
+
+conf_path = config[os.getenv('config') or 'default'].conf_path
+log_path = config[os.getenv('config') or 'default'].log_path
+p = config[os.getenv('config') or 'default'].p
 
 cs = Blueprint("cs", __name__)
 
 """
 ##################################### 公用方法 #########################################
 """
+
+
 def login_required(view):
     """View decorator that redirects anonymous users to the login page."""
 
@@ -44,6 +52,7 @@ def login_required(view):
         return view(**kwargs)
 
     return wrapped_view
+
 
 @cs.before_app_request
 def load_logged_in_user():
@@ -57,15 +66,14 @@ def load_logged_in_user():
         g.user = User.query.filter_by(id=user_id).first()
 
 
-
 def check_day_log(start, end, logs, level, key):
     log_list = []
     log_day_start = datetime.datetime.strptime(start, "%Y-%m-%d %H:%M:%S")
     log_day_end = datetime.datetime.strptime(end, "%Y-%m-%d %H:%M:%S")
     if key:
-        log_list = search_log(key,logs)
+        log_list = search_log(key, logs)
         return log_list
-        
+
     else:
         if end > start:
             for l in logs:
@@ -91,7 +99,7 @@ def search_log(key, logs,):
     logs_list = []
     if key[-1] == "*":
         for l in logs:
-            print(key[:-1],l.rsplit('  ')[2][1:-1],)
+            print(key[:-1], l.rsplit('  ')[2][1:-1],)
             m = re.search('('+key[:-1]+')?', l.rsplit('  ')[2][1:-1])
             aa = m.group(0)
             if aa:
@@ -371,11 +379,13 @@ def search():
 ##################################### config_setting ###############################
 
 """
+
+
 @cs.route('/opc', methods=['GET', 'POST'], endpoint='opc')
 def da_client():
     opc_ae_form = OpcForm()
     opc_da_form = OpcdaForm()
-    return render_template('opc/da_ae_client.html',opc_ae_form=opc_ae_form,opc_da_form=opc_da_form)
+    return render_template('opc/da_ae_client.html', opc_ae_form=opc_ae_form, opc_da_form=opc_da_form)
 
 
 @cs.route('/load_opc_se', methods=['GET', 'POST'], endpoint='load_opc_se')
@@ -427,7 +437,7 @@ def load_opc_sev():
         set_config(res, module)
         return render_template("opc/opc_show.html", basic_config=basic_config)
 
-    return render_template("opc/opc_se_index.html",opc_da_server='bg-info')
+    return render_template("opc/opc_se_index.html", opc_da_server='bg-info')
 
 
 @cs.route('/load_opc_da', methods=['GET', 'POST'], endpoint='load_opc_da')
@@ -522,7 +532,7 @@ def load_opc_da():
         tags, basic_config = read_modbus_config(cfg_msg, module)
         set_config(res, module)
         return render_template("opc/opc_show.html", basic_config=dict1)
-    return render_template("opc/opc_da_index.html",form=form,opc_da_client='bg-danger')
+    return render_template("opc/opc_da_index.html", form=form, opc_da_client='bg-danger')
 
 
 @ cs.route('/load_opc_ae', methods=['GET', 'POST'], endpoint='load_opc_ae')
@@ -583,7 +593,7 @@ def load_opc_ae():
         tags, basic_config = read_modbus_config(cfg_msg, module)
         set_config(res, module)
         return render_template("opc/opc_show.html", basic_config=dict1)
-    return render_template("opc/opc_ae_index.html",opc_ae_client='bg-warning')
+    return render_template("opc/opc_ae_index.html", opc_ae_client='bg-warning')
 
 
 @cs.route('/load_modbus', methods=['GET', 'POST'], endpoint='load_modbus')
@@ -666,7 +676,7 @@ def load_modbus():
         tags, basic_config = read_modbus_config(cfg_msg, module)
         set_config(res, module)
         return render_template('opc/opc_show.html', basic_config=basic_config)
-    return render_template('modbus/modbus_index.html',modbus_slave='bg-primary')
+    return render_template('modbus/modbus_index.html', modbus_slave='bg-primary')
 
 
 """
@@ -840,7 +850,7 @@ def config_review():
         tags, basic_config = read_opc_config(cfg_msg, module)
     else:
         tags, basic_config = read_modbus_config(cfg_msg, module)
-    return render_template('opc/opc_show.html', basic_config=basic_config,config_review='bg-success')
+    return render_template('opc/opc_show.html', basic_config=basic_config, config_review='bg-success')
 
 
 @ cs.route('/tags_review/', methods=['GET', 'POST'], endpoint='tags_review')
@@ -864,7 +874,7 @@ def tags_review():
         tags, basic_config = read_opc_config(cfg_msg, module)
     else:
         tags, basic_config = read_modbus_config(cfg_msg, module)
-    return render_template('opc/opc_tags.html', tags=tags,tags_review='bg-danger')
+    return render_template('opc/opc_tags.html', tags=tags, tags_review='bg-danger')
 
 
 @ cs.route('/get_config', methods=['GET', 'POST'], endpoint='get_config')
@@ -878,7 +888,7 @@ def get_config():
         if stu:
             res_msg = decode_config(res, module)
 
-            user_name=g.user.username
+            user_name = g.user.username
             current_app.logger.debug(f'用户{user_name}:获取{module}模块配置成功')
             return res_msg
         else:
@@ -949,7 +959,8 @@ def logs():
             logs = lg.read().splitlines()
         for l in logs:
             logs_list.append(l.rsplit('  '))
-        return render_template('log/log.html', logs_list=logs_list[:4],log='bg-info')
+        return render_template('log/log.html', logs_list=logs_list[:4], log='bg-info')
+
 
 def log1():
     loglevel = []
@@ -959,7 +970,8 @@ def log1():
         loglevel.append(lv.split('-')[0])
     dicts = dict(zip(loglevel, loglist))
     current_app.logger.debug('访问日志系统.')
-   
+
+
 def check_log():
     if request.method == "GET":
         log_level = request.args.get("log_level")
@@ -973,6 +985,3 @@ def check_log():
             elif lv.split('-')[0] == log_level and log_day == '':
                 log_list.append(lv)
         return {'log_level': log_level, 'log_list': log_list}
-
-
-
