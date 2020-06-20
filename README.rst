@@ -29,7 +29,7 @@ Create a virtualenv and activate it::
 Or on Windows cmd::
 
     $ py -3 -m venv venv
-    $ venv\Scripts\activate.bat
+    $ venv\Scripts\activate
 
 Install config_studio::
 
@@ -56,8 +56,8 @@ Or on Windows cmd::
 
     > set FLASK_APP=config_studio
     > set FLASK_ENV=development
-    > flask init-db
     > flask run
+    > `waitress-serve --port=80  --call app:create_app`
 
 Open http://127.0.0.1:5000 in a browser.
 

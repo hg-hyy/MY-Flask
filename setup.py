@@ -7,7 +7,7 @@ with io.open("README.rst", "rt", encoding="utf8") as f:
     readme = f.read()
 
 setup(
-    name="config_studio",
+    name="cs",
     version="1.0.0",
     url="http://flask.pocoo.org/docs/tutorial/",
     license="BSD",
@@ -18,6 +18,16 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     zip_safe=False,
-    install_requires=["flask","flask-wtf"],
+    install_requires=["flask",
+                      "Flask-WTF",
+                      "Flask-Cors",
+                      "Flask-Mail",
+                      "flask-restplus",
+                      "Flask-Script",
+                      "Flask-SQLAlchemy",
+                      "Flask-WTF",
+                      "xlrd",
+                      "jwt"
+                      ],
     extras_require={"test": ["pytest", "coverage"]},
 )

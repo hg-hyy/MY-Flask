@@ -27,12 +27,12 @@ from uuid import uuid4
 from .forms import OpcForm, LoginForm, OpcdaForm
 from instance.config import client, server, opc, modbus, URL
 from .model import User
-from settings import config
+from instance.settings import Config
 
+conf_path = Config.conf_path
+log_path = Config.log_path
+p = Config.p
 
-conf_path = config[os.getenv('config') or 'default'].conf_path
-log_path = config[os.getenv('config') or 'default'].log_path
-p = config[os.getenv('config') or 'default'].p
 
 cs = Blueprint("cs", __name__)
 
