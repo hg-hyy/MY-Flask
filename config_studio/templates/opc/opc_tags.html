@@ -5,78 +5,80 @@
 </style>
 {% endblock %}
 {% block content %}
-<div class="jumbotron p-4">
-<div class="div1">
-    <h1>OPC位号配置</h1>
-    <div class="form-group row ml-1">
-        <label for="module" class="col-sm1 col-form-label col-form-label-md ">
-            <h5>请选择需要查看的模块:</h5>
-        </label>
-        <div class="col-auto">
-            <select class="form-control form-control-md " name='module' id="module">
-                <option>s_opcda_client1</option>
-                <option>s_opcda_client2</option>
-                <option>s_opcda_client3</option>
-                <option>modbus1</option>
-                <option>modbus2</option>
-            </select>
-        </div>
-        <div class="col-auto">
-            <select class="form-control form-control-md " name='groups' id="groups">
 
-            </select>
-        </div>
-        <button type="button" class="col-sm-1 form-control form-control-md btn btn-outline-info"
-            onclick="module_tag_select()">click me </button>
+<h1 class="border-bottom mb-3">位号配置预览</h1>
+
+<div class="form-group row ">
+    <label for="module" class="col-sm1 col-form-label col-form-label-md ml-3 ">
+        <h5>请选择需要查看的模块:</h5>
+    </label>
+    <div class="col-auto">
+        <select class="form-control form-control-md " name='module' id="module">
+            <option>s_opcda_client1</option>
+            <option>s_opcda_client2</option>
+            <option>s_opcda_client3</option>
+            <option>modbus1</option>
+            <option>modbus2</option>
+        </select>
     </div>
+    <div class="col-auto">
+        <select class="form-control form-control-md " name='groups' id="groups">
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>tag_id:</th>
-                <th>publish_tag_name:</th>
-                <th>source_tag_name:</th>
-                <th>data_type:</th>
-            </tr>
-        </thead>
-        <tbody id='tags'>
-        </tbody>
-    </table>
+        </select>
+    </div>
+    <button type="button" class="col-sm-1 form-control form-control-md btn btn-outline-info"
+        onclick="module_tag_select()">click me </button>
+</div>
 
-    <div class="row">
-        <div class="col-md-12 col-sm-12 ">
-            <nav>
-                <ul class="pagination justify-content-end">
-                    <select class="form-control " name='pages' id="pages" onchange="pages(this)"
-                        style="width: fit-content;">
-                        <option selected>5</option>
-                        <option>10</option>
-                        <option>12</option>
-                        <option>20</option>
-                        <option>50</option>
-                    </select>
+<div class="row">
+    <div class="col-12">
+        <table id='table' class="table table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th>tag_id:</th>
+                    <th>publish_tag_name:</th>
+                    <th>source_tag_name:</th>
+                    <th>data_type:</th>
+                </tr>
+            </thead>
+            <tbody id='tags'>
+            </tbody>
+        </table>
+    </div>
+</div>
 
-                    <ul class="pagination  justify-content-end" id='page'>
-                        <li class="page-item "><a class="page-link form-control ">Pres</a></li>
-                        <li class="page-item"><a class="page-link form-control btn btn-info" id='page1'
-                                onclick="page(this)">1</a></li>
-                        <li class="page-item"><a class="page-link form-control" href="#">Next</a></li>
-                    </ul>
+<!-- 分页 -->
+<div class="row mt-5">
+    <div class="col-md-12 col-sm-12 ">
+        <nav>
+            <ul class="pagination justify-content-end">
+                <select class="form-control " name='pages' id="pages" onchange="pages(this)"
+                    style="width: fit-content;">
+                    <option selected>5</option>
+                    <option>10</option>
+                    <option>12</option>
+                    <option>20</option>
+                    <option>50</option>
+                </select>
 
-                    <li class="page-item"><a class="page-link form-control">共</a></li>
-                    <input id='total' name='total' class="form-control" style="width: 60px;" />
-                    <li class="page-item"><a class="page-link form-control">条</a></li>
-                    <li class="page-item"><a class="page-link form-control">共</a></li>
-                    <input id='max_pages' name='max_pages' class="form-control" style="width: 60px;" />
-                    <li class="page-item"><a class="page-link form-control">页</a></li>
+                <ul class="pagination  justify-content-end" id='page'>
+                    <li class="page-item "><a class="page-link form-control ">Pres</a></li>
+                    <li class="page-item"><a class="page-link form-control btn btn-info" id='page1'
+                            onclick="page(this)">1</a></li>
+                    <li class="page-item"><a class="page-link form-control" href="#">Next</a></li>
                 </ul>
-            </nav>
-        </div>
+
+                <li class="page-item"><a class="page-link form-control">共</a></li>
+                <input id='total' name='total' class="form-control" style="width: 60px;" />
+                <li class="page-item"><a class="page-link form-control">条</a></li>
+                <li class="page-item"><a class="page-link form-control">共</a></li>
+                <input id='max_pages' name='max_pages' class="form-control" style="width: 60px;" />
+                <li class="page-item"><a class="page-link form-control">页</a></li>
+            </ul>
+        </nav>
     </div>
-
-
 </div>
-</div>
+
 <script>
     var csrftoken = $("meta[name=csrf-token]").attr("content");
 
@@ -180,7 +182,7 @@
         $("#max_pages").val(data.max_pages)
         if (count > 0) {
             for (i in data.tags) {
-                var $td=''
+                var $td = ''
                 for (t in data.tags[i]) {
 
                     $td +=
@@ -189,7 +191,7 @@
                         // '<td scope="row" class="table-secondary">' + data.tags[i].source_tag_name + '</td>' +
                         // '<td scope="row" class="table-danger">' + data.tags[i].data_type + '</td>' +
                         '<td scope="row" class="table-danger">' + data.tags[i][t] + '</td>'
-                        
+
                 };
                 $comm += '<tr>' + $td + '</tr>'
                 var $subject_con = $('#tags');

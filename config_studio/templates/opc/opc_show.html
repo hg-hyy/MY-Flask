@@ -2,44 +2,39 @@
 {% block title %}OPC参数{% endblock %}
 {% block head %}
 <style type="text/css">
-
 </style>
 {% endblock %}
-
 {% block content %}
-<div class="jumbotron p-4">
-<div class="row">
 
-    <div class="col-12">
-        <h1 class="border-bottom mb-3">模块配置预览</h1>
+<h1 class="border-bottom mb-3">模块配置预览</h1>
 
-        <div class="form-group row">
-            <label for="module" class="col-sm1 col-form-label col-form-label-md ">
-                <h5>请选择需要查看的模块:</h5>
-            </label>
-            <div class="col-auto">
-                <select class="form-control form-control-md " name='module' id="module">
-                    <option>s_opcda_server1</option>
-                    <option>s_opcda_server2</option>
-                    <option>s_opcda_server3</option>
-                    <option>s_opcda_client1</option>
-                    <option>s_opcda_client2</option>
-                    <option>s_opcda_client3</option>
-                    <option>s_opcae_client1</option>
-                    <option>s_opcae_client2</option>
-                    <option>s_opcae_client3</option>
-                    <option>modbus1</option>
-                    <option>modbus2</option>
+<div class="row ">
+    <label for="module" class="col-sm1 col-form-label col-form-label-md ml-3 ">
+        <h5>请选择需要查看的模块:</h5>
+    </label>
+    <div class="col-auto">
+        <select class="form-control form-control-md " name='module' id="module">
+            <option>s_opcda_server1</option>
+            <option>s_opcda_server2</option>
+            <option>s_opcda_server3</option>
+            <option>s_opcda_client1</option>
+            <option>s_opcda_client2</option>
+            <option>s_opcda_client3</option>
+            <option>s_opcae_client1</option>
+            <option>s_opcae_client2</option>
+            <option>s_opcae_client3</option>
+            <option>modbus1</option>
+            <option>modbus2</option>
 
-                </select>
-            </div>
-            <button type="button" class="col-sm-1 form-control form-control-md btn btn-outline-primary"
-                onclick="opc_show()">show me </button>
-            <button type="button" class="col-sm-1 form-control form-control-md btn btn-outline-primary"
-                onclick="get_config()">s_config </button>
-        </div>
+        </select>
     </div>
+    <button type="button" class="col-sm-1 form-control form-control-md btn btn-outline-primary"
+        onclick="opc_show()">show me </button>
+    <button type="button" class="col-sm-1 form-control form-control-md btn btn-outline-primary"
+        onclick="get_config()">s_config </button>
+</div>
 
+<div class="row ml-1">
     <div class="col-5 p-0">
         <table class="table table-bordered table-hover">
             <thead>
@@ -111,10 +106,8 @@
     <div class="col-2 offset-6">
         <a href="{{url_for('cs.load_opc_da')}}" class="btn btn-info">修改配置</a>
     </div>
-
-
 </div>
-</div>
+
 <script>
     var csrftoken = $("meta[name=csrf-token]").attr("content");
 

@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block title %}new issue{% endblock %}
+{% block head %}
+<style type="text/css">
+
+</style>
+{% endblock %}
+{% block content %}
+<div class="jumbotron p-4">
+    <div class="container-xl">
+        <div class="row no-gutters justify-content-md-center">
+            <div class="col-12 col-md-12 col-md-12 col-xl-12 ">
+                <h6 class="display-4">Contact</h6>
+                <hr />
+
+
+                {% if success %}
+                <p>Thank you for your message. We'll get back to you shortly.</p>
+                <p>Return to <a href="{{ url_for('index') }}">Home Page</a>.</p>
+
+                {% else %}
+                <div class="text-center col-3 offset-2" id='login'>
+                {% with errors = get_flashed_messages(category_filter=["error"]) %}
+                {% if errors %}
+                {% for msg in errors %}
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <strong>{{ msg }}</strong>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                {% endfor %}
+                {% endif %}
+                {% endwith %}
+                {% endif %}
+
+            </div>
+                <form action="{{ url_for('issue.contact') }}" method='post'>
+
+                    {%for f in form%}
+                    {%if f.name == 'csrf_token' %}
+                    <div class="form-group row">
+                        <div class="col-sm-4">
+                            {{f}}
+                        </div>
+                    </div>
+                    {%else%}
+                    <div class="form-group row">
+                        {{f.label(class='col-sm-2 col-form-label col-form-label-md')}}
+                        <div class="col-sm-4">
+                            {{f}}
+                        </div>
+                        {{f.label(class='col-sm-2 col-form-label col-form-label-md')}}
+                    </div>
+                    {%endif%}
+                    {%endfor%}
+                </form>
+
+
+
+            </div>
+        </div>
+    </div>
+    {% endblock %}

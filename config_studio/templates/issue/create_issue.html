@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block title %}new issue{% endblock %}
+{% block head %}
+<style type="text/css">
+
+</style>
+{% endblock %}
+{% block content %}
+<div class="jumbotron p-4">
+  <div class="container-xl">
+    <div class="row no-gutters justify-content-md-center">
+      <div class="col-12 col-md-12 col-md-12 col-xl-12 ">
+        <h6 class="display-4">Issue</h6>
+        <hr />
+        <form method="post">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+
+          <div class="form-group row">
+            <label for="categorys" class="col-sm-2 col-form-label col-form-label-md">Title</label>
+            <div class="col-sm-4">
+              <input name="title" class="form-control form-control-md" id="title" value="{{ request.form['title'] }}"
+              placeholder="Title"  required autocomplete='off'>
+            </div>
+            <small id="emailHelp" class="form-text text-muted">请输入标题</small>
+          </div>
+
+          <div class="form-group row">
+            <label for="categorys" class="col-sm-2 col-form-label col-form-label-md">categorys</label>
+            <div class="col-sm-4">
+              <select class="form-control form-control-md " name='category_name' id="category_name">
+                {% if categorys  %}
+                {% for category in categorys %}
+                <option>{{category.name}}</option>
+                {% endfor %}
+                {% else %}
+                <option>没有主题，请先创建</option>
+                {% endif %}
+              </select>
+            </div>
+            <small id="emailHelp" class="form-text text-muted">请选择主题</small>
+          </div>
+
+          <div class="form-group row">
+            <label for="categorys" class="col-sm-2 col-form-label col-form-label-md">Body</label>
+            <div class="col-sm-4">
+              <textarea name="body" class="form-control form-control-md" rows="10"
+                id="body" placeholder="这里输入你的问题，请尽量详细。">{{ request.form['body'] }}</textarea>
+
+            </div>
+            <small id="emailHelp" class="form-text text-muted">请输入内容</small>
+          </div>
+          <div class="form-group row">
+            <div class="col-sm-4  offset-2">
+              <button type="submit" class="btn btn-primary  btn-block btn-md">save</button>
+            </div>
+          </div>
+        </form>
+
+      </div>
+    </div>
+  </div>
+  {% endblock %}

@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+{% block title %}issues{% endblock %}
+{% block head %}
+<style type="text/css">
+
+</style>
+{% endblock %}
+{% block content %}
+
+
+
+<h5 class="display-4 d-inline">issues</h5>
+
+{% if g.user  %}
+<a class="btn btn-outline-info btn-lg d-inline" href="{{ url_for('issue.create') }}">创建 issue </a>
+
+<a class="btn btn-outline-info btn-lg d-inline" href="{{ url_for('issue.add_category') }}">创建 category</a>
+<a class="btn btn-outline-info btn-lg d-inline" href="{{ url_for('issue.show_category') }}">查看 category</a>
+{% endif %}
+<hr />
+
+<form id='log_form'>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+    <div class=" justify-content-between flex-wrap flex-md-nowrap align-items-center mb-3">
+        <div class="form-group form-inline mb-0">
+
+            <label class="form-input-label mr-1" for="title">主题分类:</label>
+            <select class="form-control mr-1 col-1" id="log_level" name='log_level'>
+                {%for issue in issues%}
+                <option>{{issue.category}}</option>
+                {%endfor%}
+            </select>
+
+            <label class="form-input-label mr-1" for="log_day">发布日期:</label>
+            <input class="form-control col-1" type="text" name="log_day" id="log_day" value="">
+
+            <label class="form-input-label mr-1" for="log_day_start">开始时间:</label>
+            <input class="form-control col-1" type="text" name="log_day_start" id="log_day_start" value="">
+
+            <label class="form-input-label mr-1" for="log_day_end">结束时间:</label>
+            <input class="form-control col-1" type="text" name="log_day_end" id="log_day_end" value="">
+
+
+            <button type="button" class="btn btn-outline-info ml-1 " onclick="select_log()">
+                <span data-feather="upload"></span>
+                查询
+            </button>
+
+            <label class="form-input-label mr-1" for="key"></label>
+            <input class="form-control col-2" type="text" name="key" id="key"" value="">
+                
+
+                <button type=" button" class="btn btn-outline-success ml-1 " onclick="search()">
+            <span data-feather="calendar"></span>搜索
+            </button>
+
+
+        </div>
+    </div>
+</form>
+
+<div class="card-columns">
+    {% for issue in issues %}
+
+    <div class="card border-success mb-3" style="max-width: 30rem;">
+        <div class="card-header bg-transparent border-success">
+            <h3>
+                当前分类: <span class="badge badge-info badge-pill">
+                    {{issue.category}}</span></h3>
+        </div>
+        <div class="card-body text-success">
+            <h5 class="card-title">{{ issue['title'] }}</h5>
+            <blockquote class="blockquote mb-0">
+                <p class="card-text">{{ issue['body'] }}</p>
+                <footer class="blockquote-footer">
+                    by {{g.user}} on
+                    <cite title="Source Title">{{ issue['created'].strftime('%Y-%m-%d %H:%M:%S') }}</cite>
+                </footer>
+            </blockquote>
+        </div>
+        <div class="card-footer bg-transparent border-success d-flex flex-row-reverse">
+
+            {% if g.user.id == issue.user_id %}
+
+
+            <form action="{{ url_for('issue.delete_issue', id=issue['id']) }}" method="post">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                <input class="btn btn-outline-danger btn-md " type="submit" value="删除"
+                    onclick="return confirm('确认删除?');">
+            </form>
+            <form action="{{ url_for('issue.update_issue', id=issue['id']) }}" method="get" class="d-inline mr-3">
+                <input class="btn btn-outline-info btn-md " type="submit" value="编辑">
+            </form>
+
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<div class="row mt-5">
+    <div class="col-md-12 col-sm-12 ">
+        <nav>
+            <ul class="pagination pagination-md justify-content-end">
+                <select class="form-control " name='pages' id="pages" onchange="pages(this)"
+                    style="width: fit-content;">
+                    <option selected>5</option>
+                    <option>10</option>
+                    <option>12</option>
+                    <option>20</option>
+                    <option>50</option>
+                </select>
+
+                <ul class="pagination  justify-content-end" id='page'>
+                    <li class="page-item ">
+                        {% if paginate.has_prev %}
+                        <a class="page-link form-control" tabindex="-1"
+                            href="/show_issue?page={{ paginate.prev_num }}">Previous</a>
+                        {% endif %}
+                    </li>
+
+                    {%  for i in  paginate.iter_pages() %}
+                    {%if paginate.page == i %}
+                    <li class="page-item active">
+                        <a class="page-link form-control" href="/show_issue?page={{ i }}">{{ i }}</a>
+                    </li>
+                    {% else%}
+                    <li class="page-item ">
+                        <a class="page-link form-control" href="/show_issue?page={{ i }}">{{ i }}</a>
+                    </li>
+                    {% endif %}
+
+                    {% endfor %}
+
+                    {% if paginate.has_next %}
+                    <a class="page-link form-control" href="/show_issue?page={{ paginate.next_num }}">Next</a>
+                    {% endif %}
+
+                    </li>
+                </ul>
+
+                <li class="page-item"><a class="page-link form-control">共</a></li>
+                <input id='total' name='total' disabled class="form-control" style="width: 60px;"
+                    value="{{ paginate.total }}" />
+                <li class="page-item"><a class="page-link form-control">条</a></li>
+                <li class="page-item"><a class="page-link form-control">共</a></li>
+                <input id='max_pages' name='max_pages' disable class="form-control" style="width: 60px;"
+                    value="{{ max_pages }}" />
+                <li class="page-item"><a class="page-link form-control">页</a></li>
+            </ul>
+        </nav>
+    </div>
+</div>
+
+
+{% endblock %}

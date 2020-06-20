@@ -12,25 +12,7 @@
 </style>
 {% endblock %}
 {% block content %}
-<div class="row offset-1">
-    <!-- <div class="card" style="width: 18rem;">
-        <img class="card-img-top" src="..." alt="Card image cap">
-        <div class="card-body">
-            <h5 class="card-title">Card title</h5>
-            <p class="card-text">Some quick example text to build on the card title and mak content.</p>
-        </div>
-        <ul class="list-group list-group-flush">
-            <li class="list-group-item">Cras justo odio</li>
-            <li class="list-group-item">Dapibus ac facilisis in</li>
-            <li class="list-group-item">Vestibulum at eros</li>
-        </ul>
-        <div class="card-body">
-
-            <a href="{{url_for('config_tool.index')}}" class="btn btn-info">修改配置</a>
-            <a href="{{url_for('config_tool.file')}}" class="btn btn-info">导入标签点</a>
-
-        </div>
-    </div> -->
+<div class="row offset-2">
     <div class="col-8">
         <div class="py-1 text-center">
             <img class="d-block mx-auto mb-4" src="/static/pic/bootstrap-solid.svg" alt="" width="72" height="72">
@@ -145,6 +127,23 @@
                             <select class="custom-select d-block w-100" id="country" required>
                                 <option value="">Choose...</option>
                                 <option>United States</option>
+                                <option>
+                                    <div class="dropdown">
+                                        <button class="btn btn-secondary dropdown-toggle" type="button"
+                                            id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true"
+                                            aria-expanded="false">
+                                            Dropdown button
+                                        </button>
+                                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                            <a class="dropdown-item" href="#">Action</a>
+                                            <a class="dropdown-item" href="#">Another action</a>
+                                            <a class="dropdown-item" href="#">Something else here</a>
+                                        </div>
+                                    </div>
+                                </option>
+
+
+
                             </select>
                             <div class="invalid-feedback">
                                 Please select a valid country.
@@ -181,16 +180,6 @@
             </div>
         </div>
     </div>
-    <div class="col-12">
-        <footer class="mt-4  text-muted text-center text-small">
-            <p class="mb-1">&copy; 2017-2020 Company Name</p>
-            <ul class="list-inline">
-                <li class="list-inline-item"><a href="#">Privacy</a></li>
-                <li class="list-inline-item"><a href="#">Terms</a></li>
-                <li class="list-inline-item"><a href="#">Support</a></li>
-            </ul>
-        </footer>
-    </div>
 </div>
 <script>
     // Example starter JavaScript for disabling form submissions if there are invalid fields
@@ -213,6 +202,5 @@
             })
         }, false)
     }())
-
 </script>
 {% endblock %}

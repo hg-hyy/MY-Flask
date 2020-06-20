@@ -6,17 +6,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="FLASK_DEMON">
     <meta name="author" content="HYY, and Bootstrap contributors">
-    <meta name="generator" content="PRO_FLASK V1.0.0">
+    <meta name="generator" content="Config-Studio V1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{% block title %}{% endblock %}</title>
     <script src="{{ url_for('static', filename='js/jquery-3.5.1.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/bootstrap.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/vue.js') }}"></script>
     <script src="{{ url_for('static', filename='js/axios.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/feather.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/alerts.js') }}"></script>
     <script src="{{ url_for('static', filename='js/jquery.datetimepicker.full.min.js') }}"></script>
-    <script src='//recaptcha.net/recaptcha/api.js'></script> 
+    <script src='//recaptcha.net/recaptcha/api.js'></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.css') }}" />
     <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}" />
     <link rel="stylesheet" href="{{ url_for('static', filename='css/jquery.datetimepicker.min.css') }}">
@@ -26,18 +26,11 @@
         #main {
             margin-top: 16px;
         }
-
-        a:hover {
-            color: greenyellow;
-        }
-
-        a:active {
-            color: red;
-        }
     </style>
 </head>
 
-<body>
+<body style="overflow: hidden;">
+    <!-- 顶部标题栏 -->
     <nav class="navbar navbar-expand-md  sticky-top navbar-dark  bg-dark ">
         <span data-feather="home" style="width: 16px; height: 16px;color: aliceblue;"></span>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse"
@@ -51,57 +44,87 @@
                 </li>
 
             </ul>
+            <div class="dropdown mr-2">
+                <button class="btn btn-outline-danger dropdown-toggle" type="button" id="dropdownMenuButton"
+                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    {% if g.user %}
+                    Welcome! {{g.user}}
+                    {% else %}
+                    未登录
+                    {% endif %}
+                </button>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    {% if session['user_id'] %}
+                    <a href="{{url_for('user.profile')}}" class="dropdown-item">Profile</a>
+                    <a href="{{url_for('auth.logout')}}" class="dropdown-item">Logout</a>
+                    {% else %}
+                    <a href="{{url_for('auth.login')}}" class="dropdown-item">Login</a>
+                    {% endif %}
+                </div>
+            </div>
             <form class="form-inline mt-2 mt-md-0">
                 <input class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search">
                 <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-                <button class="btn btn-outline-info my-2 my-sm-0" type="submit">Logout</button>
             </form>
+
+
         </div>
     </nav>
+
+    <!-- 正文 -->
     <div class="container-fluid">
         <div class="row">
+
+            <!-- 左边导航栏 -->
             <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
-                <div class="sidebar-sticky pt-3 h-100" style="background:rgba(129, 104, 104, 0.438);">
+                <div class="sidebar-sticky pt-3 " style="background:rgba(129, 104, 104, 0.438);">
                     <ul class="nav flex-column">
                         <h2
-                            class="sidebar-heading d-flex justify-content-between align-items-center p-3 mt-4 mb-1 text-muted border-bottom ">
+                            class="sidebar-heading d-flex justify-content-between align-items-center p-3 mt-5 mb-1 text-muted  ">
                             <span>Home</span>
                         </h2>
-                        <li class="nav-item" active>
-                            <a class="nav-link active border-bottom" href="{{url_for('index')}}"
+                        <li class="nav-item {{home}}" active>
+                            <a class="nav-link  " href="{{url_for('index')}}"
                                 style="font-size: x-large;font-style: italic;font-family: cursive;">
                                 <span data-feather="home" style="width: 16px; height: 16px;color:black;"></span>
                                 home
                             </a>
                         </li>
                         <h2
-                            class="sidebar-heading d-flex justify-content-between align-items-center p-3 mt-4 mb-1 text-muted border-bottom ">
-                            <span>config setting</span>
+                            class="sidebar-heading d-flex justify-content-between align-items-center p-3 mt-1 mb-1 text-muted  ">
+                            <span>opc config setting</span>
                         </h2>
 
-                        <li class="nav-item">
-                            <a class="nav-link  border-bottom" href="{{url_for('cs.load_opc_se')}}"
+                        <li class="nav-item {{opc_da_server}}">
+                            <a class="nav-link  " href="{{url_for('cs.opc')}}"
                                 style="font-size: x-large;font-style: italic;font-family: cursive;">
-                                <span data-feather="anchor" style="width: 16px; height: 16px;color:black;"></span>
+                                <span data-feather="edit" style="width: 16px; height: 16px;color:black;"></span>
+                                OPC
+                            </a>
+                        </li>
+                        <li class="nav-item {{opc_da_server}}">
+                            <a class="nav-link  " href="{{url_for('cs.load_opc_se')}}"
+                                style="font-size: x-large;font-style: italic;font-family: cursive;">
+                                <span data-feather="edit" style="width: 16px; height: 16px;color:black;"></span>
                                 opc_da_server
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link  border-bottom" href="{{url_for('cs.load_opc_da')}}"
+                        <li class="nav-item {{opc_da_client}}" onclick="bg(this)">
+                            <a class="nav-link  " href="{{url_for('cs.load_opc_da')}}"
                                 style="font-size: x-large;font-style: italic;font-family: cursive;">
-                                <span data-feather="anchor" style="width: 16px; height: 16px;color:black;"></span>
+                                <span data-feather="star" style="width: 16px; height: 16px;color:black;"></span>
                                 opc_da_client
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link  border-bottom" href="{{url_for('cs.load_opc_ae')}}"
+                        <li class="nav-item {{opc_ae_client}}">
+                            <a class="nav-link  " href="{{url_for('cs.load_opc_ae')}}"
                                 style="font-size: x-large;font-style: italic;font-family: cursive;">
                                 <span data-feather="anchor" style="width: 16px; height: 16px;color:black;"></span>
                                 opc_ae_client
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link  border-bottom" href="{{url_for('cs.load_modbus')}}"
+                        <li class="nav-item {{modbus_slave}}">
+                            <a class="nav-link  " href="{{url_for('cs.load_modbus')}}"
                                 style="font-size: x-large;font-style: italic;font-family: cursive;">
                                 <span data-feather="octagon" style="width: 16px; height: 16px;color:black;"></span>
                                 modbus_slave
@@ -109,19 +132,19 @@
                         </li>
 
                         <h2
-                            class="sidebar-heading d-flex justify-content-between align-items-center p-3 mt-4 mb-1 text-muted border-bottom ">
-                            <span>config review</span>
+                            class="sidebar-heading d-flex justify-content-between align-items-center p-3 mt-1 mb-1 text-muted  ">
+                            <span>config & tag review</span>
                         </h2>
 
-                        <li class="nav-item">
-                            <a class="nav-link border-bottom" href="{{url_for('cs.config_review')}} "
+                        <li class="nav-item {{config_review}}">
+                            <a class="nav-link " href="{{url_for('cs.config_review')}} "
                                 style="font-size: x-large;font-style: italic;font-family: cursive;">
                                 <span data-feather="cpu" style="width: 16px; height: 16px;color:black;"></span>
                                 config_review
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link border-bottom" href="{{url_for('cs.tags_review')}} "
+                        <li class="nav-item {{tags_review}}">
+                            <a class="nav-link " href="{{url_for('cs.tags_review')}} "
                                 style="font-size: x-large;font-style: italic;font-family: cursive;">
                                 <span data-feather="cast" style="width: 16px; height: 16px;color:black;"></span>
                                 tags_review
@@ -129,179 +152,207 @@
                         </li>
 
                         <h2
-                            class="sidebar-heading d-flex justify-content-between align-items-center p-3 mt-4 mb-1 text-muted border-bottom ">
-                            <span>log</span>
+                            class="sidebar-heading d-flex justify-content-between align-items-center p-3 mt-1 mb-1 text-muted  ">
+                            <span>log & faq</span>
                         </h2>
-                        <li class="nav-item">
-                            <a class="nav-link border-bottom" href="{{url_for('cs.log')}} "
+                        <li class="nav-item {{log}}">
+                            <a class="nav-link " href="{{url_for('cs.log')}} "
                                 style="font-size: x-large;font-style: italic;font-family: cursive;">
                                 <span data-feather="hard-drive" style="width: 16px; height: 16px;color:black;"></span>
                                 log
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link border-bottom" href="{{url_for('cs.log1')}} "
+
+                        <li class="nav-item {{faq}}">
+                            <a class="nav-link " href="{{url_for('issue.show_issue')}} "
                                 style="font-size: x-large;font-style: italic;font-family: cursive;">
-                                <span data-feather="hard-drive" style="width: 16px; height: 16px;color:black;"></span>
-                                log1
-                            </a>
-                        </li>
-                        <h2
-                            class="sidebar-heading d-flex justify-content-between align-items-center p-3 mt-4 mb-1 text-muted border-bottom ">
-                            <span>login</span>
-                        </h2>
-                        <li class="nav-item">
-                            <a class="nav-link border-bottom" href="{{url_for('auth.login')}} "
-                                style="font-size: x-large;font-style: italic;font-family: cursive;">
-                                <span data-feather="grid" style="width: 16px; height: 16px;color:black;"></span>
-                                login
+                                <span data-feather="info" style="width: 16px; height: 16px;color:black;"></span>
+                                faq
                             </a>
                         </li>
                     </ul>
                 </div>
             </nav>
 
+            <!-- 正文-->
             <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-md-4" id='main'>
+                <div class="jumbotron p-4">
+                    <div class="row">
+                        <div class="col-12" style="position: relative; overflow-y: auto; height: 560px;">
+                            {% block heads %}{% endblock %}
+                            {% block content %}{% endblock %}
+                        </div>
+                    </div>
+                </div>
 
-                {% block content %}{% endblock %}
+                <!-- 全局提示框 -->
                 <div style="position: fixed;top: 60px;right: 30px;" id='alarm'></div>
-        <!--页脚-->
-        <div class="container-fluid">
 
-            <footer class="pt-5 mt-5  border-top ">
-                <div class="row">
-                    <div class="col-12 col-md">
-                        <img class="mb-2"   src="{{url_for('static',filename='pic/CL1.jpg')}}" alt="" width="200" height="200">
-                        <!-- <small class="d-block mb-3 text-muted">&copy; 2019-10-03</small> -->
-                    </div>
-                    <div class="col-6 col-md">
-                        <h5>Features</h5>
-                        <ul class="list-unstyled text-small">
-                            <li><a class="text-muted" href="#">Cool stuff</a></li>
-                            <li><a class="text-muted" href="#">Random feature</a></li>
-                            <li><a class="text-muted" href="#">Team feature</a></li>
-                            <li><a class="text-muted" href="#">Stuff for developers</a></li>
-                            <li><a class="text-muted" href="#">Another one</a></li>
-                            <li><a class="text-muted" href="#">Last time</a></li>
-                        </ul>
-                    </div>
-                    <div class="col-6 col-md">
-                        <h5>Resources</h5>
-                        <ul class="list-unstyled text-small">
-                            <li><a class="text-muted" href="#">Resource</a></li>
-                            <li><a class="text-muted" href="#">Resource name</a></li>
-                            <li><a class="text-muted" href="#">Another resource</a></li>
-                            <li><a class="text-muted" href="#">Final resource</a></li>
-                        </ul>
-                    </div>
-                    <div class="col-6 col-md">
-                        <h5>About</h5>
-                        <ul class="list-unstyled text-small">
-                            <li><a class="text-muted" href="#">Team</a></li>
-                            <li><a class="text-muted" href="#">Locations</a></li>
-                            <li><a class="text-muted" href="#">Privacy</a></li>
-                            <li><a class="text-muted" href="#">Terms</a></li>
-                        </ul>
-                    </div>
-                </div>
-    
-                <div class="row p-2" style="background:linear-gradient(to right,#BFF098, #6FD6FF);">
-                    <div class="mx-auto w-auto">
-                        <span>Copyright © <a href="http://www.youzhan.org">天使精选</a></span> |
-                        <span><a href="http://www.miibeian.gov.cn/" target="_blank">ICP备11008151号</a></span>
-                    </div>
-                </div>
-    
-            </footer>
-    
-        </div>
+                <!--页脚-->
+                <div class="container-fluid">
 
+                    <footer class="pt-5 mt-5  border-top ">
+                        <div class="row">
+                            <div class="col-12 col-md">
+                                <img class="mb-2" src="{{url_for('static',filename='pic/CL1.jpg')}}" alt="" width="150"
+                                    height="150">
+                                <!-- <small class="d-block mb-3 text-muted">&copy; 2019-10-03</small> -->
+                            </div>
+                            <div class="col-6 col-md">
+                                <h5>Features</h5>
+                                <ul class="list-unstyled text-small">
+                                    <li><a class="text-muted" href="#">Cool stuff</a></li>
+                                    <li><a class="text-muted" href="#">Another one</a></li>
+                                    <li><a class="text-muted" href="#">Last time</a></li>
+                                </ul>
+                            </div>
+                            <div class="col-6 col-md">
+                                <h5>Resources</h5>
+                                <ul class="list-unstyled text-small">
+                                    <li><a class="text-muted" href="#">Resource</a></li>
+                                    <li><a class="text-muted" href="#">Resource name</a></li>
+                                </ul>
+                            </div>
+                            <div class="col-6 col-md">
+                                <h5>About</h5>
+                                <ul class="list-unstyled text-small">
+                                    <li><a class="text-muted" href="#">Team</a></li>
+                                    <li><a class="text-muted" href="#">Locations</a></li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="row p-2 " style="background:linear-gradient(to right,#BFF098, #6FD6FF);">
+                            <div class="mx-auto w-auto">
+                                <span>Copyright © <a href="http://www.youzhan.org">天の使精选</a></span> |
+                                <span><a href="http://www.miibeian.gov.cn/" target="_blank">ICP备11008151号</a></span>
+                            </div>
+                        </div>
+
+                    </footer>
+
+                </div>
             </main>
+
         </div>
     </div>
 
+    <!--modal-FAQ-->
+    <div class="helper" id='helper'>
+        <a href="#FAQ" data-toggle="modal">
+            <span class="fas fa-comments-dollar fa-3x" style="color:dodgerblue;"></span>
+        </a>
+    </div>
 
+    <div class="modal fade in " id="FAQ" tabindex="-1" role="dialog" aria-labelledby="FAQ">
+        <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">Can I help U ?</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <textarea class="form-control" rows="10" placeholder="Do you have some FAQ ?"></textarea>
+                </div>
 
-        <!--modal-FAQ-->
-        <div class="helper" id='helper'>
-            <a href="#FAQ" data-toggle="modal">
-                <span class="fas fa-comments-dollar fa-3x" style="color:dodgerblue;"></span>
-            </a>
-        </div>
-        <div class="modal fade in " id="FAQ" tabindex="-1" role="dialog" aria-labelledby="FAQ">
-            <div class="modal-dialog modal-sm" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h4 class="modal-title" id="myModalLabel">Can I help U ?</h4>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <textarea class="form-control" rows="10" placeholder="Do you have some FAQ ?"></textarea>
-                    </div>
-    
-                    <div class="modal-footer ">
-                        <button class="btn btn-primary" type="submit">Send</button>
-                    </div>
+                <div class="modal-footer ">
+                    <button class="btn btn-primary" type="submit">Send</button>
                 </div>
             </div>
         </div>
-        <!--model-登录框-->
-        <div class="modal fade in " id="loginModal" tabindex="-1" role="dialog" aria-labelledby="loginModal">
-            <div class="modal-dialog modal-dialog-centered " role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h4 class="modal-title" id="myModalLabel">请登录~</h4>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span class="fas fa-power-off"></span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-    
-                        <form class="form-signin" action="" method="post">
-                            
-                            <div class="text-center mb-4">
-                                <img width="72" height="72" class="mb-4" alt=""
-                                    src="{{url_for('static',filename='pic/bootstrap-solid.svg')}}">
-                                <h1 class="h3 mb-3 font-weight-normal">Floating labels</h1>
-                                <p>Build form controls with floating labels via the <code>:placeholder-shown</code>
-                                    pseudo-element. <a href="https://caniuse.com/#feat=css-placeholder-shown">Works in
-                                        latest Chrome, Safari, and
-                                        Firefox.</a></p>
-                            </div>
-    
-                            <div class="form-label-group" style="margin-bottom:1rem">
-                                <input class="form-control form-control-lg" id="username1" autofocus="" required=""
-                                    type="text" placeholder="Username" name="username">
-                                <label for="username" style="display: none">Username</label>
-                            </div>
-    
-                            <div class="form-label-group" style="margin-bottom:1rem">
-                                <input class="form-control form-control-lg" id="password1" required="" type="password"
-                                    placeholder="Password" name="password">
-                                <label for="password" style="display: none">Password</label>
-                            </div>
-    
-                            <div class="checkbox mb-3">
-                                <label>
-                                    <input type="checkbox" value="remember-me"> Remember me
-                                    <a href="{{url_for('auth.login')}}">忘记密码?</a>
-                                </label>
-                            </div>
-                            <input class="btn btn-lg btn-primary btn-block" type="submit" value="Submit">
-                            <input type="hidden" name="next" value="" />
-                        </form>
-                    </div>
-                    <div class="modal-footer">欢迎登机</div>
+    </div>
+
+    <!--model-登录框-->
+    <div class="modal fade in " id="loginModal" tabindex="-1" role="dialog" aria-labelledby="loginModal">
+        <div class="modal-dialog modal-dialog-centered " role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">请登录~</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span class="fas fa-power-off"></span>
+                    </button>
                 </div>
+                <div class="modal-body">
+
+                    <form class="form-signin" action="" method="post">
+
+                        <div class="text-center mb-4">
+                            <img width="72" height="72" class="mb-4" alt=""
+                                src="{{url_for('static',filename='pic/bootstrap-solid.svg')}}">
+                            <h1 class="h3 mb-3 font-weight-normal">Floating labels</h1>
+                            <p>Build form controls with floating labels via the <code>:placeholder-shown</code>
+                                pseudo-element. <a href="https://caniuse.com/#feat=css-placeholder-shown">Works in
+                                    latest Chrome, Safari, and
+                                    Firefox.</a></p>
+                        </div>
+
+                        <div class="form-label-group" style="margin-bottom:1rem">
+                            <input class="form-control form-control-lg" id="username1" autofocus="" required=""
+                                type="text" placeholder="Username" name="username">
+                            <label for="username" style="display: none">Username</label>
+                        </div>
+
+                        <div class="form-label-group" style="margin-bottom:1rem">
+                            <input class="form-control form-control-lg" id="password1" required="" type="password"
+                                placeholder="Password" name="password">
+                            <label for="password" style="display: none">Password</label>
+                        </div>
+
+                        <div class="checkbox mb-3">
+                            <label>
+                                <input type="checkbox" value="remember-me"> Remember me
+                                <a href="{{url_for('auth.login')}}">忘记密码?</a>
+                            </label>
+                        </div>
+                        <input class="btn btn-lg btn-primary btn-block" type="submit" value="Submit">
+                        <input type="hidden" name="next" value="" />
+                    </form>
+                </div>
+                <div class="modal-footer">欢迎登机</div>
             </div>
         </div>
+    </div>
+
     <script>
         feather.replace()
+        var csrftoken = $("meta[name=csrf-token]").attr("content");
 
+        function logout() {
+            $.ajax({
+                url: '{{url_for("auth.logout")}}',
+                type: 'post',
+                headers: {
+                    "X-CSRFToken": csrftoken
+                },
+                dataType: 'json',
+                success: function (data) {
+                    console.log(data)
+                },
+                error: function (data) {
+                    console.log(data);
+                },
+            })
+        }
 
-        var int = self.setInterval("auto_close()", 3000);
+        function login() {
+            $.ajax({
+                url: '{{url_for("auth.login")}}',
+                type: 'post',
+                headers: {
+                    "X-CSRFToken": csrftoken
+                },
+                dataType: 'json',
+                success: function (data) {
+                    console.log(data)
+                },
+                error: function (data) {
+                    console.log(data);
+                },
+            })
+        }
+        var int = self.setInterval("auto_close()", 3500);
 
         function clock() {
             var d = new Date();
@@ -313,13 +364,6 @@
             $(".alert").alert('close');
         }
     </script>
-
-
-
-
-
-
-
 </body>
 
 </html>

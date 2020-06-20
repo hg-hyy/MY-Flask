@@ -6,68 +6,154 @@
 </style>
 {% endblock %}
 {% block content %}
-<div class="jumbotron p-4">
-    <div class="row">
-        <div class="col-12">
-            <p>opc client参数配置</p>
-            <hr />
-            <form action="{{ url_for('cs.load_opc_da') }}" method="post" id='shen' enctype="multipart/form-data">
-                <fieldset disabled id='bj'>
-                    {%for f in form%}
-                        {%if f.name == 'csrf_token' %}
-                            <div class="form-group row">
-                                <div class="col-sm-4">
-                                    {{f}}
-                                </div>
-                            </div>
-                        {%else%}
-                            <div class="form-group row">
-                                {{f.label(class='col-sm-2 col-form-label col-form-label-md')}}
-                                <div class="col-sm-4">
-                                    {{f}}
-                                </div>
-                                {{f.label(class='col-sm-2 col-form-label col-form-label-md')}}
-                            </div>
-                        {%endif%}
-                    {%endfor%}
-                </fieldset>
+
+
+<p>opc 参数配置</p>
+<ul class="nav nav-pills" id="myTab" role="tablist">
+    <li class="nav-item">
+        <a class="nav-link active" id="da-tab" data-toggle="tab" href="#opc_da" role="tab" aria-controls="da"
+            aria-selected="true">OPC DA Client</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" id="ae-tab" data-toggle="tab" href="#opc_ae" role="tab" aria-controls="ae"
+            aria-selected="false">OPC AE Client</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" id="contact-tab" data-toggle="tab" href="#server" role="tab" aria-controls="contact"
+            aria-selected="false">OPC Server</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" id="contact-tab" data-toggle="tab" href="#modbus" role="tab" aria-controls="contact"
+            aria-selected="false">Moubus</a>
+    </li>
+</ul>
+<hr />
+<div class="tab-content" id="myTabContent">
+    <div class="tab-pane fade show active" id="opc_da">
+        <form action="{{ url_for('cs.load_opc_da') }}" method="post" id='opc_da' enctype="multipart/form-data">
+            <fieldset disabled id='opc_da_form'>
+                {%for f in opc_da_form%}
+                {%if f.name == 'csrf_token' %}
                 <div class="form-group row">
-                    <div class="col-sm-4  offset-2">
-                        <button type="button" class="btn btn-info btn-block btn-md" id='alter'
-                            onclick="edit()">edit</button>
-                        <button type="submit" class="btn btn-primary d-none btn-block btn-md" id='comm1'
-                            onclick="save()">save</button>
-                            {{form.save}}
+                    <div class="col-sm-4">
+                        {{f}}
                     </div>
                 </div>
+                {%else%}
+                <div class="form-group row">
+                    {{f.label(class='col-sm-2 col-form-label col-form-label-md')}}
+                    <div class="col-sm-4">
+                        {{f}}
+                    </div>
+                    {{f.label(class='col-sm-2 col-form-label col-form-label-md')}}
+                </div>
+                {%endif%}
+                {%endfor%}
+            </fieldset>
+            <div class="form-group row">
+                <div class="col-sm-4  offset-2">
+                    <button type="button" class="btn btn-info btn-block btn-md" id='edit_da'
+                        onclick="edit_opc_da()">edit da</button>
+                    <button type="submit" class="btn btn-primary d-none btn-block btn-md" id='save_da'
+                        onclick="save_opc_da()">save da</button>
+                    {{opc_da_form.save}}
+                </div>
+            </div>
 
-            </form>
-        </div>
+        </form>
     </div>
+    <div class="tab-pane fade" id="opc_ae">
+        <form action="{{ url_for('cs.load_opc_da') }}" method="post" id='opc_ae' enctype="multipart/form-data">
+            <fieldset disabled id='opc_ae_form'>
+                {%for f in opc_ae_form%}
+                {%if f.name == 'csrf_token' %}
+                <div class="form-group row">
+                    <div class="col-sm-4">
+                        {{f(id = 'da1')}}
+                    </div>
+                </div>
+                {%else%}
+                <div class="form-group row">
+                    {{f.label(class='col-sm-2 col-form-label col-form-label-md')}}
+                    <div class="col-sm-4">
+                        {{f}}
+                    </div>
+                    {{f.label(class='col-sm-2 col-form-label col-form-label-md')}}
+                </div>
+                {%endif%}
+                {%endfor%}
+            </fieldset>
+            <div class="form-group row">
+                <div class="col-sm-4  offset-2">
+                    <button type="button" class="btn btn-info btn-block btn-md" id='edit_ae'
+                        onclick="edit_opc_ae()">edit ae</button>
+                    <button type="submit" class="btn btn-primary d-none btn-block btn-md" id='save_ae'
+                        onclick="save_opc_ae()">save ae</button>
+                    {{opc_ae_form.save}}
+                </div>
+            </div>
+
+        </form>
+    </div>
+    <div class="tab-pane fade" id="server">...</div>
+    <div class="tab-pane fade" id="modbus">...</div>
 </div>
+
+
 <script>
     var csrftoken = $("meta[name=csrf-token]").attr("content");
 
 
-    function edit() {
+    function edit_opc_da() {
         var module_name = $("#module").val()
         alarms('开始编辑' + module_name)
-        $("#alter").addClass("d-none");
-        $("#comm1").removeClass("d-none");
-        $("#bj").removeAttr("disabled");;
+        $("#edit_da").addClass("d-none");
+        $("#save_da").removeClass("d-none");
+        $("#opc_da_form").removeAttr("disabled");;
 
     }
 
-    function save() {
-        $("#alter").removeClass("d-none");
-        $("#comm1").addClass("d-none");
-        $("#bj").addAttr("disabled");
+    function save_opc_da() {
+        $("#edit_da").removeClass("d-none");
+        $("#save_da").addClass("d-none");
+        $("#opc_da_form").addAttr("disabled");
+    }
+
+    function edit_opc_ae() {
+        var module_name = $("#module").val()
+        alarms('开始编辑' + module_name)
+        $("#edit_ae").addClass("d-none");
+        $("#save_ae").removeClass("d-none");
+        $("#opc_ae_form").removeAttr("disabled");;
+
+    }
+
+    function save_opc_ae() {
+        $("#edit_ae").removeClass("d-none");
+        $("#save_ae").addClass("d-none");
+        $("#opc_ae_form").addAttr("disabled");
     }
 
 
     $(document).ready(function () {
 
-        $("#alter").click(function () {
+        $("#edit_da").click(function () {
+            var module_name = $("#module").val()
+            $.ajax({
+                url: "{{url_for('cs.alter_module')}}",
+                data: {
+                    'module': module_name
+                },
+                type: 'get',
+                dataType: 'json',
+                success: success,
+                error: function (data) {
+                    console.log("请填写完全");
+                },
+            });
+            return false;
+        });
+        $("#edit_ae").click(function () {
             var module_name = $("#module").val()
             $.ajax({
                 url: "{{url_for('cs.alter_module')}}",

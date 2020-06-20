@@ -9,9 +9,10 @@
 """
 import xlrd
 import json
-import re
+import re,functools
 from pathlib import Path
-from flask import Flask, request, render_template, Blueprint, Markup, make_response, jsonify, flash
+from flask import Flask, request, render_template, Blueprint,session,url_for
+from flask import Markup, make_response, jsonify, flash,current_app,redirect,g
 from werkzeug.utils import secure_filename
 import os
 import time
@@ -20,10 +21,12 @@ from uuid import uuid4
 import linecache
 import requests
 from flask import Blueprint
-from config_studio import conf_path, log_path, log
 import jwt
 import datetime
-from .forms import OpcForm
+from .forms import OpcForm,LoginForm,OpcdaForm
+from instance.config import  client,server,opc,modbus,URL
+from .model import User
+
 """
 ##################################### 基础配置 #########################################
 """
@@ -31,50 +34,41 @@ from .forms import OpcForm
 
 cs = Blueprint("cs", __name__)
 
+BASE_DIR = Path(__file__).resolve().parent.parent
+log_path = os.path.join(BASE_DIR, 'logs')
+conf_path = os.path.join(BASE_DIR, 'conf', '')
 
 p = Path(conf_path)
-
-
-# regist_url = 'http://127.0.0.1:40200/s_config/v1.0/regist_config'
-# unregist_url = 'http://127.0.0.1:40200/s_config/v1.0/unregist_config'
-# getconfig_url = 'http://127.0.0.1:40200/s_config/v1.0/get_configs'
-# setconfig_url = 'http://127.0.0.1:40200/s_config/v1.0/set_configs'
-
-regist_url = 'http://192.168.20.213:40200/s_config/v1.0/regist_config'
-unregist_url = 'http://192.168.20.213:40200/s_config/v1.0/unregist_config'
-getconfig_url = 'http://192.168.20.213:40200/s_config/v1.0/get_configs'
-setconfig_url = 'http://192.168.20.213:40200/s_config/v1.0/set_configs'
-
-client = [
-    's_opcda_client1',
-    's_opcda_client2',
-    's_opcda_client3',
-    's_opcae_client1',
-    's_opcae_client2',
-    's_opcae_client3'
-]
-
-server = ['s_opcda_server1',
-          's_opcda_server2',
-          's_opcda_server3']
-opc = [
-    's_opcda_server1',
-    's_opcda_server2',
-    's_opcda_server3',
-    's_opcda_client1',
-    's_opcda_client2',
-    's_opcda_client3',
-    's_opcae_client1',
-    's_opcae_client2',
-    's_opcae_client3'
-]
-
-modbus = ['modbus1', 'modbus2']
 
 
 """
 ##################################### 公用方法 #########################################
 """
+def login_required(view):
+    """View decorator that redirects anonymous users to the login page."""
+
+    @functools.wraps(view)
+    def wrapped_view(**kwargs):
+        if g.user is None:
+            form = LoginForm()
+            return redirect(url_for('auth.login'))
+            # return render_template('auth/login.html',form=form)
+
+        return view(**kwargs)
+
+    return wrapped_view
+
+@cs.before_app_request
+def load_logged_in_user():
+    """If a user id is stored in the session, load the user object from
+    the database into ``g.user``."""
+    user_id = session.get("user_id")
+
+    if user_id is None:
+        g.user = None
+    else:
+        g.user = User.query.filter_by(id=user_id).first()
+
 
 
 def check_day_log(start, end, logs, level, key):
@@ -148,6 +142,7 @@ def read_json(module):
             cfg_msg = json.loads(f.read())
         return cfg_msg
     except Exception as e:
+        print(str(e))
         return cfg_msg
 
 
@@ -189,6 +184,7 @@ def read_modbus_config(cfg_msg, module):
 
             return tag_list, basic_config
         except Exception as e:
+            print(str(e))
             return tag_list, basic_config
     else:
         return tag_list, basic_config
@@ -249,7 +245,7 @@ def read_opc_config(cfg_msg, module):
                     tag_list.append(g['tags'])
             return tag_list, opc_config
         except Exception as e:
-            print(str(e), '---------------------------')
+            print(str(e), '-----------red opc config----------')
             return tag_list, opc_config
     else:
         return tag_list, opc_config
@@ -327,10 +323,10 @@ def call_s_config(ref_url, json_data):
             res = response.json()['data']
             return res, stu
         else:
-            log.debug(response.json()["msg"])
+            current_app.logger.debug(response.json()["msg"])
             return res, stu
     except Exception as error:
-        log.error(f'配置异常!原因:{error}')
+        current_app.logger.error(f'配置异常!原因:{error}')
 
 
 @cs.route('/page', methods=['GET', 'POST'], endpoint='page')
@@ -380,7 +376,7 @@ def search():
     cfg_msg = read_json(module)
     tags, basic_config = read_modbus_config(cfg_msg, module)
     data = search_tag(tagname, tags, [])
-    log.debug('查询位号:%s' % (tagname))
+    current_app.logger.debug('查询位号:%s' % (tagname))
     return {"tags": data}
 
 
@@ -390,14 +386,13 @@ def search():
 """
 @cs.route('/opc', methods=['GET', 'POST'], endpoint='opc')
 def da_client():
-    form = OpcForm()
-    print(form)
-    for f in form:
-        print(f.label)
-    return render_template('opc/da_ae_client.html',form=form)
+    opc_ae_form = OpcForm()
+    opc_da_form = OpcdaForm()
+    return render_template('opc/da_ae_client.html',opc_ae_form=opc_ae_form,opc_da_form=opc_da_form)
 
 
 @cs.route('/load_opc_se', methods=['GET', 'POST'], endpoint='load_opc_se')
+@login_required
 def load_opc_sev():
     if request.method == 'POST':
         module = request.form['module']
@@ -444,10 +439,12 @@ def load_opc_sev():
                                sort_keys=False, indent=4))
         set_config(res, module)
         return render_template("opc/opc_show.html", basic_config=basic_config)
-    return render_template("opc/opc_se_index.html")
+
+    return render_template("opc/opc_se_index.html",opc_da_server='bg-info')
 
 
 @cs.route('/load_opc_da', methods=['GET', 'POST'], endpoint='load_opc_da')
+@login_required
 def load_opc_da():
     form = OpcForm()
     if request.method == 'POST':
@@ -538,10 +535,11 @@ def load_opc_da():
         tags, basic_config = read_modbus_config(cfg_msg, module)
         set_config(res, module)
         return render_template("opc/opc_show.html", basic_config=dict1)
-    return render_template("opc/opc_da_index.html",form=form)
+    return render_template("opc/opc_da_index.html",form=form,opc_da_client='bg-danger')
 
 
 @ cs.route('/load_opc_ae', methods=['GET', 'POST'], endpoint='load_opc_ae')
+@login_required
 def load_opc_ae():
     if request.method == 'POST':
 
@@ -598,10 +596,11 @@ def load_opc_ae():
         tags, basic_config = read_modbus_config(cfg_msg, module)
         set_config(res, module)
         return render_template("opc/opc_show.html", basic_config=dict1)
-    return render_template("opc/opc_ae_index.html")
+    return render_template("opc/opc_ae_index.html",opc_ae_client='bg-warning')
 
 
 @cs.route('/load_modbus', methods=['GET', 'POST'], endpoint='load_modbus')
+@login_required
 def load_modbus():
     if request.method == 'POST':
         module = request.form['module']
@@ -680,7 +679,7 @@ def load_modbus():
         tags, basic_config = read_modbus_config(cfg_msg, module)
         set_config(res, module)
         return render_template('opc/opc_show.html', basic_config=basic_config)
-    return render_template('modbus/modbus_index.html')
+    return render_template('modbus/modbus_index.html',modbus_slave='bg-primary')
 
 
 """
@@ -690,6 +689,7 @@ def load_modbus():
 
 
 @ cs.route('/module_reg', methods=['GET', 'POST'], endpoint='module_reg')
+@login_required
 def module_reg():
     return render_template('reg/register.html')
 
@@ -786,12 +786,12 @@ def regist():
             "url": request.form['resful_url'],
             "config":  config
         }
-        res, stu = call_s_config(regist_url, json_data)
+        res, stu = call_s_config(URL['regist_url'], json_data)
         if stu:
-            log.debug(f'{module}模块注册成功')
+            current_app.logger.debug(f'{module}模块注册成功')
             return {'success': True, 'msg': f'{module}模块注册成功'}
         else:
-            log.debug(f'{module}模块注册失败')
+            current_app.logger.debug(f'{module}模块注册失败')
             return {'success': True, 'msg': f'{module}模块注册失败'}
 
     return render_template('reg/register.html')
@@ -802,12 +802,12 @@ def unregist():
     if request.method == 'POST':
         json_data = request.json
         module = json_data['module']
-        res, stu = call_s_config(unregist_url, json_data)
+        res, stu = call_s_config(URL['unregist_url'], json_data)
         if stu:
-            log.debug(f'{module}模块注销成功')
+            current_app.logger.debug(f'{module}模块注销成功')
             return {'success': True, 'msg': f'{module}模块注销成功'}
         else:
-            log.debug(f'{module}模块注销失败')
+            current_app.logger.debug(f'{module}模块注销失败')
             return {'success': True, 'msg': f'{module}模块注销失败'}
 
     return render_template('reg/register.html')
@@ -826,24 +826,25 @@ def alter_module():
     cfg_msg = read_json(module)
     if module in opc:
         tags, basic_config = read_opc_config(cfg_msg, module)
-        log.info(f'开始编辑{module}基础配置')
+        current_app.logger.debug(f'开始编辑{module}基础配置')
     else:
         tags, basic_config = read_modbus_config(cfg_msg, module)
-        log.info(f'开始编辑{module}基础配置')
+        current_app.logger.debug(f'开始编辑{module}基础配置')
     return {'basic_config': basic_config}
 
 
 @ cs.route('/config_review', methods=['GET', 'POST'], endpoint='config_review')
+@login_required
 def config_review():
     if request.method == 'POST':
         module = request.form['module']
         cfg_msg = read_json(module)
         if module in opc:
             tags, basic_config = read_opc_config(cfg_msg, module)
-            log.debug(f'查看{module}基础配置')
+            current_app.logger.debug(f'查看{module}基础配置')
         else:
             tags, basic_config = read_modbus_config(cfg_msg, module)
-            log.debug(f'查看{module}基础配置')
+            current_app.logger.debug(f'查看{module}基础配置')
         return {'basic_config': basic_config}
 
     module = 's_opcda_client1'
@@ -852,20 +853,21 @@ def config_review():
         tags, basic_config = read_opc_config(cfg_msg, module)
     else:
         tags, basic_config = read_modbus_config(cfg_msg, module)
-    return render_template('opc/opc_show.html', basic_config=basic_config)
+    return render_template('opc/opc_show.html', basic_config=basic_config,config_review='bg-success')
 
 
 @ cs.route('/tags_review/', methods=['GET', 'POST'], endpoint='tags_review')
+@login_required
 def tags_review():
     if request.method == 'POST':
         module = request.form['module']
         cfg_msg = read_json(module)
         if module in opc:
             tags, basic_config = read_opc_config(cfg_msg, module)
-            log.debug(f'查看{module}位号配置')
+            current_app.logger.debug(f'查看{module}位号配置')
         else:
             tags, basic_config = read_modbus_config(cfg_msg, module)
-            log.debug(f'查看{module}位号配置')
+            current_app.logger.debug(f'查看{module}位号配置')
         return {'tags': tags}
 
     # module1 = request.args.get('module')
@@ -875,22 +877,25 @@ def tags_review():
         tags, basic_config = read_opc_config(cfg_msg, module)
     else:
         tags, basic_config = read_modbus_config(cfg_msg, module)
-    return render_template('opc/opc_tags.html', tags=tags)
+    return render_template('opc/opc_tags.html', tags=tags,tags_review='bg-danger')
 
 
 @ cs.route('/get_config', methods=['GET', 'POST'], endpoint='get_config')
+@login_required
 def get_config():
     if request.method == 'POST':
         res_msg = {}
         module = request.form['module']
         json_data = {'module': module}
-        res, stu = call_s_config(getconfig_url, json_data)
+        res, stu = call_s_config(URL['getconfig_url'], json_data)
         if stu:
             res_msg = decode_config(res, module)
-            log.debug(f'获取{module}模块配置成功')
+
+            user_name=g.user.username
+            current_app.logger.debug(f'用户{user_name}:获取{module}模块配置成功')
             return res_msg
         else:
-            log.debug(f'获取{module}模块配置失败{res}')
+            current_app.logger.debug(f'获取{module}模块配置失败{res}')
             return res_msg
 
     return '不支持的方法'
@@ -898,11 +903,11 @@ def get_config():
 
 def set_config(cfg_msg, module):
     if request.method == 'POST':
-        res, stu = call_s_config(setconfig_url, cfg_msg)
+        res, stu = call_s_config(URL['setconfig_url'], cfg_msg)
         if stu:
-            log.debug(f'{module}模块配置成功')
+            current_app.logger.debug(f'{module}模块配置成功')
         else:
-            log.debug(f'{module}模块配置失败{res}')
+            current_app.logger.debug(f'{module}模块配置失败{res}')
     return '不支持的方法'
 
 
@@ -913,6 +918,7 @@ def set_config(cfg_msg, module):
 
 
 @ cs.route('/log', methods=['GET', 'POST'], endpoint='log')
+@login_required
 def logs():
     if request.method == 'POST':
         logs_list = []
@@ -956,10 +962,8 @@ def logs():
             logs = lg.read().splitlines()
         for l in logs:
             logs_list.append(l.rsplit('  '))
-        return render_template('log/log.html', logs_list=logs_list[:4])
+        return render_template('log/log.html', logs_list=logs_list[:4],log='bg-info')
 
-
-@ cs.route('/log1', methods=['GET', 'POST'], endpoint='log1')
 def log1():
     loglevel = []
     for root, dirs, files in os.walk(log_path):
@@ -967,12 +971,8 @@ def log1():
     for lv in loglist:
         loglevel.append(lv.split('-')[0])
     dicts = dict(zip(loglevel, loglist))
-    log.debug('注意!'+'在' + time.strftime('%Y-%m-%d %H:%M:%S')+'访问日志系统.')
-    return render_template('log/logs.html', **{'dicts': dicts, 'log_level': loglevel})
-
-
-# 日志查询
-@ cs.route('/check_log', methods=['GET', 'POST'], endpoint='check_log')
+    current_app.logger.debug('访问日志系统.')
+   
 def check_log():
     if request.method == "GET":
         log_level = request.args.get("log_level")
@@ -988,82 +988,4 @@ def check_log():
         return {'log_level': log_level, 'log_list': log_list}
 
 
-# 日志展示
-@ cs.route('/show_log', methods=['GET', 'POST'], endpoint='show_log')
-def show_log():
-    response = {}
-    if request.method == "GET":
-        try:
-            log_level = request.args.get("log_level")
-            log_name = request.args.get("log_name")
-            filename = os.path.join(log_path, log_name),  # 返回元组
-            with open(filename[0], 'r', encoding='UTF-8') as f:
-                log_text = f.readlines()
 
-            text = linecache.getline(filename[0], 2)
-
-            if len(log_text) == 0:
-                log_text.append("暂无日志")
-            response['log_level'] = log_level
-            response['log_text'] = log_text
-            response['msg'] = 'success'
-            response['code'] = 200
-            response["Access-Control-Allow-Origin"] = "*"
-        except Exception as e:
-            response['msg'] = str(e)
-            response['error_num'] = 1000
-        return response
-
-
-"""
-##################################### 集成vue ########################################
-
-"""
-
-
-@ cs.route('/vue', methods=['GET', 'POST'], endpoint='vue')
-def vue():
-    if request.method == 'POST':
-        cs.logger.debug('flask debug')
-        name = request.json.get("name")
-        age = request.json.get("age")
-        csrf_token = generate_csrf()
-        res = {
-            'data': [
-                {'id': 1, 'name': name, 'age': age},
-                {'id': 2, 'name': name, 'age': age},
-                {'id': 2, 'name': name, 'age': age},
-                {'id': 2, 'name': name, 'age': age}
-            ],
-            'status': 200,
-            'msg': 'OK',
-            'headers': {"X-CSRFToken": csrf_token, "Access-Control-Allow-Origin": "*"},
-            'config': {}
-        }
-        response = make_response(jsonify(res))
-        # 设置响应请求头
-        response.headers["Access-Control-Allow-Origin"] = '*'
-        response.headers["Access-Control-Allow-Methods"] = 'POST'
-        response.headers["Access-Control-Allow-Headers"] = "x-requested-with,content-type"
-
-        # return json.dumps(res)
-        log.info('info 请求')
-        log.debug('debug 请求')
-        return response
-    print(request.args.get('id'), request.args.get('name'))
-    res = {
-        'groceryList': [
-            {'id': 0, 'text': '蔬菜'},
-            {'id': 1, 'text': '奶酪'},
-            {'id': 2, 'text': '随便其它什么人吃的东西'}
-        ],
-        'status': 1000,
-        'statusText': 'OK',
-        'headers': {},
-        'config': {}
-    }
-    return render_template('vue/vue.html', res=res)
-
-
-if __name__ == "__main__":
-    cs.run(host='127.0.0.1', port='80', debug=True)

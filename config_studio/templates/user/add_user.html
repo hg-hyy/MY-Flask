@@ -2,21 +2,32 @@
 {% block title %}新建用户{% endblock %}
 {% block head %}
 <style type="text/css">
-.row{
-    margin-top: 100px;
-}
+
 </style>
 {% endblock %}
 {% block content %}
-<div class="row">
-    <div class="col-12">
-        <form action="{{ url_for('user.add_user') }}" method="post" class="form-group-control">
-            {{ form.csrf_token }}
-            {{ form.username.label }} {{ form.username(size=20) }}
-            {{ form.email.label }} {{ form.email(size=20) }}
-            {{ form.password.label }} {{ form.password(size=20) }}
-            <button type="submit" class="btn btn-primary">新建</button>
-        </form>
+
+
+<p>opc client参数配置</p>
+<hr />
+<form action="{{ url_for('user.add_user') }}" method="post" class="form-group-control">
+    {%for f in form%}
+    {%if f.name == 'csrf_token' or f.name == 'submit' %}
+    <div class="form-group row">
+        <div class="col-sm-4 offset-2">
+            {{f}}
+        </div>
     </div>
-</div>
+    {%else%}
+    <div class="form-group row">
+        {{f.label(class='col-sm-2 col-form-label col-form-label-md')}}
+        <div class="col-sm-4">
+            {{f}}
+        </div>
+        {{f.label(class='col-sm-2 col-form-label col-form-label-md')}}
+    </div>
+    {%endif%}
+    {%endfor%}
+</form>
+
 {% endblock %}

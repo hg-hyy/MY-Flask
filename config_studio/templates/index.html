@@ -4,21 +4,41 @@
 <style type="text/css"></style>
 {% endblock %}
 {% block content %}
-<div class="jumbotron p-4">
-  <div class=" row justify-content-md-end ">
-    <img src="{{url_for('static',filename='pic/logo.png')}}" class="img-fluid p-0 m-0" alt="Responsive image" />
-  </div>
 
-  <h1 class="display-3  py-3 my-3">Hello, OPCer! Welcome to <span class="badge badge-info">Configuration Studio.</span>
-  </h1>
-  <blockquote class="blockquote text-right ">
+
+<div class="jumbotron p-4 p-md-5 text-white rounded bg-dark">
+
+    <div class="d-flex justify-content-end">
+        <img src="{{url_for('static',filename='pic/logo.png')}}" class="img-fluid p-0 m-0 d-inline"
+            alt="Responsive image" />
+    </div>
+    <div class=" row justify-content-md-between ">
+
+
+
+        <div class="col-md-6 px-0  ">
+            <h1 class="display-4 font-italic">Title of a featured blog post</h1>
+            <p class="lead my-3">Multiple lines of text that form the lede, informing new readers quickly and
+                efficiently
+                about what’s most interesting in this post’s contents.</p>
+            <p class="lead mb-0"><a href="#" class="text-white font-weight-bold">Continue reading...</a></p>
+        </div>
+
+
+    </div>
+</div>
+
+<h1 class="display-3  py-3 my-3">Hello, OPCer! Welcome to <span class="badge badge-info">Configuration
+        Studio.</span>
+</h1>
+<blockquote class="blockquote text-right ">
 
 
     {% with messages = get_flashed_messages() %}
     {% if messages %}
 
     {% for message in messages %}
-    <p class="mb-0">爱上一个地方，就应该背上包去旅行，走得更远。{{ message }}</p>
+    <p class="mb-0">{{ message }}</p>
 
     {% endfor %}
 
@@ -27,67 +47,37 @@
 
 
     <footer class="blockquote-footer">Power by <cite title="Source Title">冒险湾一狗</cite></footer>
-  </blockquote>
+</blockquote>
 
-  <hr class="my-4">
+<hr class="my-4">
+<div class="shadow-lg p-3 mb-2 bg-light rounded">
+    <h5 class="display-5 mb-0"> ——>点击按钮开始<span class="badge badge-info">配置之旅</span>
+        <—— </h5> </div> <a class="btn btn-info btn-lg" href="{{ url_for('cs.module_reg') }}" role="button">のModule
+            注册</a>
+            <a class="btn btn-success btn-lg" href="{{ url_for('cs.load_opc_da') }}" role="button">のOPC 配 置</a>
+            <a class="btn btn-primary btn-lg" href="{{ url_for('cs.load_modbus') }}" role="button">のModbus 配 置</a>
+            <a class="btn btn-secondary btn-lg" href="{{ url_for('user.add_user') }}" role="button">のUser 注 册</a>
+            <a class="btn btn-danger btn-lg" href="{{ url_for('issue.show_issue') }}" role="button">の我要吐槽</a>
+            <a class="btn btn-warning btn-lg" href="{{ url_for('issue.contact') }}" role="button">の联系我们</a>
+            {% with errors = get_flashed_messages(category_filter=["error"]) %}
+            {% if errors %}
+            <div class="alert-message block-message ">
+                <a class="close" href="#">×</a>
+                <ul>comment
+                    {%- for msg in errors %}
+                    <li>{{ msg }}</li>
+                    {% endfor -%}
+                </ul>
+            </div>
+            {% endif %}
+            {% endwith %}
 
-  <h5 class="display-5 mb-3"> ——>点击下面的按钮开始配置之旅<—— </h5> <a class="btn btn-info btn-lg"
-      href="{{ url_for('cs.module_reg') }}" role="button">の系统注册</a>
-      <a class="btn btn-success btn-lg" href="{{ url_for('cs.load_opc_da') }}" role="button">のOPC配置</a>
-      <a class="btn btn-primary btn-lg" href="{{ url_for('cs.load_modbus') }}" role="button">のModbus配置</a>
-      <a class="btn btn-danger btn-lg" onclick="error('hello,world!')" role="button">の随便看看</a>
-      <a class="btn btn-danger btn-lg" href="{{ url_for('auth.comment') }}" role="button">の我要吐槽</a>
-
-
-      {% with errors = get_flashed_messages(category_filter=["error"]) %}
-      {% if errors %}
-      <div class="alert-message block-message error">
-        <a class="close" href="#">×</a>
-        <ul>
-          {%- for msg in errors %}
-          <li>{{ msg }}</li>
-          {% endfor -%}
-        </ul>
-      </div>
-      {% endif %}
-      {% endwith %}
-
-      <!-- <ul class="nav flex-column" id='es6'>
+            <!-- <ul class="nav flex-column" id='es6'>
       </ul> -->
 
-</div>
+            <script type="module">
 
-
-
-<script>
-  var csrftoken = $("meta[name=csrf-token]").attr("content");
-
-  function regoogle() {
-    console.log('开始请求');
-    $.ajax({
-      url: "https://www.google.com/recaptcha/api/siteverify",
-      data: {
-        'secret': '6LfGgaQZAAAAALFg29Ktye6qiinyqwIhj-xqmYO5',
-        'response': 'srrbrebntrntrnrntntntnt'
-      },
-      type: 'post',
-      headers: {
-        "X-CSRFToken": csrftoken,
-        'Access-Control-Allow-Origin':'*'
-      },
-      dataType: 'json',
-      success: function (ata) {
-        console.log(data)
-      },
-      error: function (data) {
-        console.log(data);
-      },
-    });
-  }
-</script>
-<script type="module">
-
-  import {route} from  "{{url_for('static',filename='js/route.js')}}"
+                import {route} from  "{{url_for('static',filename='js/route.js')}}"
   var $comm=''
     route.map( (item,index) => {
     $comm+=
@@ -106,4 +96,4 @@
 
 </script>
 
-{% endblock %}
+            {% endblock %}

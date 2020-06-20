@@ -1,32 +1,18 @@
-from urllib.parse import urlparse
-from collections import abc
-from flask import Blueprint, render_template, request, redirect, url_for, current_app
-import json
-import xlrd
-from pathlib import Path
-from werkzeug.utils import secure_filename
+from flask import Blueprint, render_template, request, redirect, url_for, current_app, session, flash, g
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileRequired, FileAllowed
-from flask_wtf.recaptcha import RecaptchaField, validators
-from flask_wtf.recaptcha.validators import Recaptcha
+from flask_wtf.recaptcha import RecaptchaField
 from wtforms import widgets, Form
-from wtforms import StringField, Label, HiddenField
+from wtforms import StringField
 from wtforms.validators import DataRequired, Regexp, Length, IPAddress, ValidationError, InputRequired, Email
 from wtforms import PasswordField, SubmitField, RadioField
-from wtforms import BooleanField
+from wtforms import BooleanField, IntegerField
 from wtforms.fields import core
 from wtforms import TextAreaField, SelectField
 from wtforms.fields.html5 import EmailField
-import requests
-from .model import User
-from werkzeug.urls import url_encode
-from wtforms import ValidationError
-from urllib import request as http
-
-
-GOOGLE_RECAPTCHA_SECRET_KEY = '6LfGgaQZAAAAALFg29Ktye6qiinyqwIhj-xqmYO5'
-
-URL = 'https://recaptcha.net/recaptcha/api/siteverify'
+from .model import User, db, Category, Issue, Contact
+from wtforms.validators import EqualTo
+from werkzeug.security import generate_password_hash, check_password_hash
 
 
 class FileForm(FlaskForm):
@@ -46,51 +32,6 @@ class PhotoForm(FlaskForm):
         render_kw={'class': 'form-control form-control-md w-25'
                    })
 
-
-class UserForm(FlaskForm):
-
-    username = StringField('username',
-                           validators=[DataRequired()],
-                           widget=widgets.TextInput(),
-                           render_kw={
-                               'class': 'offset-1 form-control form-control-md mb-1 w-50', 'placeholder': 'foo'}
-                           )
-    email = StringField('email',
-                        #  validators=[DataRequired()],
-                        widget=widgets.TextInput(),
-                        render_kw={
-                            'class': 'offset-1 form-control form-control-md mb-3 w-50 ', 'placeholder': 'foo@example.com'}
-                        )
-    password = StringField('password',
-                           validators=[DataRequired()],
-                           widget=widgets.PasswordInput(),
-                           render_kw={
-                               'class': 'offset-1 form-control form-control-md mb-3 w-50 ', 'placeholder': 'foo@example.com'}
-                           )
-    gender = core.RadioField(
-        label="1,性别",
-        choices=(
-                (1, "男"),
-                (2, "女"),
-        ),
-        coerce=int,  # 限制是int类型的
-        default=[1]
-    )
-    city = core.SelectField(
-        label="城市",
-        choices=(
-                ("bj", "北京"),
-                ("sh", "上海"),
-        )
-    )
-    # def validate_email(self, field):
-    #     if User.objects.filter(email=field.data).count() > 0:
-    #         raise ValidationError('Email already registered')
-
-    # def validate_username(self, field):
-    #     if User.objects.filter(username=field.data).count() > 0:
-    #         raise ValidationError('Username has exist')
-
 # 自定义验证
 
 
@@ -99,118 +40,22 @@ def username_length_check(form, field):
         raise ValidationError('Field must be less than 50 characters')
 
 
-RECAPTCHA_VERIFY_SERVER = 'https://recaptcha.net/recaptcha/api/siteverify'
-RECAPTCHA_ERROR_CODES = {
-    'missing-input-secret': 'The secret parameter is missing.',
-    'invalid-input-secret': 'The secret parameter is invalid or malformed.',
-    'missing-input-response': 'The response parameter is missing.',
-    'invalid-input-response': 'The response parameter is invalid or malformed.'
-}
-
-
-text_type = str
-string_types = (str,)
-
-
-def to_bytes(text):
-    """Transform string to bytes."""
-    if isinstance(text, text_type):
-        text = text.encode('utf-8')
-    return text
-
-
-def to_unicode(input_bytes, encoding='utf-8'):
-    """Decodes input_bytes to text if needed."""
-    if not isinstance(input_bytes, string_types):
-        input_bytes = input_bytes.decode(encoding)
-    return input_bytes
-
-
-class Recaptcha(object):
-    """Validates a ReCaptcha."""
-
-    def __init__(self, message=None):
-        if message is None:
-            message = RECAPTCHA_ERROR_CODES['missing-input-response']
-        self.message = message
-
-    def __call__(self, form, field):
-        if current_app.testing:
-            return True
-
-        if request.json:
-            response = request.json.get('g-recaptcha-response', '')
-        else:
-            response = request.form.get('g-recaptcha-response', '')
-        remote_ip = request.remote_addr
-
-        if not response:
-            raise ValidationError(field.gettext(self.message))
-
-        if not self._validate_recaptcha(response, remote_ip):
-            field.recaptcha_error = 'incorrect-captcha-sol'
-            raise ValidationError(field.gettext(self.message))
-
-    def _validate_recaptcha(self, response, remote_addr):
-        """Performs the actual validation."""
-        try:
-            
-            private_key = current_app.config['RECAPTCHA_PRIVATE_KEY']
-        except KeyError:
-            raise RuntimeError("No RECAPTCHA_PRIVATE_KEY config set")
-
-        data = url_encode({
-            'secret':     private_key,
-            'remoteip':   remote_addr,
-            'response':   response
-        })
-
-        http_response = http.urlopen(RECAPTCHA_VERIFY_SERVER, to_bytes(data))
-
-        if http_response.code != 200:
-            return False
-
-        json_resp = json.loads(to_unicode(http_response.read()))
-
-        if json_resp["success"]:
-            return True
-
-        for error in json_resp.get("error-codes", []):
-            if error in RECAPTCHA_ERROR_CODES:
-                raise ValidationError(RECAPTCHA_ERROR_CODES[error])
-
-        return False
-
-
-def check_password(form, field):
-    print(field)
-    if len(field.data) > 50:
-        raise ValidationError('Field must be less than 50 characters')
-
-
 class LoginForm(FlaskForm):
 
-    username = StringField('name',
-                           validators=[DataRequired(), username_length_check],
+    username = StringField('username',
+                           validators=[DataRequired()],
                            widget=widgets.TextInput(),
                            render_kw={'class': 'form-control form-control-md',
-                                      'placeholder': 'Email address', 'required': 'required'}
+                                      'placeholder': 'username', 'required': 'required', 'autocomplete': 'off'}
                            )
     password = PasswordField('password',
-                             validators=[DataRequired(), 
-                                         #   Length(
-                                         #       min=8, message='用户名长度必须大于%(min)d'),
-                                         #   Regexp(regex="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$@$!%*?&])[A-Za-z\d$@$!%*?&]{8,}",
-                                         #          message='密码至少8个字符，至少1个大写字母，1个小写字母，1个数字和1个特殊字符')
+                             validators=[DataRequired(),
                                          ],
                              widget=widgets.PasswordInput(),
                              render_kw={'class': 'form-control form-control-md my-3',
                                         'placeholder': 'password', 'required': 'required'}
                              )
     recaptcha = RecaptchaField('验证码')
-    # recaptcha = RecaptchaField('验证码', validators=[check],
-    #                            widget=widgets.TextInput(),
-    #                            render_kw={'class': 'form-control form-control-md'})
 
     remember_me = BooleanField(label='remember me')
 
@@ -219,50 +64,168 @@ class LoginForm(FlaskForm):
                              'class': 'form-control btn btn-md btn-primary btn-block'}
                          )
 
-    # def validate(self):
-    #     """Validator for check the account information."""
-    #     check_validata = super(LoginForm, self).validate()
+    def validate(self):
+        """Validator for check the account information."""
+        check_validata = super(LoginForm, self).validate()
 
-    #     # If validator no pass
-    #     if not check_validata:
-    #         return False
-    #     print()
-    #     # Check the user whether exist.
-    #     user = User.query.filter_by(username=self.username.data).first()
-    #     if not user:
-    #         self.username.errors.append('Invalid username or password.')
-    #         return False
+        # If validator no pass
+        if not check_validata:
+            return False
+        remember_me = self.remember_me.data
+        user = User.query.filter_by(username=self.username.data).first_or_404(
+            description='THE {} is not found'.format(self.username.data))
 
-    #     # Check the password whether right.
-    #     if not user.check_password(self.password.data):
-    #         self.username.errors.append('Invalid username or password.')
-    #         return False
+        if user.username == self.username.data and user.check_password:
+            if remember_me == '1':
+                session.permanent = True
+                session['user_id'] = user.id
 
-    #     return True
-
-    # def check_password(self, form, field):
-    #     print(field)
-    #     if len(field.data) > 50:
-    #         raise ValidationError('Field must be less than 50 characters')
+            else:
+                session['user_id'] = user.id
+            return True
+        else:
+            self.username.errors.append('Invalid username or password.')
+            return False
 
 
-class CommentForm(FlaskForm):
 
-    comment = TextAreaField("Comment", validators=[DataRequired()])
-    recaptcha = RecaptchaField()
+class RegisterForm(FlaskForm):
+    username = StringField('Username', validators=[DataRequired(), Length(1, 60),
+                                                   Regexp('^[A-Za-z][A-Za-z0-9_.]*$', 0, 'username must have only letters, numbers dots or underscores')])
+    username = StringField('username',
+                           validators=[DataRequired(), username_length_check],
+                           widget=widgets.TextInput(),
+                           render_kw={'class': 'form-control form-control-md',
+                                      'placeholder': 'username', 'required': 'required'}
+                           )
+    email = EmailField('email address',
+                       validators=[DataRequired()],
+                       render_kw={'class': 'form-control form-control-md',
+                                  'placeholder': 'Email address', 'required': 'required'}
+                       )
+    password = PasswordField('password',
+                             validators=[DataRequired(),
+                                         Length(
+                                 min=8, message='用户名长度必须大于%(min)d'),
+                                 Regexp(regex="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$@$!%*?&])[A-Za-z\d$@$!%*?&]{8,}",
+                                        message='密码至少8个字符，至少1个大写字母，1个小写字母，1个数字和1个特殊字符')
+                             ],
+                             widget=widgets.PasswordInput(),
+                             render_kw={'class': 'form-control form-control-md my-3',
+                                        'placeholder': 'password', 'required': 'required'}
+                             )
+    comfirm = PasswordField('Confirm Password',
+                            validators=[DataRequired(), EqualTo('password')],
+                            widget=widgets.PasswordInput(),
+                            render_kw={'class': 'form-control form-control-md',
+                                       'placeholder': 'password', 'required': 'required'}
+                            )
+    recaptcha = RecaptchaField('验证码')
+
+    submit = SubmitField('注册',
+                         render_kw={
+                             'class': 'form-control btn btn-md btn-primary btn-block'}
+                         )
+
+    def validate(self):
+        """Validator for check the account information."""
+        check_validata = super(RegisterForm, self).validate()
+
+        # If validator no pass
+        if not check_validata:
+            return False
+
+        print(self.username.data, self.password.data)
+
+        user = User.query.filter_by(username=self.username.data).first()
+        # db.session.query(Users).filter(username=self.username.data).first()
+        if user:
+            self.username.errors.append('User with that name already exists.')
+            return False
+        else:
+            # rw_pwd = generate_password_hash(self.password.data)
+            user = User(username=self.username.data,
+                        email=self.email.data, password=self.password.data)
+            db.session.add(user)
+            db.session.commit()
+        return True
 
 
-class ContactForm(FlaskForm):
-    name = StringField("Name", validators=[
-                       InputRequired('Please enter your name.')])
-    email = EmailField("Email", validators=[InputRequired(
-        "Please enter your email address."), Email("Please enter your email address.")])
-    subject = StringField("Subject", validators=[
-                          InputRequired("Please enter the subject.")])
-    message = TextAreaField("Message", validators=[
-                            InputRequired("Please enter your message.")])
-    recaptcha = RecaptchaField()
-    submit = SubmitField()
+class CategoryForm(FlaskForm):
+
+    category_name = StringField("category_name",
+                                validators=[DataRequired()],
+                                render_kw={
+                                    'class': 'form-control ', 'autocomplete': 'off'})
+    submit = SubmitField(
+        '创建', render_kw={'class': 'form-control btn btn-md btn-primary btn-block'})
+
+    def validate(self):
+        """Validator for check the account information."""
+        check_validata = super(CategoryForm, self).validate()
+        if not check_validata:
+            return False
+
+        category_name = self.category_name.data
+        category = Category.query.filter_by(
+            name=self.category_name.data).first()
+
+        if category:
+            flash("OOOPSS..主题已经存在，请换一个", 'error')
+            return False
+        else:
+            category = Category(name=category_name, user_id=g.user.id)
+            db.session.add(category)
+            db.session.commit()
+        return True
+
+
+class IssueForm(FlaskForm):
+
+    title = StringField("title",
+                        validators=[DataRequired()],
+                        render_kw={
+                            'class': 'form-control '})
+    body = StringField("body",
+                       validators=[DataRequired()],
+                       render_kw={
+                           'class': 'form-control '})
+    category_name = StringField("category_name",
+                                validators=[DataRequired()],
+                                render_kw={
+                                    'class': 'form-control '})
+    submit = SubmitField(
+        '创建', render_kw={'class': 'form-control btn btn-md btn-primary btn-block'})
+
+    def validate(self):
+        """Validator for check the account information."""
+        check_validata = super(IssueForm, self).validate()
+
+        # If validator no pass
+        if not check_validata:
+            return False
+
+        title = self.title.data
+        body = self.body.data
+        category_name = self.category_name.data
+        issue = Issue.query.filter_by(title=title).first()
+        category = Category.query.filter_by(name=self.category_name.data).first_or_404(
+            description='THE {} is not found'.format(self.category_name.data))
+        if not issue:
+            if not all((title, category)):
+                flash("标题或主题不能为空")
+                return False
+            else:
+                issue = Issue(title=title, body=body,
+                              user_id=g.user.id, category_id=category.id)
+                db.session.add(issue)
+                db.session.commit()
+        print('更新------------------')
+        issue.title = title
+        issue.body = body
+        issue.category_id = category.id
+        db.session.commit()
+        return True
 
 
 class OpcForm(FlaskForm):
@@ -425,11 +388,70 @@ class OpcForm(FlaskForm):
                                                   'placeholder': 'bak_server_password', 'required': 'required'}
                                        )
 
+    # submit = SubmitField('保存', widget=widgets.SubmitInput(),
+    #                      render_kw={'class': 'btn btn-info btn-block btn-md',})
+
+
+class OpcdaForm(OpcForm):
+
     file = FileField('上传文件', validators=[
         FileRequired(),
         FileAllowed(['xls', 'xlsx'], 'excel only!')],
         widget=widgets.FileInput(),
-        render_kw={'class': 'form-control form-control-md'}
-    )
-    # submit = SubmitField('保存', widget=widgets.SubmitInput(),
-    #                      render_kw={'class': 'btn btn-info btn-block btn-md',})
+        render_kw={'class': 'form-control form-control-md'})
+
+
+class ContactForm(FlaskForm):
+    name = StringField("Name",
+                       validators=[InputRequired('Please enter your name.')],
+                       render_kw={
+                           'class': 'form-control '}
+                       )
+    email = EmailField("Email",
+                       validators=[InputRequired("Please enter your email address."),
+                                   Email("Please enter your email address.")
+                                   ],
+                       render_kw={
+                           'class': 'form-control '}
+                       )
+    subject = StringField("Subject",
+                          validators=[
+                              InputRequired("Please enter the subject.")],
+                          render_kw={
+                              'class': 'form-control '}
+                          )
+    message = TextAreaField("Message",
+                            validators=[
+                                InputRequired("Please enter your message.")],
+                            render_kw={
+                                'class': 'form-control ', 'rows': '10'}
+                            )
+    submit = SubmitField('Send',
+                         render_kw={
+                             'class': 'btn btn-info btn-block btn-md'}
+                         )
+
+    def validate(self):
+        """Validator for check the account information."""
+        check_validata = super(ContactForm, self).validate()
+
+        # If validator no pass
+        if not check_validata:
+            return False
+
+        user = User.query.filter_by(username=self.name.data).first()
+        # db.session.query(Users).filter(username=self.username.data).first()
+        if not user:
+            self.name.errors.append('User with that name not exists.')
+            flash('User with that name not exists.', 'error')
+            return False
+        else:
+            contact = Contact(
+                name=self.name.data,
+                email=self.email.data,
+                subject=self.subject.data,
+                message=self.message.data,
+                user_id=user.id)
+            db.session.add(contact)
+            db.session.commit()
+        return True

@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}issues{% endblock %}
+{% block head %}
+<style type="text/css">
+
+</style>
+{% endblock %}
+{% block content %}
+<div class="jumbotron p-4">
+  <div class="row">
+    <div class="col-12">
+      <p>Edit "{{ category['name'] }}"</p>
+      <hr />
+      <form method="post" action="{{url_for('issue.update_category',id=category['id'])}}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+
+        <div class="form-group row">
+          <label for="category" class="col-sm-2 col-form-label col-form-label-md">category name</label>
+          <div class="col-sm-4">
+            <input name="title" id="title" class="form-control form-control-md"
+              value="{{ request.form['name'] or category['name'] }}" required>
+          </div>
+          <small id="emailHelp" class="form-text text-muted">请输入主题名称</small>
+        </div>
+
+        {% with errors = get_flashed_messages(category_filter=["error"]) %}
+        {% if errors %}
+        {% for msg in errors %}
+        <div class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
+          <strong>{{ msg }}</strong>
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+        <div class="form-group row">
+          <div class="col-sm-4  offset-2">
+            <button type="submit" class="btn btn-primary  btn-block btn-md">save</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+{% endblock %}

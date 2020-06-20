@@ -5,152 +5,67 @@
         "s_opcda_server1.isDataConvert": 0,
         "s_opcda_server1.tags": [
             {
-                "publish_tag_name": "FIX.F_1.F_CV",
+                "publish_tag_name": "Local.Test.TagBool.Value",
                 "write_able": 0,
                 "data_type": "ENUM_INT32"
             },
             {
-                "publish_tag_name": "FIX.F_2.F_CV",
+                "publish_tag_name": "Local.Test.TagByte.Value",
                 "write_able": 0,
                 "data_type": "ENUM_INT32"
             },
             {
-                "publish_tag_name": "FIX.F_3.F_CV",
+                "publish_tag_name": "Local.Test.TagBytes.Value",
                 "write_able": 0,
                 "data_type": "ENUM_INT32"
             },
             {
-                "publish_tag_name": "FIX.F_4.F_CV",
+                "publish_tag_name": "Local.Test.TagDouble.Value",
                 "write_able": 0,
                 "data_type": "ENUM_INT32"
             },
             {
-                "publish_tag_name": "FIX.F_5.F_CV",
+                "publish_tag_name": "Local.Test.TagFloat.Value",
                 "write_able": 0,
                 "data_type": "ENUM_INT32"
             },
             {
-                "publish_tag_name": "FIX.F_6.F_CV",
+                "publish_tag_name": "Local.Test.TagInt32.Value",
                 "write_able": 0,
                 "data_type": "ENUM_INT32"
             },
             {
-                "publish_tag_name": "FIX.F_7.F_CV",
+                "publish_tag_name": "Local.Test.TagLong.Value",
                 "write_able": 0,
                 "data_type": "ENUM_INT32"
             },
             {
-                "publish_tag_name": "FIX.F_8.F_CV",
+                "publish_tag_name": "Local.Test.TagSByte.Value",
                 "write_able": 0,
                 "data_type": "ENUM_INT32"
             },
             {
-                "publish_tag_name": "FIX.F_9.F_CV",
+                "publish_tag_name": "Local.Test.TagShort.Value",
                 "write_able": 0,
                 "data_type": "ENUM_INT32"
             },
             {
-                "publish_tag_name": "FIX.F_10.F_CV",
+                "publish_tag_name": "Local.Test.TagString.Value",
                 "write_able": 0,
                 "data_type": "ENUM_INT32"
             },
             {
-                "publish_tag_name": "FIX.F_11.F_CV",
+                "publish_tag_name": "Local.Test.TagUInt32.Value",
                 "write_able": 0,
                 "data_type": "ENUM_INT32"
             },
             {
-                "publish_tag_name": "FIX.F_12.F_CV",
+                "publish_tag_name": "Local.Test.TagULong.Value",
                 "write_able": 0,
                 "data_type": "ENUM_INT32"
             },
             {
-                "publish_tag_name": "FIX.F_13.F_CV",
-                "write_able": 0,
-                "data_type": "ENUM_INT32"
-            },
-            {
-                "publish_tag_name": "FIX.F_14.F_CV",
-                "write_able": 0,
-                "data_type": "ENUM_INT32"
-            },
-            {
-                "publish_tag_name": "FIX.F_15.F_CV",
-                "write_able": 0,
-                "data_type": "ENUM_INT32"
-            },
-            {
-                "publish_tag_name": "FIX.F_16.F_CV",
-                "write_able": 0,
-                "data_type": "ENUM_INT32"
-            },
-            {
-                "publish_tag_name": "FIX.F_17.F_CV",
-                "write_able": 0,
-                "data_type": "ENUM_INT32"
-            },
-            {
-                "publish_tag_name": "FIX.F_18.F_CV",
-                "write_able": 0,
-                "data_type": "ENUM_INT32"
-            },
-            {
-                "publish_tag_name": "FIX.F_19.F_CV",
-                "write_able": 0,
-                "data_type": "ENUM_INT32"
-            },
-            {
-                "publish_tag_name": "FIX.F_20.F_CV",
-                "write_able": 0,
-                "data_type": "ENUM_INT32"
-            },
-            {
-                "publish_tag_name": "FIX.F_21.F_CV",
-                "write_able": 0,
-                "data_type": "ENUM_INT32"
-            },
-            {
-                "publish_tag_name": "FIX.F_22.F_CV",
-                "write_able": 0,
-                "data_type": "ENUM_INT32"
-            },
-            {
-                "publish_tag_name": "FIX.F_23.F_CV",
-                "write_able": 0,
-                "data_type": "ENUM_INT32"
-            },
-            {
-                "publish_tag_name": "FIX.F_24.F_CV",
-                "write_able": 0,
-                "data_type": "ENUM_INT32"
-            },
-            {
-                "publish_tag_name": "FIX.F_25.F_CV",
-                "write_able": 0,
-                "data_type": "ENUM_INT32"
-            },
-            {
-                "publish_tag_name": "FIX.F_26.F_CV",
-                "write_able": 0,
-                "data_type": "ENUM_INT32"
-            },
-            {
-                "publish_tag_name": "FIX.F_27.F_CV",
-                "write_able": 0,
-                "data_type": "ENUM_INT32"
-            },
-            {
-                "publish_tag_name": "FIX.F_28.F_CV",
-                "write_able": 0,
-                "data_type": "ENUM_INT32"
-            },
-            {
-                "publish_tag_name": "FIX.F_29.F_CV",
-                "write_able": 0,
-                "data_type": "ENUM_INT32"
-            },
-            {
-                "publish_tag_name": "FIX.F_30.F_CV",
+                "publish_tag_name": "Local.Test.TagUShort.Value",
                 "write_able": 0,
                 "data_type": "ENUM_INT32"
             }

@@ -6,149 +6,139 @@
 </style>
 {% endblock %}
 {% block content %}
-<div class="jumbotron p-4">
-<div class="container-xl">
-    <div class="row no-gutters justify-content-md-center">
-        <div class="col-12 col-md-12 col-md-12 col-xl-12 ">
-            <p>Modbus参数配置</p>
-            <hr />
-            <form action="{{ url_for('cs.load_modbus') }}" method="post" id='shen' enctype="multipart/form-data">
-                <fieldset disabled id='bj'>
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-
-                    <div class="form-group row">
-                        <label for="module" class="col-sm-2 col-form-label col-form-label-md">module_name</label>
-                        <div class="col-sm-4">
-                            <select class="form-control form-control-md " name='module' id="module">
-                                <option>modbus1</option>
-                                <option>modbus2</option>
-                                <option>modbus3</option>
-                            </select>
-                        </div>
-                        <label for="module" class="col-sm-2 col-form-label col-form-label-md">请选择模块名称</label>
-                    </div>
-                    <div class="form-group row">
-                        <label for="ID" class="col-sm-2 col-form-label col-form-label-md">设备ID:</label>
-                        <div class="col-sm-4">
-                            <input type="text" name='id' class="form-control form-control-md" id="ID"
-                                placeholder="device ID" style="width: 100%" required>
-                            <small id="emailHelp" class="form-text text-muted">这里请填写设备名称</small>
-                        </div>
-
-                    </div>
-
-                    <div class="form-group row">
-                        <label for="type" class="col-sm-2 col-form-label col-form-label-md">通讯类型:</label>
-                        <div class="col-sm-4">
-                            <select class="form-control form-control-md " name='type' id="type" onchange="rtu_tcp()">
-                                <option>TCP</option>
-                                <option selected>RTU</option>
-                            </select>
-                            <small id="emailHelp" class="form-text text-muted">请选择通讯类型</small>
-                        </div>
-                    </div>
-
-                    <hr class="w-25 px-0 mx-0" />
 
 
-                    <div id='tcp'>
-                        <div class="form-group row">
-                            <label for="ip" class="col-sm-2 col-form-label col-form-label-md">IP地址:</label>
-                            <div class="col-sm-4">
-                                <input type="text" name="ip" class="form-control form-control-md" id="ip"
-                                    placeholder="ip address">
-                            </div>
-                        </div>
-                        <div class="form-group row">
-                            <label for="port" class="col-sm-2 col-form-label col-form-label-md">通讯端口:</label>
-                            <div class="col-sm-4">
-                                <input type="text" name="port" value="502" class="form-control form-control-md"
-                                    id="port" placeholder="默认502">
-                            </div>
-                        </div>
-                    </div>
+<p>Modbus参数配置</p>
+<hr />
+<form action="{{ url_for('cs.load_modbus') }}" method="post" id='shen' enctype="multipart/form-data">
+    <fieldset disabled id='bj'>
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
 
-                    <div id='rtu'>
-                        <div class="form-group row">
-                            <label for="com" class="col-sm-2 col-form-label col-form-label-md">串口:</label>
-                            <div class="col-sm-4">
-                                <input type="text" name='com' class="form-control form-control-md" id="com"
-                                    placeholder="com端口" style="width: 100%">
-                                <small id="emailHelp" class="form-text text-muted">这里请填写串口</small>
-                            </div>
-                        </div>
-                        <div class="form-group row">
-                            <label for="baud" class="col-sm-2 col-form-label col-form-label-md">波特率:</label>
-                            <div class="col-sm-4">
-                                <select class="form-control form-control-md " name='baud' id="baud">
-                                    <option>4800</option>
-                                    <option selected>9600</option>
-                                    <option>115200</option>
-                                </select>
+        <div class="form-group row">
+            <label for="module" class="col-sm-2 col-form-label col-form-label-md">module_name</label>
+            <div class="col-sm-4">
+                <select class="form-control form-control-md " name='module' id="module">
+                    <option>modbus1</option>
+                    <option>modbus2</option>
+                    <option>modbus3</option>
+                </select>
+            </div>
+            <label for="module" class="col-sm-2 col-form-label col-form-label-md">请选择模块名称</label>
+        </div>
+        <div class="form-group row">
+            <label for="ID" class="col-sm-2 col-form-label col-form-label-md">设备ID:</label>
+            <div class="col-sm-4">
+                <input type="text" name='id' class="form-control form-control-md" id="ID" placeholder="device ID"
+                    style="width: 100%" required>
+                <small id="emailHelp" class="form-text text-muted">这里请填写设备名称</small>
+            </div>
 
-                            </div>
-                        </div>
+        </div>
 
-                        <div class="form-group row">
-                            <label for="data_bit" class="col-sm-2 col-form-label col-form-label-md">数据位:</label>
-                            <div class="col-sm-4">
-                                <select class="form-control form-control-md " name='data_bit' id="data_bit">
-                                    <option>7</option>
-                                    <option selected>8</option>
+        <div class="form-group row">
+            <label for="type" class="col-sm-2 col-form-label col-form-label-md">通讯类型:</label>
+            <div class="col-sm-4">
+                <select class="form-control form-control-md " name='type' id="type" onchange="rtu_tcp()">
+                    <option>TCP</option>
+                    <option selected>RTU</option>
+                </select>
+                <small id="emailHelp" class="form-text text-muted">请选择通讯类型</small>
+            </div>
+        </div>
 
-                                </select>
 
-                            </div>
-                        </div>
-                        <div class="form-group row">
-                            <label for="stop_bit" class="col-sm-2 col-form-label col-form-label-md">停止位:</label>
-                            <div class="col-sm-4">
-                                <select class="form-control form-control-md " name='stop_bit' id="stop_bit">
-                                    <option selected>1</option>
-                                    <option>2</option>
-                                </select>
 
-                            </div>
-                        </div>
-                        <div class="form-group row">
-                            <label for="parity" class="col-sm-2 col-form-label col-form-label-md">校验:</label>
-                            <div class="col-sm-4">
-                                <select class="form-control form-control-md " name='parity' id="parity">
-                                    <option selected>none</option>
-                                    <option>odd</option>
-                                    <option>even</option>
-                                </select>
 
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="form-group row">
-                        <label for="file" class="col-sm-2 col-form-label col-form-label-md">上传位号:</label>
-                        <div class="col-sm-4">
-                            <input type="file" name='file' class="form-control form-control-md" id="file">
-                        </div>
-                    </div>
-
-                </fieldset>
-                <div class="form-group row">
-                    <div class="col-sm-4  offset-2">
-                        <button type="button" class="btn btn-info btn-block btn-md" id='alter'
-                            onclick="edit()">edit</button>
-                        <button type="submit" class="btn btn-primary d-none btn-block btn-md" id='comm1'
-                            onclick="save()">save</button>
-                    </div>
+        <div id='tcp'>
+            <div class="form-group row">
+                <label for="ip" class="col-sm-2 col-form-label col-form-label-md">IP地址:</label>
+                <div class="col-sm-4">
+                    <input type="text" name="ip" class="form-control form-control-md" id="ip" placeholder="ip address">
                 </div>
+            </div>
+            <div class="form-group row">
+                <label for="port" class="col-sm-2 col-form-label col-form-label-md">通讯端口:</label>
+                <div class="col-sm-4">
+                    <input type="text" name="port" value="502" class="form-control form-control-md" id="port"
+                        placeholder="默认502">
+                </div>
+            </div>
+        </div>
 
-            </form>
+        <div id='rtu'>
+            <div class="form-group row">
+                <label for="com" class="col-sm-2 col-form-label col-form-label-md">串口:</label>
+                <div class="col-sm-4">
+                    <input type="text" name='com' class="form-control form-control-md" id="com" placeholder="com端口"
+                        style="width: 100%">
+                    <small id="emailHelp" class="form-text text-muted">这里请填写串口</small>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="baud" class="col-sm-2 col-form-label col-form-label-md">波特率:</label>
+                <div class="col-sm-4">
+                    <select class="form-control form-control-md " name='baud' id="baud">
+                        <option>4800</option>
+                        <option selected>9600</option>
+                        <option>115200</option>
+                    </select>
+
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label for="data_bit" class="col-sm-2 col-form-label col-form-label-md">数据位:</label>
+                <div class="col-sm-4">
+                    <select class="form-control form-control-md " name='data_bit' id="data_bit">
+                        <option>7</option>
+                        <option selected>8</option>
+
+                    </select>
+
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="stop_bit" class="col-sm-2 col-form-label col-form-label-md">停止位:</label>
+                <div class="col-sm-4">
+                    <select class="form-control form-control-md " name='stop_bit' id="stop_bit">
+                        <option selected>1</option>
+                        <option>2</option>
+                    </select>
+
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="parity" class="col-sm-2 col-form-label col-form-label-md">校验:</label>
+                <div class="col-sm-4">
+                    <select class="form-control form-control-md " name='parity' id="parity">
+                        <option selected>none</option>
+                        <option>odd</option>
+                        <option>even</option>
+                    </select>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label for="file" class="col-sm-2 col-form-label col-form-label-md">上传位号:</label>
+            <div class="col-sm-4">
+                <input type="file" name='file' class="form-control form-control-md" id="file">
+            </div>
+        </div>
+
+    </fieldset>
+    <div class="form-group row">
+        <div class="col-sm-4  offset-2">
+            <button type="button" class="btn btn-info btn-block btn-md" id='alter' onclick="edit()">edit</button>
+            <button type="submit" class="btn btn-primary d-none btn-block btn-md" id='comm1'
+                onclick="save()">save</button>
         </div>
     </div>
 
-    </form>
-</div>
-</div>
-</div>
-</div>
+</form>
+
+
 <script>
     // var csrf_token = "{{ csrf_token() }}";
 
@@ -165,7 +155,7 @@
 
     function edit() {
         var module_name = $("#module").val()
-        alarms('开始编辑'+module_name)
+        alarms('开始编辑' + module_name)
         $("#alter").addClass("d-none");
         $("#comm1").removeClass("d-none");
         $("#bj").removeAttr("disabled");;
