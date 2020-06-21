@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}OPC参数{% endblock %}
+{% block title %}admin{% endblock %}
 {% block head %}
 <style type="text/css">
     .div1 {
@@ -14,7 +14,7 @@
         <h1 >用户信息表</h1>
     </div>
     <div class="d-flex flex-row-reverse">
-        <p><a href="{{url_for('user.add_user')}}" class="btn btn-info">新增用户</a></p>
+        <p><a href="{{url_for('admin.add')}}" class="btn btn-info">新增用户</a></p>
     </div>
     {% if user_list %}
     <table class="table table-bordered">
@@ -22,6 +22,8 @@
             <th scope="col">#ID</th>
             <th scope="col">用户名</th>
             <th scope="col">邮箱</th>
+            <th scope="col">注册时间</th>
+            <th scope="col">登录时间</th>
             <th scope="col">操作</th>
         </thead>
         {% for user in user_list %}
@@ -31,8 +33,10 @@
                 <th scope="row" class="table-info">{{user.id}}</th>
                 <td class="table-success">{{user.username}}</td>
                 <td class="table-primary">{{user.email}}</td>
+                <td class="table-primary">{{user.create_time}}</td>
+                <td class="table-primary">{{user.last_login_time}}</td>
                 <td class="table-warning">
-                    <a class="btn badge-danger btn-sm" href="{{url_for('user.delete_user',username=user.username)}}">
+                    <a class="btn badge-danger btn-sm" href="{{url_for('admin.delete',username=user.username)}}">
                         删除
                     </a>
                 </td>

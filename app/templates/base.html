@@ -15,10 +15,12 @@
     <script src="{{ url_for('static', filename='js/axios.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/feather.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/alerts.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/impress.js') }}"></script>
     <script src="{{ url_for('static', filename='js/jquery.datetimepicker.full.min.js') }}"></script>
     <script src='//recaptcha.net/recaptcha/api.js'></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.css') }}" />
     <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/impress.css') }}" />
     <link rel="stylesheet" href="{{ url_for('static', filename='css/jquery.datetimepicker.min.css') }}">
 
     {% block head %}{% endblock %}
@@ -55,7 +57,7 @@
                 </button>
                 <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                     {% if session['user_id'] %}
-                    <a href="{{url_for('user.profile')}}" class="dropdown-item">Profile</a>
+                    <a href="{{url_for('admin.profile')}}" class="dropdown-item">Profile</a>
                     <a href="{{url_for('auth.logout')}}" class="dropdown-item">Logout</a>
                     {% else %}
                     <a href="{{url_for('auth.login')}}" class="dropdown-item">Login</a>
@@ -164,7 +166,7 @@
                         </li>
 
                         <li class="nav-item {{faq}}">
-                            <a class="nav-link " href="{{url_for('issue.show_issue')}} "
+                            <a class="nav-link " href="{{url_for('faq.show_issue')}} "
                                 style="font-size: x-large;font-style: italic;font-family: cursive;">
                                 <span data-feather="info" style="width: 16px; height: 16px;color:black;"></span>
                                 faq
@@ -176,7 +178,7 @@
 
             <!-- 正文-->
             <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-md-4" id='main'>
-                <div class="jumbotron p-4">
+                <div class="jumbotron p-4 ">
                     <div class="row">
                         <div class="col-12" style="position: relative; overflow-y: auto; height: 560px;">
                             {% block heads %}{% endblock %}

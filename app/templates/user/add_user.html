@@ -8,9 +8,21 @@
 {% block content %}
 
 
-<p>opc client参数配置</p>
+<p>用户注册</p>
 <hr />
-<form action="{{ url_for('user.add_user') }}" method="post" class="form-group-control">
+<form action="{{ url_for('admin.add') }}" method="post" class="form-group-control">
+    {% with errors = get_flashed_messages(category_filter=["error"]) %}
+    {% if errors %}
+    {% for msg in errors %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      <strong>{{ msg }}</strong>
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
     {%for f in form%}
     {%if f.name == 'csrf_token' or f.name == 'submit' %}
     <div class="form-group row">

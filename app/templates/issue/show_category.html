@@ -13,10 +13,10 @@
 
 {% if g.user  %}
 
-<a class="btn btn-outline-info btn-lg d-inline" href="{{ url_for('issue.add_category') }}">创建 category
+<a class="btn btn-outline-info btn-lg d-inline mr-2" href="{{ url_for('faq.add_category') }}">创建 category
 </a>
-{%elif category %}
-<a class="btn btn-outline-info btn-lg d-inline" href="{{ url_for('issue.create') }}">创建 issue </a>
+
+<a class="btn btn-outline-danger btn-lg d-inline" href="{{ url_for('faq.show_issue') }}">查看 issue </a>
 
 {% endif %}
 <hr />
@@ -45,12 +45,12 @@
                         {% if g.user.id == category.user_id %}
 
 
-                        <form action=" {{ url_for('issue.delete_category', id=category['id']) }}" method="post"
+                        <form action=" {{ url_for('faq.delete_category', id=category['id']) }}" method="post"
             class="d-inline">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
             <input class="btn btn-outline-danger btn-md " type="submit" value="删除" onclick="return confirm('确认删除?');">
             </form>
-            <form action="{{ url_for('issue.update_category', id=category['id']) }}" method="get" class="d-inline mr-3">
+            <form action="{{ url_for('faq.update_category', id=category['id']) }}" method="get" class="d-inline mr-3">
                 <input class="btn btn-outline-info btn-md " type="submit" value="编辑">
             </form>
 

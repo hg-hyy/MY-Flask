@@ -13,6 +13,7 @@ from wtforms.fields.html5 import EmailField
 from .model import User, db, Category, Issue, Contact
 from wtforms.validators import EqualTo
 from werkzeug.security import generate_password_hash, check_password_hash
+import datetime
 
 
 class FileForm(FlaskForm):
@@ -55,7 +56,7 @@ class LoginForm(FlaskForm):
                              render_kw={'class': 'form-control form-control-md my-3',
                                         'placeholder': 'password', 'required': 'required'}
                              )
-    recaptcha = RecaptchaField('验证码')
+    # recaptcha = RecaptchaField('验证码')
 
     remember_me = BooleanField(label='remember me')
 
@@ -76,24 +77,26 @@ class LoginForm(FlaskForm):
             description='THE {} is not found'.format(self.username.data))
 
         if user.username == self.username.data and user.check_password:
-            if remember_me == '1':
+            if remember_me == True:
                 session.permanent = True
+                current_app.permanent_session_lifetime = datetime.timedelta(
+                    seconds=60)
                 session['user_id'] = user.id
-
+                user.last_login_time = datetime.datetime.now()
+                db.session.commit()
             else:
                 session['user_id'] = user.id
+            flash('You were successfully logged in', 'success')
             return True
         else:
             self.username.errors.append('Invalid username or password.')
             return False
 
 
-
 class RegisterForm(FlaskForm):
-    username = StringField('Username', validators=[DataRequired(), Length(1, 60),
-                                                   Regexp('^[A-Za-z][A-Za-z0-9_.]*$', 0, 'username must have only letters, numbers dots or underscores')])
     username = StringField('username',
-                           validators=[DataRequired(), username_length_check],
+                           validators=[DataRequired(), Length(1, 60),
+                                       Regexp('^[A-Za-z][A-Za-z0-9_.]*$', 0, '用户名必须只有字母，数字，点或下划线'), username_length_check],
                            widget=widgets.TextInput(),
                            render_kw={'class': 'form-control form-control-md',
                                       'placeholder': 'username', 'required': 'required'}
@@ -101,12 +104,12 @@ class RegisterForm(FlaskForm):
     email = EmailField('email address',
                        validators=[DataRequired()],
                        render_kw={'class': 'form-control form-control-md',
-                                  'placeholder': 'Email address', 'required': 'required'}
+                                  'placeholder': 'Email address'}
                        )
     password = PasswordField('password',
                              validators=[DataRequired(),
                                          Length(
-                                 min=8, message='用户名长度必须大于%(min)d'),
+                                 min=8, message='密码名长度必须大于%(min)d'),
                                  Regexp(regex="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$@$!%*?&])[A-Za-z\d$@$!%*?&]{8,}",
                                         message='密码至少8个字符，至少1个大写字母，1个小写字母，1个数字和1个特殊字符')
                              ],
@@ -133,6 +136,7 @@ class RegisterForm(FlaskForm):
 
         # If validator no pass
         if not check_validata:
+            flash(self.errors, 'error')
             return False
 
         print(self.username.data, self.password.data)
@@ -140,7 +144,8 @@ class RegisterForm(FlaskForm):
         user = User.query.filter_by(username=self.username.data).first()
         # db.session.query(Users).filter(username=self.username.data).first()
         if user:
-            self.username.errors.append('User with that name already exists.')
+            self.username.errors.append('用户名不存在')
+            flash(self.username.errors, 'error')
             return False
         else:
             # rw_pwd = generate_password_hash(self.password.data)
@@ -200,31 +205,33 @@ class IssueForm(FlaskForm):
     def validate(self):
         """Validator for check the account information."""
         check_validata = super(IssueForm, self).validate()
-
         # If validator no pass
         if not check_validata:
             return False
-
         title = self.title.data
         body = self.body.data
         category_name = self.category_name.data
+        if not all((title, category_name, body)):
+            flash("标题或主题不能为空")
+            return False
         issue = Issue.query.filter_by(title=title).first()
-        category = Category.query.filter_by(name=self.category_name.data).first_or_404(
-            description='THE {} is not found'.format(self.category_name.data))
+        category = Category.query.filter_by(
+            name=self.category_name.data).first()
+
+        if not category and category_name == 'all':
+            category = Category(name=category_name, user_id=g.user.id)
+            db.session.add(category)
+            db.session.commit()
+
         if not issue:
-            if not all((title, category)):
-                flash("标题或主题不能为空")
-                return False
-            else:
-                issue = Issue(title=title, body=body,
-                              user_id=g.user.id, category_id=category.id)
-                db.session.add(issue)
-                db.session.commit()
-        print('更新------------------')
+            issue = Issue(title=title, body=body,
+                          user_id=g.user.id, category_id=category.id)
+            db.session.add(issue)
+            db.session.commit()
         issue.title = title
         issue.body = body
-        issue.category_id = category.id
         db.session.commit()
+        issue.category_id = category.id
         return True
 
 
@@ -248,9 +255,9 @@ class OpcForm(FlaskForm):
                              ("modbus2 ", "modbus2"),
                          ),
                          coerce=str,  # 限制是int类型的
-                         default=['s_opcda_client1'],
+                         default=[("s_opcda_client1", "s_opcda_client1")],
                          widget=widgets.Select(),
-                         render_kw={'class': 'form-control form-control-md',
+                         render_kw={'class': 'form-control form-control-md custom-select',
                                     'placeholder': 'module name', 'required': 'required'}
                          )
 
@@ -276,7 +283,7 @@ class OpcForm(FlaskForm):
                                      coerce=str,  # 限制是int类型的
                                      default=['Intellution.OPCiFIX.1'],
                                      widget=widgets.Select(),
-                                     render_kw={'class': 'form-control form-control-md',
+                                     render_kw={'class': 'form-control form-control-md custom-select',
                                                 'placeholder': 'main_server_prgid', 'required': 'required'}
                                      )
     main_server_classid = SelectField('main_server_classid',
@@ -299,7 +306,7 @@ class OpcForm(FlaskForm):
                                       default=[
                                           '3C5702A2-EB8E-11D4-83A4-00105A984CBD'],
                                       widget=widgets.Select(),
-                                      render_kw={'class': 'form-control form-control-md',
+                                      render_kw={'class': 'form-control form-control-md custom-select',
                                                  'placeholder': 'main_server_clsid', 'required': 'required'}
                                       )
     main_server_domain = StringField('main_server_domain',
@@ -343,7 +350,7 @@ class OpcForm(FlaskForm):
                                      coerce=str,  # 限制是int类型的
                                      default=['Kepware.KEPServerEX.V6'],
                                      widget=widgets.Select(),
-                                     render_kw={'class': 'form-control form-control-md',
+                                     render_kw={'class': 'form-control form-control-md custom-select',
                                                 'placeholder': 'bak_server_prgid', 'required': 'required'}
                                      )
     back_server_classid = SelectField('back_server_classid',
@@ -366,7 +373,7 @@ class OpcForm(FlaskForm):
                                       default=[
                                           '3C5702A2-EB8E-11D4-83A4-00105A984CBD'],
                                       widget=widgets.Select(),
-                                      render_kw={'class': 'form-control form-control-md',
+                                      render_kw={'class': 'form-control form-control-md custom-select',
                                                  'placeholder': 'bak_server_clsid', 'required': 'required'}
                                       )
     back_server_domain = StringField('back_server_domain',
@@ -405,14 +412,14 @@ class ContactForm(FlaskForm):
     name = StringField("Name",
                        validators=[InputRequired('Please enter your name.')],
                        render_kw={
-                           'class': 'form-control '}
+                           'class': 'form-control ', 'placeholder': 'Name'}
                        )
     email = EmailField("Email",
                        validators=[InputRequired("Please enter your email address."),
                                    Email("Please enter your email address.")
                                    ],
                        render_kw={
-                           'class': 'form-control '}
+                           'class': 'form-control ', 'placeholder': 'Email'}
                        )
     subject = StringField("Subject",
                           validators=[
@@ -424,7 +431,7 @@ class ContactForm(FlaskForm):
                             validators=[
                                 InputRequired("Please enter your message.")],
                             render_kw={
-                                'class': 'form-control ', 'rows': '10'}
+                                'class': 'form-control ', 'rows': '5', 'placeholder': 'something ..'}
                             )
     submit = SubmitField('Send',
                          render_kw={

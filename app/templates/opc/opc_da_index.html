@@ -10,17 +10,20 @@
 
 <p>opc client参数配置</p>
 <hr />
-<form action="{{ url_for('cs.load_opc_da') }}" method="post" id='shen' enctype="multipart/form-data">
+<form action="{{ url_for('cs.load_opc_da') }}" method="post" id='shen' enctype="multipart/form-data" class="needs-validation" novalidate>
     <fieldset disabled id='bj'>
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
         <div class="form-group row">
             <label for="module" class="col-sm-2 col-form-label col-form-label-md">module_name</label>
             <div class="col-sm-4">
-                <select class="form-control form-control-md " name='module' id="module">
+                <select class="form-control form-control-md custom-select " name='module' id="module">
                     <option>s_opcda_client1</option>
                     <option>s_opcda_client2</option>
                     <option>s_opcda_client3</option>
                 </select>
+                <div class="invalid-feedback" style="width: 100%;">
+                    Your username is required.
+                </div>
             </div>
             <label for="module" class="col-sm-2 col-form-label col-form-label-md">模块名称</label>
         </div>
@@ -38,7 +41,7 @@
             <label for="main_server_progid"
                 class="col-sm-2 col-form-label col-form-label-md">Main_OPC_Server_ProgID</label>
             <div class="col-sm-4">
-                <select class="form-control form-control-md " name='main_server_progid' id="main_server_progid">
+                <select class="form-control form-control-md custom-select" name='main_server_progid' id="main_server_progid">
                     <option>Intellution.OPCiFIX.1</option>
                     <option>Kepware.KEPServerEX.V6</option>
                     <option>Yokogawa.CSHIS_OPC.1</option>
@@ -52,7 +55,7 @@
             <label for="main_server_classid"
                 class="col-sm-2 col-form-label col-form-label-md">Main_OPC_Server_classID</label>
             <div class="col-sm-4">
-                <select class="form-control form-control-md " name='main_server_classid' id="main_server_classid">
+                <select class="form-control form-control-md custom-select" name='main_server_classid' id="main_server_classid">
                     <option>3C5702A2-EB8E-11D4-83A4-00105A984CBD</option>
                     <option>7BC0CC8E-482C-47CA-ABDC-0FE7F9C6E729</option>
                     <option>E6C32641-F1CF-11D0-B0E4-080009CCD384</option>
@@ -105,7 +108,7 @@
             <label for="back_server_progid"
                 class="col-sm-2 col-form-label col-form-label-md">Back_OPC_Server_ProgID</label>
             <div class="col-sm-4">
-                <select class="form-control form-control-md " name='back_server_progid' id="back_server_progid">
+                <select class="form-control form-control-md custom-select" name='back_server_progid' id="back_server_progid">
                     <option>Intellution.OPCiFIX.1</option>
                     <option>Kepware.KEPServerEX.V6</option>
                     <option>Yokogawa.CSHIS_OPC.1</option>
@@ -119,7 +122,7 @@
             <label for="back_server_classid"
                 class="col-sm-2 col-form-label col-form-label-md">Back_OPC_Server_classID</label>
             <div class="col-sm-4">
-                <select class="form-control form-control-md " name='back_server_classid' id="back_server_classid">
+                <select class="form-control form-control-md custom-select " name='back_server_classid' id="back_server_classid">
                     <option>3C5702A2-EB8E-11D4-83A4-00105A984CBD</option>
                     <option>7BC0CC8E-482C-47CA-ABDC-0FE7F9C6E729</option>
                     <option>E6C32641-F1CF-11D0-B0E4-080009CCD384</option>
@@ -232,5 +235,29 @@
 
 
     }
+    (function () {
+        'use strict'
+
+        window.addEventListener('load',
+            function () {
+                // Fetch all the forms we want to apply custom Bootstrap validation styles to
+                var forms = document.getElementsByClassName('needs-validation')
+
+                // Loop over them and prevent submission
+                Array.prototype.filter.call(
+                    forms,
+                    function (form) {
+                        form.addEventListener('submit',
+                            function (event) {
+                                if (form.checkValidity() === false) {
+                                    event.preventDefault()
+                                    event.stopPropagation()
+                                }
+                                form.classList.add('was-validated')
+                            }, false)
+                    })
+            }, false)
+    }())
+
 </script>
 {% endblock %}

@@ -1,21 +1,21 @@
-from flask import Flask, request, render_template, session, url_for, escape, redirect, flash
+from flask import Flask, render_template, session, url_for, redirect, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf.csrf import CSRFProtect
 import logging
 from logging.config import dictConfig
 from logging.handlers import RotatingFileHandler
 from flask import g
-from flask_mail import Mail, Message
+from flask_mail import Mail
 import os
 import functools
 import time
-from pathlib import Path
 from flask_cors import CORS
 from flask_wtf.csrf import generate_csrf
 import jwt
 import datetime
 from .model import db
 from .settings import Config
+
 
 
 def create_log(log_path,log_level):
@@ -69,10 +69,6 @@ def create_app(test_config=None):
     else:
         # load the test config if passed in
         app.config.from_mapping(test_config)
-    try:
-        os.makedirs(app.instance_path)
-    except OSError:
-        pass
     db.init_app(app)
     db.app = app
     db.create_all()
@@ -88,9 +84,9 @@ def create_app(test_config=None):
     """
     from app import opc, user, auth, issue
     app.register_blueprint(auth.auth)
-    app.register_blueprint(user.user)
+    app.register_blueprint(user.admin)
     app.register_blueprint(opc.cs)
-    app.register_blueprint(issue.issue)
+    app.register_blueprint(issue.faq)
 
     def make_toke():
         csrf_token = generate_csrf()
@@ -111,10 +107,12 @@ def create_app(test_config=None):
     @app.route('/', methods=['GET'], endpoint='index')
     @login_required
     def index():
-        flash('爱上一个地方，就应该背上包去旅行，走得更远。大家都在等你，还不快过来。。。玩耍！！！')
-        if request.method == 'POST':
-            return{'class': 'bg-info'}
+        flash('爱上一个地方，就应该背上包去旅行，走得更远。大家都在等你，还不快过来。。。玩耍！！！','success')
         return render_template('index.html', home='bg-primary')
+
+    @app.route('/impress', methods=['GET'], endpoint='impress')
+    def impress():
+        return render_template('impress.html')
 
     @app.errorhandler(404)
     def page_not_found(error):
@@ -122,7 +120,7 @@ def create_app(test_config=None):
 
     @app.before_first_request
     def before_first():
-        app.logger.debug("config_studio 重新启动...")
+        app.logger.debug("config_studio 重新启动")
 
 
     def encode_auth_token(email):

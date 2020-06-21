@@ -12,6 +12,10 @@ manager.add_command('runserver', Server(
     host='127.0.0.1',
     port=80))
 
+# with app.app_context():
+#     db.create_all()
+
+
 
 if __name__ == "__main__":
     """

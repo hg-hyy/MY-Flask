@@ -8,11 +8,11 @@ import math
 import markdown2 as Markdown
 import bleach
 from threading import Thread
-issue = Blueprint('issue', __name__)
+faq = Blueprint('faq', __name__)
 mail = Mail()
 
 
-@issue.route("/show_category", methods=['GET', 'POST'], endpoint='show_category')
+@faq.route("/show_category", methods=['GET', 'POST'], endpoint='show_category')
 def show_category(form=None):
     """Show all the posts, most recent first."""
     page = int(request.args.get('page', 1))
@@ -29,33 +29,33 @@ def show_category(form=None):
     return render_template('issue/show_category.html', paginate=paginates,  max_pages=max_pages, faq='bg-success', categorys=categorys)
 
 
-@issue.route("/add_category", methods=['GET', 'POST'], endpoint='add_category')
+@faq.route("/add_category", methods=['GET', 'POST'], endpoint='add_category')
 def add_category():
     form = CategoryForm()
     if request.method == 'POST':
         if form.validate_on_submit():
             flash("你 TMD 又提了一个大BUG", 'error')
-            return redirect(url_for('issue.show_category'))
+            return redirect(url_for('faq.show_category'))
     return render_template('issue/create_category.html', form=form)
 
 
-@issue.route("/<int:id>/update_category", methods=("GET", "POST"), endpoint='update_category')
+@faq.route("/<int:id>/update_category", methods=("GET", "POST"), endpoint='update_category')
 def update_category(id):
     """Update a post if the current user is the author."""
     category = get_category(id)
     form = CategoryForm()
     if request.method == "POST":
         if form.validate_on_submit():
-            return redirect(url_for("issue.show_category"))
+            return redirect(url_for("faq.show_category"))
     return render_template("issue/update_category.html",  category=category)
 
 
-@issue.route("/<int:id>/delete_category", methods=("POST",), endpoint='delete_category')
+@faq.route("/<int:id>/delete_category", methods=("POST",), endpoint='delete_category')
 def delete_category(id):
     category = get_category(id)
     db.session.delete(category)
     db.session.commit()
-    return redirect(url_for("issue.show_category"))
+    return redirect(url_for("faq.show_category"))
 
 
 def get_category(id, check_user=True):
@@ -84,7 +84,7 @@ def get_issue(id, check_user=True):
     return issue
 
 
-@issue.route("/show_issue", methods=['GET', 'POST'], endpoint='show_issue')
+@faq.route("/show_issue", methods=['GET', 'POST'], endpoint='show_issue')
 @login_required
 def show_issue():
     """Show all the posts, most recent first."""
@@ -103,18 +103,18 @@ def show_issue():
     return render_template('issue/show_issue.html', paginate=paginates, issues=issues, max_pages=max_pages, faq='bg-success', categorys=categorys, Issue=Issue)
 
 
-@issue.route("/create", methods=("GET", "POST"), endpoint='create')
-def create():
+@faq.route("/create_issue", methods=("GET", "POST"), endpoint='create_issue')
+def create_issue():
     """Create a new post for the current user."""
     form = IssueForm()
     if request.method == "POST":
         if form.validate_on_submit():
-            return redirect(url_for("issue.show_issue"))
+            return redirect(url_for("faq.show_issue"))
     categorys = Category.query.all()
     return render_template("issue/create_issue.html", categorys=categorys)
 
 
-@issue.route("/<int:id>/update_issue", methods=("GET", "POST"), endpoint='update_issue')
+@faq.route("/<int:id>/update_issue", methods=("GET", "POST"), endpoint='update_issue')
 def update_issue(id):
     """Update a post if the current user is the author."""
     issue = get_issue(id)
@@ -122,11 +122,11 @@ def update_issue(id):
     form = IssueForm()
     if request.method == "POST":
         if form.validate_on_submit():
-            return redirect(url_for("issue.show_issue"))
+            return redirect(url_for("faq.show_issue"))
     return render_template("issue/update_issue.html", issue=issue, categorys=categorys)
 
 
-@issue.route("/<int:id>/delete_issue", methods=("POST",), endpoint='delete_issue')
+@faq.route("/<int:id>/delete_issue", methods=("POST",), endpoint='delete_issue')
 def delete_issue(id):
     """Delete a post.
 
@@ -136,10 +136,10 @@ def delete_issue(id):
     issue = get_issue(id)
     db.session.delete(issue)
     db.session.commit()
-    return redirect(url_for("issue.show_issue"))
+    return redirect(url_for("faq.show_issue"))
 
 
-@issue.route('/contact', methods=['GET', 'POST'], endpoint='contact')
+@faq.route('/contact', methods=['GET', 'POST'], endpoint='contact')
 def contact():
     form = ContactForm()
     if request.method == 'POST':

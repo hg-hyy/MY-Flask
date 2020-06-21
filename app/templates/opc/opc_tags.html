@@ -240,21 +240,26 @@
         var $comm = '';
         var $lis = '';
         var $lis1 = '';
+        var $option = '';
         var count = data.total //条数
         var groups = data.groups //组数
-        console.log(data.tags[0].tag_id)
+        console.log(data.tags)
         $("#total").val(count)
         $("#max_pages").val(data.max_pages)
         if (count > 0) {
-            for (var i = 0; i < count; i++) {
-                $comm += '<tr>' +
-                    '<td scope="row" class="table-success">' + data.tags[i].tag_id + '</td>' +
-                    '<td scope="row" class="table-info">' + data.tags[i].publish_tag_name + '</td>' +
-                    '<td scope="row" class="table-secondary">' + data.tags[i].source_tag_name + '</td>' +
-                    '<td scope="row" class="table-danger">' + data.tags[i].data_type + '</td>' +
-                    '</tr>'
+            for (i in data.tags) {
+                var $td = ''
+                for (t in data.tags[i]) {
+                    $td +='<td scope="row" class="table-danger">' + data.tags[i][t] + '</td>'
+                };
+                $comm += '<tr>' + $td + '</tr>'
                 var $subject_con = $('#tags');
                 $subject_con.html($comm)
+            }
+            for (var g = 1; g < groups + 1; g++) {
+                $option += '<option>' + g + '</option>'
+                var $groups = $('#groups');
+                $groups.html($option)
             }
         } else {
             $comm += '<tr>' + '<td scope="row" class="table-danger">' + '没有位号信息，请重新上传。。。' + '</td>' + '</tr>'

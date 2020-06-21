@@ -25,7 +25,6 @@
       {{form.recaptcha }}
       {{form.remember_me}}
       {{form.remember_me.label}}
-
       {% with errors = get_flashed_messages(category_filter=["error"]) %}
       {% if errors %}
       {% for msg in errors %}

@@ -15,7 +15,7 @@ class User(db.Model):
     create_time = db.Column(db.DateTime, index=True,
                             default=datetime.datetime.now())
     last_login_time = db.Column(
-        db.DateTime, index=True, default=datetime.datetime.now())
+        db.DateTime, index=True, default=datetime.datetime.now(),onupdate=datetime.datetime.now())
     is_superuser = db.Column(db.Boolean, default=False,nullable=True)
     _password = db.Column(db.String(128), unique=True, nullable=False)
     # issue = db.relationship('Issue', backref='User', lazy=True)

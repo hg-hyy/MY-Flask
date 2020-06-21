@@ -13,7 +13,7 @@
       <div class="col-12 col-md-12 col-md-12 col-xl-12 ">
         <h6 class="display-4">Issue</h6>
         <hr />
-        <form method="post">
+        <form method="post" action="{{url_for('faq.create_issue')}}">
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
 
           <div class="form-group row">
@@ -28,13 +28,13 @@
           <div class="form-group row">
             <label for="categorys" class="col-sm-2 col-form-label col-form-label-md">categorys</label>
             <div class="col-sm-4">
-              <select class="form-control form-control-md " name='category_name' id="category_name">
+              <select class="form-control form-control-md " name='category_name' id="category_name" required>
                 {% if categorys  %}
                 {% for category in categorys %}
                 <option>{{category.name}}</option>
                 {% endfor %}
                 {% else %}
-                <option>没有主题，请先创建</option>
+                <option>all</option>
                 {% endif %}
               </select>
             </div>

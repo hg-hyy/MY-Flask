@@ -12,7 +12,7 @@
       {% for category in categorys %}
       <p>{{ category }}</p>
       {% endfor %}
-      <form method="POST" action="{{ url_for('issue.add_category') }}">
+      <form method="POST" action="{{ url_for('faq.add_category') }}">
         {%for f in form%}
         {%if f.name == 'csrf_token' or f.name == 'submit' %}
         <div class="form-group row">

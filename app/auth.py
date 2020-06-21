@@ -18,8 +18,7 @@ def login():
     if request.method == 'POST':
         try:
             if form.validate_on_submit():
-                flash('You were successfully logged in', 'sucess')
-            return redirect(url_for('index'))
+                return redirect(url_for('index'))
         except Exception as e:
             flash(f'用户名或密码错误{str(e)}', 'error')
             return render_template('auth/login.html', form=form)

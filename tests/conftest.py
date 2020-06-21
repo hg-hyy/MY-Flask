@@ -1,17 +1,15 @@
 import os
 import tempfile
-
 import pytest
-
 from app import create_app
-
 
 
 @pytest.fixture
 def app():
     """Create and configure a new app instance for each test."""
-    app = create_app({"TESTING": True})
-
+    db_fd, db_path = tempfile.mkstemp()
+    app = create_app()
+    yield app
 
 @pytest.fixture
 def client(app):
@@ -29,13 +27,13 @@ class AuthActions(object):
     def __init__(self, client):
         self._client = client
 
-    def login(self, username="test", password="test"):
+    def login(self, username="admin", password="12!@QWqw"):
         return self._client.post(
-            "/auth/login", data={"username": username, "password": password}
+            "/login", data={"username": username, "password": password}
         )
 
     def logout(self):
-        return self._client.get("/auth/logout")
+        return self._client.get("/logout")
 
 
 @pytest.fixture

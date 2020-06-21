@@ -9,13 +9,13 @@ def test_register(client, app):
     assert client.get("/add_user").status_code == 200
 
     # test that successful registration redirects to the login page
-    response = client.post("/add_user", data={"username": "a", "password": "a"})
+    response = client.post("/add_user", data={"username": "hyy", "password": "1qaz@WSX"})
     assert "http://localhost/login" == response.headers["Location"]
 
     # test that the user was inserted into the database
     with app.app_context():
         assert (
-            User.query.filter_by(username = 'a').first() is not None
+            User.query.filter_by(username = 'hyy').first() is not None
         )
 
 
@@ -24,7 +24,7 @@ def test_register(client, app):
     (
         ("", "", b"Username is required."),
         ("a", "", b"Password is required."),
-        ("test", "test", b"already registered"),
+        ("admin", "12!@QWqw", b"already registered"),
     ),
 )
 def test_register_validate_input(client, username, password, message):

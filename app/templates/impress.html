@@ -1,0 +1,57 @@
+<!doctype html>
+<html>
+
+<head>
+    <title>Impress Tutorial</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <link href="{{url_for('static',filename='css/impress.css')}}" rel="stylesheet" />
+</head>
+<style>
+    .contact-footer {
+        background: #f85d5d;
+        width: 100%;
+        padding: 30px 0;
+        text-align: center;
+    }
+</style>
+
+<body>
+    <div id="impress">
+        <div class="no-support-message">
+            Your browser doesn't support impress.js. Try Chrome or Safari.
+        </div>
+
+        <div class="step" data-x="100" data-y="0">
+            This is slide 1. It slides left 300 pixels.
+        </div>
+
+        <div class="step" data-x="100" data-y="-100">
+            This is slide 2. It slides down 400 pixels.
+        </div>
+
+        <div class="step" data-x="100" data-y="-200" data-scale="0.5">
+            This is slide 3. It scales everything up by a factor of 2.
+        </div>
+
+    </div>
+
+    <section class="contact-footer">
+        <h2>Let's talk!</h2>
+        <p>Project Manager, Designer and Developers are wating for your <strong>project</strong>.</p>
+        <form method="post" id="form-contact">
+            <div> <input name="Name" placeholder="Name" class="name" required=""> </div>
+            <div> <input type="email" name="Email" placeholder="Email" class="email" required=""> </div> <textarea
+                type="textarea" name="Message" placeholder="Message" class="message" required=""></textarea> <button
+                type="submit" class="submit"
+                onclick="ga('send','event', 'Btn-article', 'Article', 'contact-success')"><span>Submit</span> <img
+                    class="loader-form" src="../../images/loader-form.svg"></button>
+        </form>
+    </section>
+    <script type="text/javascript" src="{{url_for('static',filename='js/impress.js')}}"></script>
+
+    <script>
+        impress().init();
+    </script>
+</body>
+
+</html>
