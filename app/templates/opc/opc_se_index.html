@@ -7,9 +7,13 @@
 {% endblock %}
 {% block content %}
 
-
-<p>opc server参数配置</p>
-<hr />
+<div class="align-middle col-12   mb-2 row ">
+    <h5 class="h2 d-inline">
+        <span class="text-muted ">opc server参数配置</span>
+    </h5>
+    
+</div>
+<hr class="border-bottom border-danger" />
 <form action="{{url_for('cs.load_opc_se')}}" method="post" id='shen' enctype="multipart/form-data"
     class="needs-validation" novalidate>
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />

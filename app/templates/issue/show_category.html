@@ -8,21 +8,22 @@
 {% block content %}
 
 
+<div class="align-middle col-12 row">
+    <h5 class="h2 d-inline">
+        <span class="text-muted ">categorys</span>
+        {% if g.user  %}
 
-<h5 class="display-4 d-inline">categorys</h5>
+        <a class="btn btn-outline-info btn-lg d-inline mr-2" href="{{ url_for('faq.add_category') }}">创建 category
+        </a>
 
-{% if g.user  %}
+        <a class="btn btn-outline-danger btn-lg d-inline" href="{{ url_for('faq.show_issue') }}">查看 issue </a>
 
-<a class="btn btn-outline-info btn-lg d-inline mr-2" href="{{ url_for('faq.add_category') }}">创建 category
-</a>
-
-<a class="btn btn-outline-danger btn-lg d-inline" href="{{ url_for('faq.show_issue') }}">查看 issue </a>
-
-{% endif %}
-<hr />
-
+        {% endif %}
+    </h5>
+</div>
+<hr class="border-bottom border-info" />
 <div class="card-columns">
-    {% for category in categorys %}
+    {% for category in paginate.items %}
 
     <div class="card border-success mb-3" style="max-width: 30rem;">
         <div class="card-header bg-transparent border-success">
@@ -107,7 +108,7 @@
                 <li class="page-item"><a class="page-link form-control">条</a></li>
                 <li class="page-item"><a class="page-link form-control">共</a></li>
                 <input id='max_pages' name='max_pages' disable class="form-control" style="width: 60px;"
-                    value="{{ max_pages }}" />
+                    value="{{ paginate.pages }}" />
                 <li class="page-item"><a class="page-link form-control">页</a></li>
             </ul>
         </nav>

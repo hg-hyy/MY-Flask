@@ -35,7 +35,6 @@ class PhotoForm(FlaskForm):
 
 # 自定义验证
 
-
 def username_length_check(form, field):
     if len(field.data) > 50:
         raise ValidationError('Field must be less than 50 characters')

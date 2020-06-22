@@ -7,14 +7,16 @@
 {% block content %}
 
 <div class="row">
-    <div class="align-middle col-12 border-bottom  mb-2">
-        <h5 class="display-4 d-inline">
+    <div class="align-middle col-12  mb-2">
+        <h5 class="h2 d-inline">
             <span class="text-muted ">参数配置预览</span>
         </h5>
+        <hr class="border-bottom border-danger" />
     </div>
     <label for="module" class="col-sm1 col-form-label col-form-label-md ml-3 ">
-        <h5>请选择需要查看的模块:</h5>
+        <h5>请选择模块:</h5>
     </label>
+    
     <div class="col-auto">
         <select class="form-control form-control-md " name='module' id="module">
             <option>s_opcda_server1</option>
@@ -37,8 +39,8 @@
         onclick="get_config()">s_config </button>
 </div>
 
-<div class="row ml-1">
-    <div class="col-5 p-0">
+<div class="row">
+    <div class="col-5 mt-1">
         <table class="table table-bordered table-hover">
             <thead>
                 <tr>

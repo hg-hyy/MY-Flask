@@ -6,17 +6,17 @@
 {% endblock %}
 {% block content %}
 
-<div class=" form-group  row">
-    <div class="align-middle col-12 border-bottom  mb-2">
-        <h5 class="display-4 d-inline">
+<div class="row">
+    <div class="align-middle col-12">
+        <h2 class="h2 d-inline">
             <span class="text-muted ">标签配置预览</span>
-        </h5>
+        </h2>
+        <hr class="border-bottom border-danger" />
     </div>
-
-
     <label for="module" class="col-sm1 col-form-label col-form-label-md ml-3 ">
         <h5>请选择模块:</h5>
     </label>
+    
     <div class="col-auto">
         <select class="form-control form-control-md " name='module' id="module">
             <option>s_opcda_client1</option>
@@ -44,10 +44,11 @@
     </div>
     <button type="button" class="col-sm-1 form-control form-control-md btn btn-outline-info" onclick="Search()">点击 搜索
     </button>
+
 </div>
 
 <div class="row">
-    <div class="col-12">
+    <div class="col-md-12 mt-1">
         <table id='table' class="table table-bordered table-hover">
             <thead>
                 <tr>

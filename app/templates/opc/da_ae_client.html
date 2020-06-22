@@ -6,9 +6,12 @@
 </style>
 {% endblock %}
 {% block content %}
-
-
-<p>opc 参数配置</p>
+<div class="align-middle col-12 row">
+    <h5 class="h2 d-inline">
+        <span class="text-muted ">opc 参数配置</span>
+    </h5>
+</div>
+<hr class="border-bottom border-danger"/>
 <ul class="nav nav-pills" id="myTab" role="tablist">
     <li class="nav-item">
         <a class="nav-link active" id="da-tab" data-toggle="tab" href="#opc_da" role="tab" aria-controls="da"
@@ -30,7 +33,8 @@
 <hr />
 <div class="tab-content" id="myTabContent">
     <div class="tab-pane fade show active" id="opc_da">
-        <form action="{{ url_for('cs.load_opc_da') }}" method="post" id='opc_da' enctype="multipart/form-data" class="needs-validation" novalidate>
+        <form action="{{ url_for('cs.load_opc_da') }}" method="post" id='opc_da' enctype="multipart/form-data"
+            class="needs-validation" novalidate>
             <fieldset disabled id='opc_da_form'>
                 {%for f in opc_da_form%}
                 {%if f.name == 'csrf_token' %}
@@ -66,7 +70,8 @@
         </form>
     </div>
     <div class="tab-pane fade" id="opc_ae">
-        <form action="{{ url_for('cs.load_opc_da') }}" method="post" id='opc_ae' enctype="multipart/form-data" class="needs-validation" novalidate>
+        <form action="{{ url_for('cs.load_opc_da') }}" method="post" id='opc_ae' enctype="multipart/form-data"
+            class="needs-validation" novalidate>
             <fieldset disabled id='opc_ae_form'>
                 {%for f in opc_ae_form%}
                 {%if f.name == 'csrf_token' %}
@@ -214,7 +219,5 @@
                     })
             }, false)
     }())
-
-
 </script>
 {% endblock %}

@@ -1109,16 +1109,7 @@ def show_tag():
                 tags, basic_config = read_modbus_config(cfg_msg, module)
             else:
                 tags, basic_config = read_opc_config(cfg_msg, module)
-
-            pag = paginate(tags[0],page,pages)
-            # for i in pag.iter_pages():
-            #     if i:
-            #         print(i)
-            #     else:
-            #         print('...')
-                
+            pag = paginate(tags[0],page,pages) 
             return render_template('opc/show_tag.html', paginate=pag,show_tag='bg-warning')
-        
         return render_template('opc/show_tag.html', paginate=[{}],show_tag='bg-warning')
-        
     return '404'

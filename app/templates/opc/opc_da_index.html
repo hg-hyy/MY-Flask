@@ -7,9 +7,13 @@
 {% endblock %}
 {% block content %}
 
+<div class="align-middle col-12  mb-2 row">
+    <h5 class="h2 d-inline">
+        <span class="text-muted ">opc client参数配置</span>
+    </h5>
+</div>
+<hr class="border-bottom border-danger"/>
 
-<p>opc client参数配置</p>
-<hr />
 <form action="{{ url_for('cs.load_opc_da') }}" method="post" id='shen' enctype="multipart/form-data" class="needs-validation" novalidate>
     <fieldset disabled id='bj'>
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
@@ -226,7 +230,7 @@
         $('#main_server_domain').val(data.basic_config.main_server_domain)
         $('#main_server_username').val(data.basic_config.main_server_username)
         $('#main_server_password').val(data.basic_config.main_server_password)
-        $('#back_server_ip').val(data.basic_config.back_server_ip)
+        $('#back_server_ip').val(data.basic_config.bak_server_ip)
         $('#back_server_progid').val(data.basic_config.bak_server_prgid)
         $('#back_server_classid').val(data.basic_config.bak_server_clsid)
         $('#back_server_domain').val(data.basic_config.bak_server_domain)

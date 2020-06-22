@@ -26,7 +26,7 @@ def show_category(form=None):
     # totalpage为总页面数
     max_pages = math.ceil(paginates.total/pages)
 
-    return render_template('issue/show_category.html', paginate=paginates,  max_pages=max_pages, faq='bg-success', categorys=categorys)
+    return render_template('issue/show_category.html', paginate=paginates)
 
 
 @faq.route("/add_category", methods=['GET', 'POST'], endpoint='add_category')
@@ -95,12 +95,8 @@ def show_issue():
     paginates = Issue.query.order_by('id').paginate(
         page, pages, error_out=False)
     issues = paginates.items
-
-    # totalpage为总页面数
-    max_pages = math.ceil(paginates.total/pages)
     categorys = Category.query.all()
-    print(paginates.iter_pages)
-    return render_template('issue/show_issue.html', paginate=paginates, issues=issues, max_pages=max_pages, faq='bg-success', categorys=categorys, Issue=Issue)
+    return render_template('issue/show_issue.html', paginate=paginates, faq='bg-success', categorys=categorys)
 
 
 @faq.route("/create_issue", methods=("GET", "POST"), endpoint='create_issue')

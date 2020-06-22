@@ -7,9 +7,12 @@
 {% endblock %}
 {% block content %}
 
-
-<p>opc ae参数配置</p>
-<hr />
+<div class="align-middle col-12 row">
+    <h5 class="h2 d-inline">
+        <span class="text-muted ">opc ae参数配置</span>
+    </h5>
+</div>
+<hr class="border-bottom border-danger" />
 <form action="{{ url_for('cs.load_opc_ae') }}" method="post" id='shen' enctype="multipart/form-data">
     <fieldset disabled id='bj'>
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
