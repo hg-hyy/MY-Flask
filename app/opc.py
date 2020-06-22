@@ -112,7 +112,7 @@ def search_log(key, logs,):
         return logs_list
 
 
-def search_tag(tagname, source, tag_list):
+def search_modbus_tag(tagname, source, tag_list):
     if tagname[-1] == "*":
         for s in source:
             for ss in s:
@@ -124,6 +124,23 @@ def search_tag(tagname, source, tag_list):
         for s in source:
             for ss in s:
                 if ss['tag'] == tagname:
+                    tag_list.append(ss)
+
+    return tag_list
+
+
+def search_opc_tag(tagname, source, tag_list):
+    if tagname[-1] == "*":
+        for s in source:
+            for ss in s:
+                m = re.search('('+tagname[:-1]+')?', ss['publish_tag_name'])
+                aa = m.group(0)
+                if aa:
+                    tag_list.append(ss)
+    else:
+        for s in source:
+            for ss in s:
+                if ss['publish_tag_name'] == tagname:
                     tag_list.append(ss)
 
     return tag_list
@@ -351,13 +368,22 @@ def page():
         for i in tags:
             total += len(i)
         max_pages, a = divmod(total, pages)
+        has_pre = False
+        has_next = False
+
         if a > 0:
             max_pages = max_pages + 1
+            
+        if page != 1:
+            has_pre = True
+        if page != max_pages:
+            has_next = True
+
         # print(module, group, pages, page, groups, total, max_pages)
         start = (page-1) * pages
         end = page*pages
         data = tags[group][start:end]
-        return {"tags": data, "basic_config": basic_config, "total": total, "max_pages": max_pages, 'groups': groups}
+        return {"tags": data, "basic_config": basic_config, "total": total, "max_pages": max_pages, 'groups': groups, "has_pre": has_pre, "has_next": has_next}
     return {"tags": [[]], "basic_config": basic_config, "total": 0, "max_pages": 0, 'groups': 0}
 
 
@@ -369,9 +395,13 @@ def search():
     module = request.args.get('module')
     tagname = request.args.get('tagname')  # 标签名
     cfg_msg = read_json(module)
-    tags, basic_config = read_modbus_config(cfg_msg, module)
-    data = search_tag(tagname, tags, [])
-    current_app.logger.debug('查询位号:%s' % (tagname))
+    if module in modbus:
+        tags, basic_config = read_modbus_config(cfg_msg, module)
+        data = search_modbus_tag(tagname, tags, [])
+    else:
+        tags, basic_config = read_opc_config(cfg_msg, module)
+        data = search_opc_tag(tagname, tags, [])
+    current_app.logger.debug(f'查询{module}位号:%s' % (tagname))
     return {"tags": data}
 
 
@@ -985,3 +1015,110 @@ def check_log():
             elif lv.split('-')[0] == log_level and log_day == '':
                 log_list.append(lv)
         return {'log_level': log_level, 'log_list': log_list}
+
+from math import ceil
+
+
+class Pagination(object):
+
+    def __init__(self, page, per_page, total, items):
+        #: the unlimited query object that was used to create this
+        #: pagination object.
+        #: the current page number (1 indexed)
+        self.page = page
+        #: the number of items to be displayed on a page.
+        self.per_page = per_page
+        #: the total number of items matching the query
+        self.total = total
+        #: the items for the current page
+        self.items = items
+
+    @property
+    def pages(self):
+        """The total number of pages"""
+        if self.per_page == 0:
+            pages = 0
+        else:
+            pages = int(ceil(self.total / float(self.per_page)))
+        return pages
+
+    def prev(self, error_out=False):
+        """Returns a :class:`Pagination` object for the previous page."""
+        return paginate(self.page - 1, self.per_page, error_out)
+
+    @property
+    def prev_num(self):
+        """Number of the previous page."""
+        if not self.has_prev:
+            return None
+        return self.page - 1
+
+    @property
+    def has_prev(self):
+        """True if a previous page exists"""
+        return self.page > 1
+
+    def next(self, error_out=False):
+        return paginate(self.page + 1, self.per_page, error_out)
+
+    @property
+    def has_next(self):
+        """True if a next page exists."""
+        return self.page < self.pages
+
+    @property
+    def next_num(self):
+        """Number of the next page"""
+        if not self.has_next:
+            return None
+        return self.page + 1
+
+    def iter_pages(self, left_edge=2, left_current=2, right_current=5, right_edge=2):
+
+        last = 0
+        for num in range(1, self.pages + 1):
+            if num <= left_edge or \
+               (num > self.page - left_current - 1 and
+                num < self.page + right_current) or \
+               num > self.pages - right_edge:
+                if last + 1 != num:
+                    yield None
+                yield num
+                last = num
+
+
+def paginate(list, page=1, per_page=3, max_per_page=None):
+    if max_per_page is not None:
+        per_page = min(per_page, max_per_page)
+    start = (page-1) * per_page
+    end = page*per_page
+    items = list[start:end]
+    total = len(list)
+    return Pagination(page, per_page, total, items)
+
+
+@cs.route("/show_tag", methods=['GET', 'POST'], endpoint='show_tag')
+def show_tag():
+    if request.method=='GET':
+        module = request.args.get('module','s_opcda_client1')
+        page = int(request.args.get('page', 1))
+        pages = int(request.args.get('pages', 3))
+        cfg_msg = read_json(module)
+        if cfg_msg:
+            if module in modbus:
+                tags, basic_config = read_modbus_config(cfg_msg, module)
+            else:
+                tags, basic_config = read_opc_config(cfg_msg, module)
+
+            pag = paginate(tags[0],page,pages)
+            # for i in pag.iter_pages():
+            #     if i:
+            #         print(i)
+            #     else:
+            #         print('...')
+                
+            return render_template('opc/show_tag.html', paginate=pag,show_tag='bg-warning')
+        
+        return render_template('opc/show_tag.html', paginate=[{}],show_tag='bg-warning')
+        
+    return '404'

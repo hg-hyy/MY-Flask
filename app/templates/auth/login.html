@@ -23,8 +23,10 @@
       {{form.username}}
       {{form.password}}
       {{form.recaptcha }}
-      {{form.remember_me}}
-      {{form.remember_me.label}}
+      <div class="custom-control custom-checkbox mb-3">
+        <input type="checkbox" class="custom-control-input" id="remember_me" name='remember_me'>
+        <label class="custom-control-label" for="remember_me">Check this remember</label>
+      </div>
       {% with errors = get_flashed_messages(category_filter=["error"]) %}
       {% if errors %}
       {% for msg in errors %}

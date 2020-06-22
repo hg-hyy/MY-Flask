@@ -6,11 +6,16 @@
 {% endblock %}
 {% block content %}
 
-<h1 class="border-bottom mb-3">位号配置预览</h1>
+<div class=" form-group  row">
+    <div class="align-middle col-12 border-bottom  mb-2">
+        <h5 class="display-4 d-inline">
+            <span class="text-muted ">标签配置预览</span>
+        </h5>
+    </div>
 
-<div class="form-group row ">
+
     <label for="module" class="col-sm1 col-form-label col-form-label-md ml-3 ">
-        <h5>请选择需要查看的模块:</h5>
+        <h5>请选择模块:</h5>
     </label>
     <div class="col-auto">
         <select class="form-control form-control-md " name='module' id="module">
@@ -21,13 +26,24 @@
             <option>modbus2</option>
         </select>
     </div>
+
+    <label for="module" class="col-sm1 col-form-label col-form-label-md ml-3 ">
+        <h5>请选择组:</h5>
+    </label>
     <div class="col-auto">
         <select class="form-control form-control-md " name='groups' id="groups">
 
         </select>
     </div>
+
     <button type="button" class="col-sm-1 form-control form-control-md btn btn-outline-info"
-        onclick="module_tag_select()">click me </button>
+        onclick="module_tag_select()">点击 查询 </button>
+
+    <div class="col-auto">
+        <input class="form-control form-control-md " name='tagname' id="tagname" />
+    </div>
+    <button type="button" class="col-sm-1 form-control form-control-md btn btn-outline-info" onclick="Search()">点击 搜索
+    </button>
 </div>
 
 <div class="row">
@@ -62,10 +78,10 @@
                 </select>
 
                 <ul class="pagination  justify-content-end" id='page'>
-                    <li class="page-item "><a class="page-link form-control ">Pres</a></li>
+                    <li class="page-item "><a class="page-link form-control " onclick=" pre()">Pres</a></li>
                     <li class="page-item"><a class="page-link form-control btn btn-info" id='page1'
                             onclick="page(this)">1</a></li>
-                    <li class="page-item"><a class="page-link form-control" href="#">Next</a></li>
+                    <li class="page-item"><a class="page-link form-control" onclick=" next()">Next</a></li>
                 </ul>
 
                 <li class="page-item"><a class="page-link form-control">共</a></li>
@@ -81,6 +97,41 @@
 
 <script>
     var csrftoken = $("meta[name=csrf-token]").attr("content");
+
+
+
+    function pre() {
+        page = $("a.active").text()
+    }
+
+    function next() {
+
+        page = $("a.active").text()
+        var pages = $("#pages").val();
+        var page = $(obj).text();
+        var module_name = $("#module").val()
+        $(obj).addClass('active')
+        $(obj).parent('li').siblings().children().removeClass('active')
+        $.ajax({
+            url: "{{url_for('cs.page')}}",
+            // data: "pages=10&page=1" ,
+            data: {
+                "module": module_name,
+                "group": 1,
+                "pages": pages,
+                "page": page,
+            },
+            type: 'get',
+            dataType: 'json',
+            success: page_success,
+            error: function (data) {
+                console.log(data);
+            },
+        });
+        return false;
+
+    }
+
 
     function module_tag_select() {
         var module_name = $("#module").val()
@@ -108,14 +159,16 @@
 
     function Search(obj) {
         var tagname = $("#tagname").val();
+        var module_name = $("#module").val();
         $.ajax({
             url: "{{url_for('cs.search')}}",
             data: {
                 "tagname": tagname,
+                "module": module_name,
             },
             type: 'get',
             dataType: 'json',
-            success: search_success,
+            success: page_success,
             error: function (data) {
                 console.log(data);
             },
@@ -130,7 +183,8 @@
         var pages = $("#pages").val();
         var page = $(obj).text();
         var module_name = $("#module").val()
-
+        $(obj).addClass('active')
+        $(obj).parent('li').siblings().children().removeClass('active')
         $.ajax({
             url: "{{url_for('cs.page')}}",
             // data: "pages=10&page=1" ,
@@ -180,18 +234,13 @@
         var groups = data.groups
         $("#total").val(count)
         $("#max_pages").val(data.max_pages)
+        console.log(data.tags)
         if (count > 0) {
             for (i in data.tags) {
                 var $td = ''
                 for (t in data.tags[i]) {
-
                     $td +=
-                        // '<td scope="row" class="table-success">' + data.tags[i].tag_id + '</td>' +
-                        // '<td scope="row" class="table-info">' + data.tags[i].publish_tag_name + '</td>' +
-                        // '<td scope="row" class="table-secondary">' + data.tags[i].source_tag_name + '</td>' +
-                        // '<td scope="row" class="table-danger">' + data.tags[i].data_type + '</td>' +
                         '<td scope="row" class="table-danger">' + data.tags[i][t] + '</td>'
-
                 };
                 $comm += '<tr>' + $td + '</tr>'
                 var $subject_con = $('#tags');
@@ -204,30 +253,6 @@
                 $option += '<option>' + g + '</option>'
                 var $groups = $('#groups');
                 $groups.html($option)
-            }
-        } else {
-            $comm += '<tr>' + '<td scope="row" class="table-danger">' + '没有位号信息，请重新上传。。。' + '</td>' + '</tr>'
-            var $subject_con = $('#tags');
-            $subject_con.html($comm)
-        }
-    }
-
-    function search_success(data) {
-        var $comm = '';
-        var count = data.tags.length
-        if (count > 0) {
-            for (var i = 0; i < count; i++) {
-                $comm += '<tr>' +
-                    '<td scope="row" class="table-light">' + i + '</td>' +
-                    '<td scope="row" class="table-success">' + data.tags[i].tag + '</td>' +
-                    '<td scope="row" class="table-info">' + data.tags[i].start + '</td>' +
-                    '<td scope="row" class="table-secondary">' + data.tags[i].register_number + '</td>' +
-                    '<td scope="row" class="table-danger">' + data.tags[i].data_type + '</td>' +
-                    '<td scope="row" class="table-primary">' + data.tags[i].data_format + '</td>' +
-                    '<td scope="row" class="table-warning">' + data.tags[i].desc + '</td>' +
-                    '</tr>'
-                var $subject_con = $('#tags');
-                $subject_con.html($comm)
             }
         } else {
             $comm += '<tr>' + '<td scope="row" class="table-danger">' + '没有位号信息，请重新上传。。。' + '</td>' + '</tr>'
@@ -243,14 +268,14 @@
         var $option = '';
         var count = data.total //条数
         var groups = data.groups //组数
-        console.log(data.tags)
+        console.log(data.max_pages)
         $("#total").val(count)
         $("#max_pages").val(data.max_pages)
         if (count > 0) {
             for (i in data.tags) {
                 var $td = ''
                 for (t in data.tags[i]) {
-                    $td +='<td scope="row" class="table-danger">' + data.tags[i][t] + '</td>'
+                    $td += '<td scope="row" class="table-danger">' + data.tags[i][t] + '</td>'
                 };
                 $comm += '<tr>' + $td + '</tr>'
                 var $subject_con = $('#tags');
@@ -267,12 +292,13 @@
             $subject_con.html($comm)
         }
 
-        var head = '<li class="page-item "><a class="page-link form-control">' + 'Pres' + '</a></li>'
-        var tail = '<li class="page-item "><a class="page-link form-control">' + 'Next' + '</a></li>'
+        var head = '<li class="page-item "><a class="page-link form-control" onclick="pre()">' + 'Pres' + '</a></li>'
+        var tail = '<li class="page-item "><a class="page-link form-control" onclick="next()">' + 'Next' + '</a></li>'
         if (data.max_pages > 0) {
             for (var i = 1; i < data.max_pages + 1; i++) {
                 $lis +=
-                    '<li class="page-item"><a class="page-link form-control btn btn-info" id="page1" onclick="page(this)">' +
+                    '<li class="page-item"><a class="page-link form-control btn btn-info mr-2" id="page' + i +
+                    '" onclick="page(this)">' +
                     i + '</a></li>'
             }
             $lis1 = head + $lis + tail
@@ -291,4 +317,5 @@
         page($("#page1"))
     })
 </script>
+
 {% endblock %}

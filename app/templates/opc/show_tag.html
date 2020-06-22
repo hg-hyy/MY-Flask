@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+{% block title %}issues{% endblock %}
+{% block head %}
+<style type="text/css">
+
+</style>
+{% endblock %}
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <!-- 标题 -->
+
+        <nav class="navbar justify-content-between" style="background-color: #058dee;">
+
+            <a class="navbar-brand">
+                <img src="/static/pic/bootstrap-solid.svg" width="30" height="30" class="d-inline align-middle" alt="">
+                tag_show
+            </a>
+
+            <span class="navbar-text">
+                Navbar text with an inline element
+            </span>
+            <form action="{{url_for('cs.show_tag')}}" method="get" class="form-inline my-2 my-lg-0 needs-validation"
+                novalidate>
+                <div class="form-group">
+                    <select class=" custom-select" name='module' id="module" required>
+                        <option value="">select module</option>
+                        <option>s_opcda_client1</option>
+                        <option>s_opcda_client1</option>
+                        <option>s_opcda_client2</option>
+                        <option>s_opcda_client3</option>
+                        <option>modbus1</option>
+                        <option>modbus2</option>
+                    </select>
+                </div>
+                <button class="btn btn-warning  my-2 my-sm-0" type="submit">点击 查询</button>
+            </form>
+        </nav>
+        <!-- 功能表单 -->
+
+        <hr />
+        <!-- issue卡片 -->
+        <div class="card-columns col-auto">
+            {% for issue in paginate.items %}
+
+            <div class="card border-success mb-3" style="max-width: 30rem;">
+                <div class="card-header bg-transparent border-success">
+                    <h3>
+                        <span class="text-muted">当前分类</span>
+                        <span class="badge badge-info badge-pill">
+                            {{issue.data_type}}</span>
+                    </h3>
+                </div>
+                <div class="card-body text-success">
+                    <h5 class="card-title">{{ issue['publish_tag_name'] }}</h5>
+                    <blockquote class="blockquote mb-0">
+                        <p class="card-text">{{ issue['source_tag_name'] }}</p>
+                        <footer class="blockquote-footer">
+                            by {{g.user}} on
+                            <cite title="Source Title">{{ issue['tag_id']}}</cite>
+                        </footer>
+                    </blockquote>
+                </div>
+                <div class="card-footer bg-transparent border-success d-flex flex-row-reverse">
+
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <!-- 分页 -->
+        <div class="row mt-4 ">
+            <div class="col-md-12 col-sm-12 ">
+                <nav>
+                    <ul class="pagination pagination-md justify-content-end">
+                        <ul class="pagination  justify-content-end" id='page'>
+                            <li class="page-item ">
+                                {% if paginate.has_prev %}
+                                <a class="page-link form-control" tabindex="-1"
+                                    href="/show_tag?module={{request.args.get('module')}}&page={{ paginate.prev_num }}">Previous</a>
+                                {% endif %}
+                            </li>
+
+
+                            {%  for i in  paginate.iter_pages() %}
+
+                            {% if i %}
+                            {%if paginate.page == i%}
+                            <li class="page-item active">
+                                <a class="page-link form-control"
+                                    href="/show_tag?module={{request.args.get('module')}}&page={{ i }}">{{ i }}</a>
+                            </li>
+                            {%else%}
+                            <li class="page-item ">
+                                <a class="page-link form-control"
+                                    href="/show_tag?module={{request.args.get('module')}}&page={{ i }}">{{ i }}</a>
+                            </li>
+                            {% endif %}
+                            {% else %}
+                            <li class="page-item ">
+                                <a class="page-link form-control"
+                                    href="/show_tag?module={{request.args.get('module')}}&page={{ i }}">...</a>
+                            </li>
+
+                            {% endif %}
+
+                            {% endfor %}
+
+                            {% if paginate.has_next %}
+                            <a class="page-link form-control"
+                                href="/show_tag?module={{request.args.get('module')}}&page={{ paginate.next_num }}">Next</a>
+                            {% endif %}
+
+                            </li>
+                        </ul>
+
+                        <li class="page-item"><a class="page-link form-control">共</a></li>
+                        <input id='total' name='total' disabled class="form-control" style="width: 60px;"
+                            value="{{ paginate.total }}" />
+                        <li class="page-item"><a class="page-link form-control">条</a></li>
+                        <li class="page-item"><a class="page-link form-control">共</a></li>
+                        <input id='max_pages' name='max_pages' disable class="form-control" style="width: 60px;"
+                            value="{{ paginate.pages }}" />
+                        <li class="page-item"><a class="page-link form-control">页</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function page() {
+
+        var pages = $("#pages").val();
+
+        var module_name = $("#module").val()
+        $.ajax({
+            url: "{{url_for('cs.show_tag')}}",
+            data: {
+                "module": module_name,
+                "pages": pages,
+                "page": 1,
+            },
+            type: 'get',
+            dataType: 'json',
+            success: function (data) {
+                console.log()
+            },
+            error: function (data) {
+                console.log(data);
+            },
+        });
+        return false
+    }
+
+    (function () {
+        'use strict'
+
+        window.addEventListener('load',
+            function () {
+                // Fetch all the forms we want to apply custom Bootstrap validation styles to
+                var forms = document.getElementsByClassName('needs-validation')
+
+                // Loop over them and prevent submission
+                Array.prototype.filter.call(
+                    forms,
+                    function (form) {
+                        form.addEventListener('submit',
+                            function (event) {
+                                if (form.checkValidity() === false) {
+                                    event.preventDefault()
+                                    event.stopPropagation()
+                                }
+                                form.classList.add('was-validated')
+                            }, false)
+                    })
+            }, false)
+    }())
+</script>
+{% endblock %}

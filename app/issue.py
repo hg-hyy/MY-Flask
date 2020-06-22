@@ -99,7 +99,7 @@ def show_issue():
     # totalpage为总页面数
     max_pages = math.ceil(paginates.total/pages)
     categorys = Category.query.all()
-
+    print(paginates.iter_pages)
     return render_template('issue/show_issue.html', paginate=paginates, issues=issues, max_pages=max_pages, faq='bg-success', categorys=categorys, Issue=Issue)
 
 

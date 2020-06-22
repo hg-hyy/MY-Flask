@@ -7,17 +7,15 @@
 {% endblock %}
 {% block content %}
 <div class="row">
-    <div class="col-9">
-
-        <!-- 标题 -->
-        <div class="align-middle">
-            <h5 class="display-4 d-inline">
-                <span class="text-muted ">issue</span>
-            </h5>
+    <!-- 标题 -->
+    <div class="align-middle col-12 border-bottom  mb-2">
+        <h5 class="display-4 d-inline">
+            <span class="text-muted ">issue</span>
             {% if g.user %}
             <a class="btn btn-outline-info btn-lg d-inline" href="{{ url_for('faq.create_issue') }}">创建 issue </a>
-            {% endif %}
-        </div>
+            {% endif %}</h5>
+    </div>
+    <div class="col-9">
         <!-- 功能表单 -->
         <form id='issue'>
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
@@ -58,7 +56,7 @@
                 </div>
             </div>
         </form>
-        <hr />
+
         <!-- issue卡片 -->
         <div class="card-columns col-auto">
             {% for issue in issues %}
@@ -156,7 +154,7 @@
         </div>
     </div>
     <!-- cotegory -->
-    <div class="col-auto mt-5">
+    <div class="col-auto">
         <div class="card" style="width: 22rem;">
             <img class="card-img-top" src="..." alt="Card image cap">
             <div class="card-body">

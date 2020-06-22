@@ -19,7 +19,7 @@
     <script src="{{ url_for('static', filename='js/jquery.datetimepicker.full.min.js') }}"></script>
     <script src='//recaptcha.net/recaptcha/api.js'></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.css') }}" />
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}" />
     <link rel="stylesheet" href="{{ url_for('static', filename='css/impress.css') }}" />
     <link rel="stylesheet" href="{{ url_for('static', filename='css/jquery.datetimepicker.min.css') }}">
 
@@ -150,6 +150,13 @@
                                 style="font-size: x-large;font-style: italic;font-family: cursive;">
                                 <span data-feather="cast" style="width: 16px; height: 16px;color:black;"></span>
                                 tags_review
+                            </a>
+                        </li>
+                        <li class="nav-item {{show_tag}}">
+                            <a class="nav-link " href="{{url_for('cs.show_tag')}} "
+                                style="font-size: x-large;font-style: italic;font-family: cursive;">
+                                <span data-feather="cast" style="width: 16px; height: 16px;color:black;"></span>
+                                show_tag
                             </a>
                         </li>
 
