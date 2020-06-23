@@ -208,6 +208,7 @@ def read_modbus_config(cfg_msg, module):
 def read_opc_config(cfg_msg, module):
     opc_config = {}
     tag_list = []
+    group_infos = []
     if cfg_msg:
         try:
             if module in client and cfg_msg:
@@ -257,13 +258,16 @@ def read_opc_config(cfg_msg, module):
                     group_id = g['group_id']
                     group_name = g['group_name']
                     collect_cycle = g['collect_cycle']
+                    group_info = {'group_id': group_id, 'group_name': group_name,
+                                  'collect_cycle': collect_cycle, 'tags_num': len(g['tags']),'tags':g['tags']}
                     tag_list.append(g['tags'])
-            return tag_list, opc_config
+                    group_infos.append(group_info)
+            return tag_list, opc_config, group_infos
         except Exception as e:
-            print(str(e), '-----------red opc config----------')
-            return tag_list, opc_config
+            print(str(e), '--------error  in red opc config----------')
+            return tag_list, opc_config, group_infos
     else:
-        return tag_list, opc_config
+        return tag_list, opc_config, group_infos
 
 
 def decode_config(cfg_msg, module):
@@ -349,6 +353,7 @@ def page():
     """
     分页
     """
+    group_infos=[]
     if request.method == 'POST':
         module = request.form['module']
         group = int(request.form['group'])-1
@@ -364,7 +369,7 @@ def page():
     if module in modbus:
         tags, basic_config = read_modbus_config(cfg_msg, module)
     else:
-        tags, basic_config = read_opc_config(cfg_msg, module)
+        tags, basic_config, group_infos = read_opc_config(cfg_msg, module)
     total = 0
     if tags:
         groups = len(tags)  # 总计条目数
@@ -386,8 +391,8 @@ def page():
         start = (page-1) * pages
         end = page*pages
         data = tags[group][start:end]
-        return {"tags": data, "basic_config": basic_config, "total": total, "max_pages": max_pages, 'groups': groups, "has_pre": has_pre, "has_next": has_next}
-    return {"tags": [[]], "basic_config": basic_config, "total": 0, "max_pages": 0, 'groups': 0}
+        return {"tags": data, "basic_config": basic_config, "group_infos": group_infos, "total": total, "max_pages": max_pages, 'groups': groups}
+    return {"tags": [[]], "basic_config": basic_config, "group_infos": [], "total": 0, "max_pages": 0, 'groups': 0}
 
 
 @cs.route('/search', methods=['GET', 'POST'], endpoint='search')
@@ -402,7 +407,7 @@ def search():
         tags, basic_config = read_modbus_config(cfg_msg, module)
         data = search_modbus_tag(tagname, tags, [])
     else:
-        tags, basic_config = read_opc_config(cfg_msg, module)
+        tags, basic_config, _ = read_opc_config(cfg_msg, module)
         data = search_opc_tag(tagname, tags, [])
     current_app.logger.debug(f'查询{module}位号:%s' % (tagname))
     return {"tags": data}
@@ -855,7 +860,7 @@ def alter_module():
     module = request.args.get('module')
     cfg_msg = read_json(module)
     if module in opc:
-        tags, basic_config = read_opc_config(cfg_msg, module)
+        tags, basic_config, _ = read_opc_config(cfg_msg, module)
         current_app.logger.debug(f'开始编辑{module}基础配置')
     else:
         tags, basic_config = read_modbus_config(cfg_msg, module)
@@ -870,7 +875,7 @@ def config_review():
         module = request.form['module']
         cfg_msg = read_json(module)
         if module in opc:
-            tags, basic_config = read_opc_config(cfg_msg, module)
+            tags, basic_config, _ = read_opc_config(cfg_msg, module)
             current_app.logger.info(f'查看{module}基础配置')
         else:
             tags, basic_config = read_modbus_config(cfg_msg, module)
@@ -880,7 +885,7 @@ def config_review():
     module = 's_opcda_client1'
     cfg_msg = read_json(module)
     if module in opc:
-        tags, basic_config = read_opc_config(cfg_msg, module)
+        tags, basic_config, _ = read_opc_config(cfg_msg, module)
     else:
         tags, basic_config = read_modbus_config(cfg_msg, module)
     return render_template('opc/opc_show.html', basic_config=basic_config, config_review='bg-success')
@@ -904,7 +909,7 @@ def tags_review():
     module = 's_opcda_client1'
     cfg_msg = read_json(module)
     if module in opc:
-        tags, basic_config = read_opc_config(cfg_msg, module)
+        tags, basic_config, _ = read_opc_config(cfg_msg, module)
     else:
         tags, basic_config = read_modbus_config(cfg_msg, module)
     return render_template('opc/opc_tags.html', tags=tags, tags_review='bg-danger')
@@ -1103,7 +1108,6 @@ z = ZClient()
 
 @cs.route("/show_sensor", methods=['GET', 'POST'], endpoint='show_sensor')
 def show_sensor():
-
     tags = []
     page = int(request.args.get('page', 1))
     pages = int(request.args.get('pages', 3))
@@ -1126,3 +1130,6 @@ def show_alarm():
         return {'tags': tags}
     pag = paginate(tags, page, pages)
     return render_template('opc/show_alarm.html', paginate=pag, show_alarm='bg-warning')
+
+
+

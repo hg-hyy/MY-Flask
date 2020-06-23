@@ -16,7 +16,7 @@
     <label for="module" class="col-sm1 col-form-label col-form-label-md ml-3 ">
         <h5>请选择模块:</h5>
     </label>
-    
+
     <div class="col-auto">
         <select class="form-control form-control-md " name='module' id="module">
             <option>s_opcda_client1</option>
@@ -50,15 +50,10 @@
 <div class="row">
     <div class="col-md-12 mt-1">
         <table id='table' class="table table-bordered table-hover">
-            <thead>
-                <tr>
-                    <th>tag_id:</th>
-                    <th>publish_tag_name:</th>
-                    <th>source_tag_name:</th>
-                    <th>data_type:</th>
-                </tr>
+            <thead id='keys'>
+
             </thead>
-            <tbody id='tags'>
+            <tbody id='values'>
             </tbody>
         </table>
     </div>
@@ -98,41 +93,6 @@
 
 <script>
     var csrftoken = $("meta[name=csrf-token]").attr("content");
-
-
-
-    function pre() {
-        page = $("a.active").text()
-    }
-
-    function next() {
-
-        page = $("a.active").text()
-        var pages = $("#pages").val();
-        var page = $(obj).text();
-        var module_name = $("#module").val()
-        $(obj).addClass('active')
-        $(obj).parent('li').siblings().children().removeClass('active')
-        $.ajax({
-            url: "{{url_for('cs.page')}}",
-            // data: "pages=10&page=1" ,
-            data: {
-                "module": module_name,
-                "group": 1,
-                "pages": pages,
-                "page": page,
-            },
-            type: 'get',
-            dataType: 'json',
-            success: page_success,
-            error: function (data) {
-                console.log(data);
-            },
-        });
-        return false;
-
-    }
-
 
     function module_tag_select() {
         var module_name = $("#module").val()
@@ -228,24 +188,31 @@
     }
 
     function page_success(data) {
-        var $comm = '';
-        // var $td = '';
+        var $keys = '';
+        var $values = '';
         var $option = '';
-        var count = data.tags.length //组数
+        var count = data.total //组数
         var groups = data.groups
         $("#total").val(count)
         $("#max_pages").val(data.max_pages)
         console.log(data.tags)
         if (count > 0) {
             for (i in data.tags) {
-                var $td = ''
+                var $keys_td = ''
+                var $values_td = ''
                 for (t in data.tags[i]) {
-                    $td +=
-                        '<td scope="row" class="table-danger">' + data.tags[i][t] + '</td>'
-                };
-                $comm += '<tr>' + $td + '</tr>'
-                var $subject_con = $('#tags');
-                $subject_con.html($comm)
+                    if(t!='tags'){
+                    $keys_td +=
+                        '<th scope="row" class="table-danger">' + t + '</th>';
+                    $values_td +=
+                        '<td scope="row" class="table-info">' + data.tags[i][t] + '</td>'
+                }};
+                $keys = '<tr>' + $keys_td +'<th scope="row" class="table-danger">' +'操作'+ '</th>'+ '</tr>';
+                $values += '<tr>' + $values_td +'<th scope="row" class="table-danger">' +'<button class="btn btn-info">'+"编辑"+'</button>'+ '</th>'+ '</tr>'
+                var $subject_con = $('#keys');
+                $subject_con.html($keys)
+                var $subject_con = $('#values');
+                $subject_con.html($values)
 
             }
 
@@ -256,14 +223,15 @@
                 $groups.html($option)
             }
         } else {
-            $comm += '<tr>' + '<td scope="row" class="table-danger">' + '没有位号信息，请重新上传。。。' + '</td>' + '</tr>'
-            var $subject_con = $('#tags');
-            $subject_con.html($comm)
+            $values += '<tr>' + '<td scope="row" class="table-danger">' + '没有位号信息，请重新上传。。。' + '</td>' + '</tr>'
+            var $subject_con = $('#values');
+            $subject_con.html($values)
         }
     }
 
     function pages_success(data) {
-        var $comm = '';
+        var $keys = '';
+        var $values = '';
         var $lis = '';
         var $lis1 = '';
         var $option = '';
@@ -274,23 +242,33 @@
         $("#max_pages").val(data.max_pages)
         if (count > 0) {
             for (i in data.tags) {
-                var $td = ''
+                var $keys_td = ''
+                var $values_td = ''
                 for (t in data.tags[i]) {
-                    $td += '<td scope="row" class="table-danger">' + data.tags[i][t] + '</td>'
+                    $keys_td +=
+                        '<td scope="row" class="table-danger">' + t + '</td>';
+                    $values_td +=
+                        '<td scope="row" class="table-danger">' + data.tags[i][t] + '</td>'
                 };
-                $comm += '<tr>' + $td + '</tr>'
-                var $subject_con = $('#tags');
-                $subject_con.html($comm)
+                $keys = '<tr>' + $keys_td + '</tr>';
+                $values += '<tr>' + $values_td + '</tr>'
+                var $subject_con = $('#keys');
+                $subject_con.html($keys)
+                var $subject_con = $('#values');
+                $subject_con.html($values)
+
             }
+
+
             for (var g = 1; g < groups + 1; g++) {
                 $option += '<option>' + g + '</option>'
                 var $groups = $('#groups');
                 $groups.html($option)
             }
         } else {
-            $comm += '<tr>' + '<td scope="row" class="table-danger">' + '没有位号信息，请重新上传。。。' + '</td>' + '</tr>'
-            var $subject_con = $('#tags');
-            $subject_con.html($comm)
+            $values += '<tr>' + '<td scope="row" class="table-danger">' + '没有位号信息，请重新上传。。。' + '</td>' + '</tr>'
+            var $subject_con = $('#values');
+            $subject_con.html($values)
         }
 
         var head = '<li class="page-item "><a class="page-link form-control" onclick="pre()">' + 'Pres' + '</a></li>'
@@ -306,17 +284,23 @@
             var $subject_con = $('#page');
             $subject_con.html($lis1)
         } else {
-            $lis1 +=
+            $lis1 =
                 '<li class="page-item"><a class="page-link form-control btn btn-info" id="page1" onclick="page(this)">' +
                 '对不起，没有' + '</a></li>'
-            var $subject_con = $('#tags');
-            $subject_con.html($comm)
+            var $subject_con = $('#values');
+            $subject_con.html($values)
         }
     }
 
     $(document).ready(function () {
         page($("#page1"))
     })
+   
+
+
+
+
+
 </script>
 
 {% endblock %}
