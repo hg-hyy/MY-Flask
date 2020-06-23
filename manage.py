@@ -1,6 +1,7 @@
 from app import create_app, db
 from flask_script import Manager, Server
 from waitress import serve
+from app.zmq_route import ZClient
 
 
 app = create_app()
@@ -16,7 +17,6 @@ manager.add_command('runserver', Server(
 #     db.create_all()
 
 
-
 if __name__ == "__main__":
     """
     Production
@@ -28,4 +28,4 @@ if __name__ == "__main__":
     Development
 
     """
-    app.run()
+    app.run(threaded=True)

@@ -89,7 +89,7 @@
                             <a class="nav-link  " href="{{url_for('index')}}"
                                 style="font-size: x-large;font-style: italic;font-family: cursive;">
                                 <span data-feather="home" style="width: 16px; height: 16px;color:black;"></span>
-                                home
+                                HOME
                             </a>
                         </li>
                         <h2
@@ -101,35 +101,35 @@
                             <a class="nav-link  " href="{{url_for('cs.opc')}}"
                                 style="font-size: x-large;font-style: italic;font-family: cursive;">
                                 <span data-feather="edit" style="width: 16px; height: 16px;color:black;"></span>
-                                OPC
+                                Opc
                             </a>
                         </li>
                         <li class="nav-item {{opc_da_server}}">
                             <a class="nav-link  " href="{{url_for('cs.load_opc_se')}}"
                                 style="font-size: x-large;font-style: italic;font-family: cursive;">
                                 <span data-feather="edit" style="width: 16px; height: 16px;color:black;"></span>
-                                opc_da_server
+                                Opc_da_server
                             </a>
                         </li>
                         <li class="nav-item {{opc_da_client}}" onclick="bg(this)">
                             <a class="nav-link  " href="{{url_for('cs.load_opc_da')}}"
                                 style="font-size: x-large;font-style: italic;font-family: cursive;">
                                 <span data-feather="star" style="width: 16px; height: 16px;color:black;"></span>
-                                opc_da_client
+                                Opc_da_client
                             </a>
                         </li>
                         <li class="nav-item {{opc_ae_client}}">
                             <a class="nav-link  " href="{{url_for('cs.load_opc_ae')}}"
                                 style="font-size: x-large;font-style: italic;font-family: cursive;">
                                 <span data-feather="anchor" style="width: 16px; height: 16px;color:black;"></span>
-                                opc_ae_client
+                                Opc_ae_client
                             </a>
                         </li>
                         <li class="nav-item {{modbus_slave}}">
                             <a class="nav-link  " href="{{url_for('cs.load_modbus')}}"
                                 style="font-size: x-large;font-style: italic;font-family: cursive;">
                                 <span data-feather="octagon" style="width: 16px; height: 16px;color:black;"></span>
-                                modbus_slave
+                                Modbus_slave
                             </a>
                         </li>
 
@@ -142,21 +142,28 @@
                             <a class="nav-link " href="{{url_for('cs.config_review')}} "
                                 style="font-size: x-large;font-style: italic;font-family: cursive;">
                                 <span data-feather="cpu" style="width: 16px; height: 16px;color:black;"></span>
-                                config_review
+                                Config
                             </a>
                         </li>
                         <li class="nav-item {{tags_review}}">
                             <a class="nav-link " href="{{url_for('cs.tags_review')}} "
                                 style="font-size: x-large;font-style: italic;font-family: cursive;">
                                 <span data-feather="cast" style="width: 16px; height: 16px;color:black;"></span>
-                                tags_review
+                                Tags
                             </a>
                         </li>
-                        <li class="nav-item {{show_tag}}">
-                            <a class="nav-link " href="{{url_for('cs.show_tag')}} "
+                        <li class="nav-item {{show_sensor}}">
+                            <a class="nav-link " href="{{url_for('cs.show_sensor')}} "
                                 style="font-size: x-large;font-style: italic;font-family: cursive;">
                                 <span data-feather="cast" style="width: 16px; height: 16px;color:black;"></span>
-                                show_tag
+                                Sensor
+                            </a>
+                        </li>
+                        <li class="nav-item {{show_alarm}}">
+                            <a class="nav-link " href="{{url_for('cs.show_alarm')}} "
+                                style="font-size: x-large;font-style: italic;font-family: cursive;">
+                                <span data-feather="cast" style="width: 16px; height: 16px;color:black;"></span>
+                                Alarms
                             </a>
                         </li>
 
@@ -168,7 +175,7 @@
                             <a class="nav-link " href="{{url_for('cs.log')}} "
                                 style="font-size: x-large;font-style: italic;font-family: cursive;">
                                 <span data-feather="hard-drive" style="width: 16px; height: 16px;color:black;"></span>
-                                log
+                                Log
                             </a>
                         </li>
 
@@ -176,7 +183,7 @@
                             <a class="nav-link " href="{{url_for('faq.show_issue')}} "
                                 style="font-size: x-large;font-style: italic;font-family: cursive;">
                                 <span data-feather="info" style="width: 16px; height: 16px;color:black;"></span>
-                                faq
+                                Faq
                             </a>
                         </li>
                     </ul>
@@ -185,9 +192,9 @@
 
             <!-- 正文-->
             <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-md-4" id='main'>
-                <div class="jumbotron p-4 ">
+                <div class="jumbotron p-0 m-0 ">
                     <div class="row">
-                        <div class="col-12" style="position: relative; overflow-y: auto; height: 560px;">
+                        <div class="col-12" style="position: relative; overflow-y: auto; height: 716px;">
                             {% block heads %}{% endblock %}
                             {% block content %}{% endblock %}
                         </div>
@@ -198,47 +205,44 @@
                 <div style="position: fixed;top: 60px;right: 30px;" id='alarm'></div>
 
                 <!--页脚-->
-                <div class="container-fluid">
-
-                    <footer class="pt-5 mt-5  border-top ">
-                        <div class="row">
-                            <div class="col-12 col-md">
-                                <img class="mb-2" src="{{url_for('static',filename='pic/CL1.jpg')}}" alt="" width="150"
-                                    height="150">
-                                <!-- <small class="d-block mb-3 text-muted">&copy; 2019-10-03</small> -->
-                            </div>
-                            <div class="col-6 col-md">
-                                <h5>Features</h5>
-                                <ul class="list-unstyled text-small">
-                                    <li><a class="text-muted" href="#">Cool stuff</a></li>
-                                    <li><a class="text-muted" href="#">Another one</a></li>
-                                    <li><a class="text-muted" href="#">Last time</a></li>
-                                </ul>
-                            </div>
-                            <div class="col-6 col-md">
-                                <h5>Resources</h5>
-                                <ul class="list-unstyled text-small">
-                                    <li><a class="text-muted" href="#">Resource</a></li>
-                                    <li><a class="text-muted" href="#">Resource name</a></li>
-                                </ul>
-                            </div>
-                            <div class="col-6 col-md">
-                                <h5>About</h5>
-                                <ul class="list-unstyled text-small">
-                                    <li><a class="text-muted" href="#">Team</a></li>
-                                    <li><a class="text-muted" href="#">Locations</a></li>
-                                </ul>
-                            </div>
+                <div class="container-fluid p-0 m-0 ">
+                    <hr class="border-top border-info" />
+                    <div class="row justify-content-start text-center">
+                        <div class="col-3 col-md">
+                            <img class="mb-2" src="{{url_for('static',filename='pic/CL1.jpg')}}" alt="" width="100"
+                                height="100">
+                            <!-- <small class="d-block mb-3 text-muted">&copy; 2019-10-03</small> -->
                         </div>
+                        <div class="col-3 col-md">
+                            <h5>Features</h5>
+                            <ul class="list-unstyled text-small">
+                                <li><a class="text-muted" href="#">Cool stuff</a></li>
+                                <li><a class="text-muted" href="#">Another one</a></li>
 
-                        <div class="row p-2 " style="background:linear-gradient(to right,#BFF098, #6FD6FF);">
-                            <div class="mx-auto w-auto">
-                                <span>Copyright © <a href="http://www.youzhan.org">天の使精选</a></span> |
-                                <span><a href="http://www.miibeian.gov.cn/" target="_blank">ICP备11008151号</a></span>
-                            </div>
+                            </ul>
                         </div>
+                        <div class="col-3 col-md">
+                            <h5>Resources</h5>
+                            <ul class="list-unstyled text-small">
+                                <li><a class="text-muted" href="#">Resource</a></li>
+                                <li><a class="text-muted" href="#">Resource name</a></li>
+                            </ul>
+                        </div>
+                        <div class="col-3 col-md">
+                            <h5>About</h5>
+                            <ul class="list-unstyled text-small">
+                                <li><a class="text-muted" href="#">Team</a></li>
+                                <li><a class="text-muted" href="#">Locations</a></li>
+                            </ul>
+                        </div>
+                    </div>
 
-                    </footer>
+                    <div class="row py-2 px-1 " style="background:linear-gradient(to right,#BFF098, #6FD6FF);">
+                        <div class="mx-auto w-auto">
+                            <span>Copyright © <a href="http://www.youzhan.org">天の使精选</a></span> |
+                            <span><a href="http://www.miibeian.gov.cn/" target="_blank">ICP备11008151号</a></span>
+                        </div>
+                    </div>
 
                 </div>
             </main>

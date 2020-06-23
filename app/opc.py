@@ -7,6 +7,7 @@
 @desc:
 
 """
+from math import ceil
 import jwt
 import datetime
 import os
@@ -28,6 +29,9 @@ from .forms import OpcForm, LoginForm, OpcdaForm
 from .config import client, server, opc, modbus, URL
 from .model import User
 from .settings import Config
+from threading import Thread
+from .zmq_route import ZClient, event2dict, sensor2dict
+
 
 conf_path = Config.conf_path
 log_path = Config.log_path
@@ -373,7 +377,7 @@ def page():
 
         if a > 0:
             max_pages = max_pages + 1
-            
+
         if page != 1:
             has_pre = True
         if page != max_pages:
@@ -954,7 +958,7 @@ def logs():
         log_day_start = log_day+' ' + \
             request.form.get('log_day_start', '00:00:00')
         log_day_end = log_day+' '+request.form.get("log_day_end", "23:59:59")
-        pages = int(request.form.get('pages', 5))
+        pages = int(request.form.get('pages', 10))
         page = int(request.form.get('page', 1))
         key = request.form.get('key')
         log_name = log_path+'\\'+'{}.log'.format(log_day)
@@ -1015,8 +1019,6 @@ def check_log():
             elif lv.split('-')[0] == log_level and log_day == '':
                 log_list.append(lv)
         return {'log_level': log_level, 'log_list': log_list}
-
-from math import ceil
 
 
 class Pagination(object):
@@ -1097,19 +1099,31 @@ def paginate(list, page=1, per_page=3, max_per_page=None):
     return Pagination(page, per_page, total, items)
 
 
-@cs.route("/show_tag", methods=['GET', 'POST'], endpoint='show_tag')
-def show_tag():
-    if request.method=='GET':
-        module = request.args.get('module','s_opcda_client1')
-        page = int(request.args.get('page', 1))
-        pages = int(request.args.get('pages', 3))
-        cfg_msg = read_json(module)
-        if cfg_msg:
-            if module in modbus:
-                tags, basic_config = read_modbus_config(cfg_msg, module)
-            else:
-                tags, basic_config = read_opc_config(cfg_msg, module)
-            pag = paginate(tags[0],page,pages) 
-            return render_template('opc/show_tag.html', paginate=pag,show_tag='bg-warning')
-        return render_template('opc/show_tag.html', paginate=[{}],show_tag='bg-warning')
-    return '404'
+z = ZClient()
+
+
+@cs.route("/show_sensor", methods=['GET', 'POST'], endpoint='show_sensor')
+def show_sensor():
+
+    tags = []
+    page = int(request.args.get('page', 1))
+    pages = int(request.args.get('pages', 3))
+    for data in z.sensor_list:
+        tags.append(sensor2dict(data))
+    if request.method == 'POST':
+        return {'tags': tags}
+    pag = paginate(tags, page, pages)
+    return render_template('opc/show_sensor.html', paginate=pag, show_sensor='bg-warning')
+
+
+@cs.route("/show_alarm", methods=['GET', 'POST'], endpoint='show_alarm')
+def show_alarm():
+    tags = []
+    page = int(request.args.get('page', 1))
+    pages = int(request.args.get('pages', 3))
+    for data in z.event_list:
+        tags.append(event2dict(data))
+    if request.method == 'POST':
+        return {'tags': tags}
+    pag = paginate(tags, page, pages)
+    return render_template('opc/show_alarm.html', paginate=pag, show_alarm='bg-warning')

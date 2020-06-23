@@ -14,7 +14,7 @@
 
             <a class="navbar-brand">
                 <img src="/static/pic/bootstrap-solid.svg" width="30" height="30" class="d-inline align-middle" alt="">
-                alarm
+                Alarm
             </a>
 
             <span class="navbar-text">
@@ -115,7 +115,7 @@
                             value="{{ paginate.total }}" />
                         <li class="page-item"><a class="page-link form-control">条</a></li>
                         <li class="page-item"><a class="page-link form-control">共</a></li>
-                        <input id='max_pages' name='max_pages' disable class="form-control" style="width: 60px;"
+                        <input id='pages' name='pages' disable class="form-control" style="width: 60px;"
                             value="{{ paginate.pages }}" />
                         <li class="page-item"><a class="page-link form-control">页</a></li>
                     </ul>
@@ -125,9 +125,7 @@
     </div>
 
     <div class="col-12">
-
-
-        <table class="table">
+        <table class="table table-bordered">
             <thead>
                 <tr>
                     <th>source</th>
@@ -136,11 +134,10 @@
                     <th>keyword</th>
                     <th>content</th>
                     <th>timestamp</th>
+                    <th>操作</th>
                 </tr>
             </thead>
             <tbody id='alarm'>
-
-
             </tbody>
         </table>
     </div>
@@ -158,7 +155,7 @@
                         <option>50</option>
                     </select>
 
-                    <ul class="pagination  justify-content-end" id='page'>
+                    <ul class="pagination  justify-content-end" id='alarm_page'>
                         <li class="page-item "><a class="page-link form-control " onclick=" pre()">Pres</a></li>
                         <li class="page-item"><a class="page-link form-control btn btn-info" id='page1'
                                 onclick="page(this)">1</a></li>
@@ -166,7 +163,7 @@
                     </ul>
 
                     <li class="page-item"><a class="page-link form-control">共</a></li>
-                    <input id='total' name='total' class="form-control" style="width: 60px;" />
+                    <input id='nums' name='nums' class="form-control" style="width: 60px;" />
                     <li class="page-item"><a class="page-link form-control">条</a></li>
                     <li class="page-item"><a class="page-link form-control">共</a></li>
                     <input id='max_pages' name='max_pages' class="form-control" style="width: 60px;" />
@@ -180,10 +177,6 @@
     var csrftoken = $("meta[name=csrf-token]").attr("content");
 
     function page() {
-
-        var pages = $("#pages").val();
-
-        var module_name = $("#module").val()
         $.ajax({
             url: "{{url_for('cs.show_alarm')}}",
             data: {
@@ -207,25 +200,22 @@
         var $lis = '';
         var $lis1 = '';
         var $option = '';
-        console.log(data.length)
+        var count = data.tags.length
+        console.log(count)
         if (count > 0) {
             for (i in data.tags) {
                 var $td = ''
                 for (t in data.tags[i]) {
-                    $td += '<td scope="row" class="table-danger">' + data.tags[i][t] + '</td>'
+                    $td += '<td scope="row" class="table-warning">' + data.tags[i][t] + '</td>'
                 };
-                $comm += '<tr>' + $td + '</tr>'
-                var $subject_con = $('#tags');
+                $comm += '<tr>' + $td + '<td scope="row" class="table-warning">' + '<button class="btn btn-info">' +
+                    "确认报警" + '</button>' + '</td>' + '</tr>'
+                var $subject_con = $('#alarm');
                 $subject_con.html($comm)
             }
-            for (var g = 1; g < groups + 1; g++) {
-                $option += '<option>' + g + '</option>'
-                var $groups = $('#groups');
-                $groups.html($option)
-            }
         } else {
-            $comm += '<tr>' + '<td scope="row" class="table-danger">' + '没有位号信息，请重新上传。。。' + '</td>' + '</tr>'
-            var $subject_con = $('#tags');
+            $comm += '<tr>' + '<td scope="row" class="table-danger">' + '当前暂无报警。。。' + '</td>' + '</tr>'
+            var $subject_con = $('#alarm');
             $subject_con.html($comm)
         }
 
@@ -239,20 +229,17 @@
                     i + '</a></li>'
             }
             $lis1 = head + $lis + tail
-            var $subject_con = $('#page');
+            var $subject_con = $('#alarm_page');
             $subject_con.html($lis1)
         } else {
             $lis1 +=
                 '<li class="page-item"><a class="page-link form-control btn btn-info" id="page1" onclick="page(this)">' +
                 '对不起，没有' + '</a></li>'
-            var $subject_con = $('#tags');
-            $subject_con.html($comm)
+            var $subject_con = $('#alarm_page');
+            $subject_con.html($lis1)
         }
     }
-
-
     var int = self.setInterval("page()", 5000);
-
     (function () {
         'use strict'
 
