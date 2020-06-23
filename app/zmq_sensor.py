@@ -12,10 +12,7 @@ from .import event_list_pb2
 # import event_list_pb2
 
 # 监听的ip和端口
-
 tcp_sensor='tcp://192.168.20.213:40210'
-tcp_event='tcp://192.168.20.213:40220'
-
 
 # 传感类数据对象
 
@@ -54,23 +51,6 @@ class Data:
 
 # 事件类数据对象
 
-
-class Event:
-    def __init__(self, source, event_type, level, keyword, content, timestamp):
-        # 事件源
-        self.source = source
-        # 事件类型
-        self.event_type = event_type
-        # 等级
-        self.level = level
-        # 摘要
-        self.keyword = keyword
-        # 内容
-        self.content = content
-        # 时间戳
-        self.timestamp = timestamp
-
-
 def sdt(ts):
     da = datetime.datetime.fromtimestamp(ts)
     ymd = da.strftime("%Y-%m-%d %H:%M:%S")
@@ -92,38 +72,21 @@ def sensor2dict(data):
 
 # 事件类数据对象转字典
 
-
-def event2dict(event):
-    if event:
-        return {'source': event.source,
-                'event_type': event.event_type,
-                'level': event.level,
-                'keyword': event.keyword,
-                'content': event.content,
-                'timestamp': sdt(event.timestamp)}
-    else:
-        return {}
-
-
 class ZClient(object):
 
-    def __init__(self, tcp_sensor=tcp_sensor, tcp_event=tcp_event):
+    def __init__(self,tcp_sensor=tcp_sensor, tcp_event=tcp_event):
         """Initialize Worker"""
         self.tcp_sensor = tcp_sensor
         self.tcp_event = tcp_event
         self.sensor_list = []
-        self.event_list = []
         self._context = zmq.Context()
         self.sub_sensor = self._context.socket(zmq.SUB)
-        self.sub_event = self._context.socket(zmq.SUB)
         self._make_thread()
 
     def _do_init(self):
         self.sub_sensor.connect(self.tcp_sensor)
         self.sub_sensor.setsockopt(zmq.SUBSCRIBE, b"")
 
-        self.sub_event.connect(self.tcp_event)
-        self.sub_event.setsockopt(zmq.SUBSCRIBE, b"")
 
     def _make_thread(self):
 
@@ -136,8 +99,6 @@ class ZClient(object):
         self._do_init()
         print('初始化完成。。。')
         while True:
-            self.receive_event_message()
-            time.sleep(5)
             self.receive_sensor_message()
             time.sleep(5)
 
@@ -154,37 +115,19 @@ class ZClient(object):
             data_list.append(data)
         return data_list
 
-    def un_package_event_data(self, msg_data):
-        data_list = []
-        event_list = event_list_pb2.event_list()
-        event_list.ParseFromString(msg_data)
-        for event in event_list.events:
-            data = Event(event.source, event.event_type, event.level,
-                         event.keyword, event.content, event.timestamp)
-            data_list.append(data)
-        return data_list
-
     def receive_sensor_message(self):
-        list_temp=[]
+        list_sensor_temp=[]
         message = self.sub_sensor.recv()
         topic, message = message.split(b'^', 1)
-        list_temp=[]= self.un_package_sensor_data(message)
-        self.sensor_list.extend(list_temp)
+        list_sensor_temp=[]= self.un_package_sensor_data(message)
+        self.sensor_list.extend(list_sensor_temp)
         print(self.sensor_list[0].tag, self.sensor_list[0].get_value())
-
-    def receive_event_message(self):
-        list_temp = []
-        message = self.sub_event.recv()
-        topic, message = message.split(b'^', 1)
-        list_temp = self.un_package_event_data(message)
-        self.event_list.extend(list_temp)
-
 
 if __name__ == "__main__":
     z = ZClient()
     while True:
-        print(len(z.event_list))
-        for data in z.event_list:
+        print(len(z.sensor_list))
+        for data in z.sensor_list:
             print(
-                f"{event2dict(data)['timestamp']}:{event2dict(data)['content']}")
+                f"{sensor2dict(data)['tag']}:{sensor2dict(data)['value']}")
         time.sleep(5)

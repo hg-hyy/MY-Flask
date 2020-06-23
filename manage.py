@@ -1,7 +1,7 @@
 from app import create_app, db
 from flask_script import Manager, Server
 from waitress import serve
-from app.zmq_route import ZClient
+
 
 
 app = create_app()

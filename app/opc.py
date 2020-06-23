@@ -8,7 +8,6 @@
 
 """
 from math import ceil
-import jwt
 import datetime
 import os
 import time
@@ -30,7 +29,7 @@ from .config import client, server, opc, modbus, URL
 from .model import User
 from .settings import Config
 from threading import Thread
-from .zmq_route import ZClient, event2dict, sensor2dict
+from .zmq_event import ZClient, event2dict, sensor2dict
 
 
 conf_path = Config.conf_path
