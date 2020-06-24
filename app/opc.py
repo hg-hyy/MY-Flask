@@ -164,16 +164,9 @@ def read_json(module):
 def read_modbus_config(cfg_msg, module):
     tag_list = []
     basic_config = {}
+    group_infos = []
     if cfg_msg:
         try:
-            for d in cfg_msg["data"][module+'.data']:
-                slave_id = d['slave_id']
-                block = d['block']
-
-                for b in block:
-                    fun_code = b['fun_code']
-                    tag_list.append(b['tags'])
-
             dev_id = cfg_msg["data"][module+'.dev_id']
             Coll_Type = cfg_msg["data"][module+'.Coll_Type']
             TCP = cfg_msg["data"][module+'.TCP']
@@ -196,13 +189,23 @@ def read_modbus_config(cfg_msg, module):
                     'fstop_bit': RTU['stop_bit'],
                     'gparity': RTU['parity'],
                 }
+            for d in cfg_msg["data"][module+'.data']:
+                slave_id = d['slave_id']
+                block = d['block']
 
-            return tag_list, basic_config
+                for b in block:
+                    fun_code = b['fun_code']
+                    tag_list.append(b['tags'])
+                    group_info = {'group_id': slave_id, 'group_name': fun_code,
+                                  'collect_cycle': 10, 'tags_num': len(b['tags']), 'tags': b['tags']}
+                    group_infos.append(group_info)
+
+            return tag_list, basic_config, group_infos
         except Exception as e:
-            print(str(e))
-            return tag_list, basic_config
+            print(str(e), '------error in read modbus conf----------')
+            return tag_list, basic_config, group_infos
     else:
-        return tag_list, basic_config
+        return tag_list, basic_config, group_infos
 
 
 def read_opc_config(cfg_msg, module):
@@ -259,7 +262,7 @@ def read_opc_config(cfg_msg, module):
                     group_name = g['group_name']
                     collect_cycle = g['collect_cycle']
                     group_info = {'group_id': group_id, 'group_name': group_name,
-                                  'collect_cycle': collect_cycle, 'tags_num': len(g['tags']),'tags':g['tags']}
+                                  'collect_cycle': collect_cycle, 'tags_num': len(g['tags']), 'tags': g['tags']}
                     tag_list.append(g['tags'])
                     group_infos.append(group_info)
             return tag_list, opc_config, group_infos
@@ -353,7 +356,7 @@ def page():
     """
     分页
     """
-    group_infos=[]
+    group_infos = []
     if request.method == 'POST':
         module = request.form['module']
         group = int(request.form['group'])-1
@@ -367,7 +370,7 @@ def page():
         page = int(request.args.get('page'))  # 当前第几页1
     cfg_msg = read_json(module)
     if module in modbus:
-        tags, basic_config = read_modbus_config(cfg_msg, module)
+        tags, basic_config, group_infos = read_modbus_config(cfg_msg, module)
     else:
         tags, basic_config, group_infos = read_opc_config(cfg_msg, module)
     total = 0
@@ -395,6 +398,62 @@ def page():
     return {"tags": [[]], "basic_config": basic_config, "group_infos": [], "total": 0, "max_pages": 0, 'groups': 0}
 
 
+@cs.route('/page1', methods=['GET', 'POST'], endpoint='page1')
+def page1():
+    """
+    分页
+    """
+    group_infos = []
+    if request.method == 'POST':
+        group_id = int(request.form.get('group_id', 1))-1
+        module = request.form.get('module', 's_opcda_client1')
+        pages = int(request.form.get('pages', 10))
+        page = int(request.form.get('page', 1))
+        print(group_id, module, pages, page)
+        cfg_msg = read_json(module)
+        if module in modbus:
+            tags, basic_config, group_infos = read_modbus_config(
+                cfg_msg, module)
+        else:
+            tags, basic_config, group_infos = read_opc_config(cfg_msg, module)
+
+        pga = paginate(group_infos[group_id]['tags'], page, pages)
+        pga_dict = {'items': pga.items,
+                    'has_prev': pga.has_prev,
+                    'prev_num': pga.prev_num,
+                    'has_next': pga.has_next,
+                    'next_num': pga.next_num,
+                    'iter_pages': list(pga.iter_pages()),
+                    'pages': pga.pages,
+                    'page': pga.page,
+                    'total': pga.total
+                    }
+        print(pga.total,pga.pages,pga.has_prev,pga.has_next,pga.prev_num,pga.next_num,pga_dict['iter_pages'])
+        return {"paginate": pga_dict, 'group_infos': group_infos}
+
+    module = 's_opcda_client1'
+    pages = int(request.args.get('pages', 5))
+    page = int(request.args.get('page', 1))
+
+    cfg_msg = read_json(module)
+    if module in modbus:
+        tags, basic_config, group_infos = read_modbus_config(
+            cfg_msg, module)
+    else:
+        tags, basic_config, group_infos = read_opc_config(cfg_msg, module)
+    pga = paginate(group_infos, page, pages)
+    pga_dict = {'items': pga.items,
+                'has_prev': pga.has_prev,
+                'prev_num': pga.prev_num,
+                'has_next': pga.has_next,
+                'next_num': pga.next_num,
+                'iter_pages': pga.iter_pages(),
+                'pages': pga.pages,
+                'total': pga.total
+                }
+    return render_template('opc/show_tag.html', paginate=pga_dict, group_infos=group_infos)
+
+
 @cs.route('/search', methods=['GET', 'POST'], endpoint='search')
 def search():
     """
@@ -404,7 +463,7 @@ def search():
     tagname = request.args.get('tagname')  # 标签名
     cfg_msg = read_json(module)
     if module in modbus:
-        tags, basic_config = read_modbus_config(cfg_msg, module)
+        tags, basic_config, _ = read_modbus_config(cfg_msg, module)
         data = search_modbus_tag(tagname, tags, [])
     else:
         tags, basic_config, _ = read_opc_config(cfg_msg, module)
@@ -567,7 +626,7 @@ def load_opc_da():
             f.write(json.dumps(res, ensure_ascii=False,
                                sort_keys=False, indent=4))
         cfg_msg = read_json(module)
-        tags, basic_config = read_modbus_config(cfg_msg, module)
+        tags, basic_config, _ = read_modbus_config(cfg_msg, module)
         set_config(res, module)
         return render_template("opc/opc_show.html", basic_config=dict1)
     return render_template("opc/opc_da_index.html", form=form, opc_da_client='bg-danger')
@@ -628,7 +687,7 @@ def load_opc_ae():
             f.write(json.dumps(res, ensure_ascii=False,
                                sort_keys=False, indent=4))
         cfg_msg = read_json(module)
-        tags, basic_config = read_modbus_config(cfg_msg, module)
+        tags, basic_config, _ = read_modbus_config(cfg_msg, module)
         set_config(res, module)
         return render_template("opc/opc_show.html", basic_config=dict1)
     return render_template("opc/opc_ae_index.html", opc_ae_client='bg-warning')
@@ -711,7 +770,7 @@ def load_modbus():
             f.write(json.dumps(res, ensure_ascii=False,
                                sort_keys=False, indent=4))
         cfg_msg = read_json(module)
-        tags, basic_config = read_modbus_config(cfg_msg, module)
+        tags, basic_config, _ = read_modbus_config(cfg_msg, module)
         set_config(res, module)
         return render_template('opc/opc_show.html', basic_config=basic_config)
     return render_template('modbus/modbus_index.html', modbus_slave='bg-primary')
@@ -863,7 +922,7 @@ def alter_module():
         tags, basic_config, _ = read_opc_config(cfg_msg, module)
         current_app.logger.debug(f'开始编辑{module}基础配置')
     else:
-        tags, basic_config = read_modbus_config(cfg_msg, module)
+        tags, basic_config, _ = read_modbus_config(cfg_msg, module)
         current_app.logger.debug(f'开始编辑{module}基础配置')
     return {'basic_config': basic_config}
 
@@ -878,7 +937,7 @@ def config_review():
             tags, basic_config, _ = read_opc_config(cfg_msg, module)
             current_app.logger.info(f'查看{module}基础配置')
         else:
-            tags, basic_config = read_modbus_config(cfg_msg, module)
+            tags, basic_config, _ = read_modbus_config(cfg_msg, module)
             current_app.logger.debug(f'查看{module}基础配置')
         return {'basic_config': basic_config}
 
@@ -887,7 +946,7 @@ def config_review():
     if module in opc:
         tags, basic_config, _ = read_opc_config(cfg_msg, module)
     else:
-        tags, basic_config = read_modbus_config(cfg_msg, module)
+        tags, basic_config, _ = read_modbus_config(cfg_msg, module)
     return render_template('opc/opc_show.html', basic_config=basic_config, config_review='bg-success')
 
 
@@ -901,7 +960,7 @@ def tags_review():
             tags, basic_config = read_opc_config(cfg_msg, module)
             current_app.logger.debug(f'查看{module}位号配置')
         else:
-            tags, basic_config = read_modbus_config(cfg_msg, module)
+            tags, basic_config, _ = read_modbus_config(cfg_msg, module)
             current_app.logger.debug(f'查看{module}位号配置')
         return {'tags': tags}
 
@@ -911,7 +970,7 @@ def tags_review():
     if module in opc:
         tags, basic_config, _ = read_opc_config(cfg_msg, module)
     else:
-        tags, basic_config = read_modbus_config(cfg_msg, module)
+        tags, basic_config, _ = read_modbus_config(cfg_msg, module)
     return render_template('opc/opc_tags.html', tags=tags, tags_review='bg-danger')
 
 
@@ -1130,6 +1189,3 @@ def show_alarm():
         return {'tags': tags}
     pag = paginate(tags, page, pages)
     return render_template('opc/show_alarm.html', paginate=pag, show_alarm='bg-warning')
-
-
-

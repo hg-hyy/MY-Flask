@@ -8,8 +8,7 @@
 {% block content %}
 <div class="row">
     <div class="col-12">
-        <!-- 标题 -->
-
+        <!-- 标题 、功能表单 -->
         <nav class="navbar justify-content-between" style="background-color: #058dee;">
 
             <a class="navbar-brand">
@@ -23,8 +22,6 @@
             <form action="{{request.path}}" method="get" class="form-inline my-2 my-lg-0 needs-validation" novalidate>
                 <div class="form-group">
                     <select class=" custom-select" name='module' id="module" required>
-                        <option value="">select module</option>
-                        <option>s_opcda_client1</option>
                         <option>s_opcda_client1</option>
                         <option>s_opcda_client2</option>
                         <option>s_opcda_client3</option>
@@ -35,159 +32,159 @@
                 <button class="btn btn-warning  my-2 my-sm-0" type="submit">点击 查询</button>
             </form>
         </nav>
-        <!-- 功能表单 -->
 
         <hr class="border-bottom border-danger" />
-        <!-- issue卡片 -->
-        <div class="card-deck">
-            {% for alarm in paginate.items %}
 
-            <div class="card border-success mb-3" style="max-width: 30rem;">
-                <div class="card-header bg-transparent border-success">
-                    <h3>
-                        <span class="text-muted">报警类别:</span>
-                        <span class="badge badge-info badge-pill">
-                            {{alarm.event_type}}</span>
-                    </h3>
-                </div>
-                <div class="card-body text-success">
-                    <h5 class="card-title text-info">
-                        <span class="badge badge-info badge-pill">关键字:</span>
-                        {{ alarm['keyword'] }}
-                    </h5>
-                    <blockquote class="blockquote mb-0">
-                        <p class="card-text text-danger">{{ alarm['content'] }}</p>
-                        <footer class="blockquote-footer">
-                            <cite title="Source Title">{{ alarm['source'] }}:{{ alarm['level']}}</cite>
-                        </footer>
-                    </blockquote>
-                </div>
-                <div class="card-footer bg-transparent border-success d-flex flex-row-reverse">
-                    <cite title="Source Title">On:{{ alarm['timestamp']}}</cite>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-        <!-- 分页 -->
-        <div class="row mt-4 ">
-            <div class="col-md-12 col-sm-12 ">
-                <nav>
-                    <ul class="pagination pagination-md justify-content-end">
-                        <ul class="pagination  justify-content-end" id='page'>
-                            <li class="page-item ">
-                                {% if paginate.has_prev %}
-                                <a class="page-link form-control" tabindex="-1"
-                                    href="/show_alarm?page={{ paginate.prev_num }}">Previous</a>
-                                {% endif %}
-                            </li>
-
-
-                            {%  for i in  paginate.iter_pages() %}
-
-                            {% if i %}
-                            {%if paginate.page == i%}
-                            <li class="page-item active">
-                                <a class="page-link form-control" href="/show_alarm?page={{ i }}">{{ i }}</a>
-                            </li>
-                            {%else%}
-                            <li class="page-item ">
-                                <a class="page-link form-control" href="/show_alarm?page={{ i }}">{{ i }}</a>
-                            </li>
-                            {% endif %}
-                            {% else %}
-                            <li class="page-item ">
-                                <a class="page-link form-control" href="/show_alarm?page={{ i }}">...</a>
-                            </li>
-
-                            {% endif %}
-
-                            {% endfor %}
-
-                            {% if paginate.has_next %}
-                            <a class="page-link form-control" href="/show_alarm?page={{ paginate.next_num }}">Next</a>
-                            {% endif %}
-
-                            </li>
-                        </ul>
-
-                        <li class="page-item"><a class="page-link form-control">共</a></li>
-                        <input id='total' name='total' disabled class="form-control" style="width: 60px;"
-                            value="{{ paginate.total }}" />
-                        <li class="page-item"><a class="page-link form-control">条</a></li>
-                        <li class="page-item"><a class="page-link form-control">共</a></li>
-                        <input id='max_pages' name='max_pages' disable class="form-control" style="width: 60px;"
-                            value="{{ paginate.pages }}" />
-                        <li class="page-item"><a class="page-link form-control">页</a></li>
-                    </ul>
-                </nav>
-            </div>
-        </div>
     </div>
 
-    <div class="col-12">
-
-
-        <table class="table">
+    <!-- 分组表 -->
+    <div class="col-12 text-center">
+        <table class="table table-bordered table-hover">
             <thead>
                 <tr>
-                    <th>source</th>
-                    <th>level</th>
-                    <th>event_type</th>
-                    <th>keyword</th>
-                    <th>content</th>
-                    <th>timestamp</th>
+                    <th>group_id</th>
+                    <th>group_name</th>
+                    <th>collect_cycle</th>
+                    <th>tags_num</th>
+                    <th>操作</th>
                 </tr>
             </thead>
             <tbody id='alarm'>
+                {% for gi in group_infos %}
+                <tr>
+                    <td> {{gi['group_id']}}</td>
+                    <td> {{gi['group_name']}}</td>
+                    <td> {{gi['collect_cycle']}}</td>
+                    <td> {{gi['tags_num']}}</td>
+                    <td>
+                        <!-- <a class="btn btn-info btn-sm" href="{{url_for('cs.page1',group_id=gi['group_id'])}}">编辑</a> -->
+                        <a id="showLogModel1" href="javascript:void(0)" onclick="showLogModel('{{gi['group_id']}}')">查看
 
-
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
             </tbody>
         </table>
     </div>
-    <!-- 分页 -->
-    <div class="row mt-5">
-        <div class="col-md-12 col-sm-12 ">
-            <nav>
-                <ul class="pagination justify-content-end">
-                    <select class="form-control " name='pages' id="pages" onchange="pages(this)"
-                        style="width: fit-content;">
-                        <option selected>5</option>
-                        <option>10</option>
-                        <option>12</option>
-                        <option>20</option>
-                        <option>50</option>
-                    </select>
+</div>
+<!-- 分页 -->
+<div class="row mt-4 ">
+    <div class="col-md-12 col-sm-12 ">
+        <nav>
+            <ul class="pagination pagination-md justify-content-end">
+                <ul class="pagination  justify-content-end" id='page'>
+                    <li class="page-item ">
+                        {% if paginate.has_prev %}
+                        <a class="page-link form-control" tabindex="-1"
+                            href="/page1?page={{ paginate.prev_num }}">Previous</a>
+                        {% endif %}
+                    </li>
 
-                    <ul class="pagination  justify-content-end" id='page'>
-                        <li class="page-item "><a class="page-link form-control " onclick=" pre()">Pres</a></li>
-                        <li class="page-item"><a class="page-link form-control btn btn-info" id='page1'
-                                onclick="page(this)">1</a></li>
-                        <li class="page-item"><a class="page-link form-control" onclick=" next()">Next</a></li>
-                    </ul>
 
-                    <li class="page-item"><a class="page-link form-control">共</a></li>
-                    <input id='total' name='total' class="form-control" style="width: 60px;" />
-                    <li class="page-item"><a class="page-link form-control">条</a></li>
-                    <li class="page-item"><a class="page-link form-control">共</a></li>
-                    <input id='max_pages' name='max_pages' class="form-control" style="width: 60px;" />
-                    <li class="page-item"><a class="page-link form-control">页</a></li>
+                    {%  for i in  paginate.iter_pages %}
+
+                    {% if i %}
+                    {%if paginate.page == i%}
+                    <li class="page-item active">
+                        <a class="page-link form-control" href="/page1?page={{ i }}">{{ i }}</a>
+                    </li>
+                    {%else%}
+                    <li class="page-item ">
+                        <a class="page-link form-control" href="/page1?page={{ i }}">{{ i }}</a>
+                    </li>
+                    {% endif %}
+                    {% else %}
+                    <li class="page-item ">
+                        <a class="page-link form-control" href="/page1?page={{ i }}">...</a>
+                    </li>
+
+                    {% endif %}
+
+                    {% endfor %}
+
+                    {% if paginate.has_next %}
+                    <a class="page-link form-control" href="/page1?page={{ paginate.next_num }}">Next</a>
+                    {% endif %}
+
+                    </li>
                 </ul>
-            </nav>
-        </div>
+
+                <li class="page-item"><a class="page-link form-control">共</a></li>
+                <input id='total' name='total' disabled class="form-control" style="width: 60px;"
+                    value="{{ paginate.total }}" />
+                <li class="page-item"><a class="page-link form-control">条</a></li>
+                <li class="page-item"><a class="page-link form-control">共</a></li>
+                <input id='max_pages' name='max_pages' disable class="form-control" style="width: 60px;"
+                    value="{{ paginate.pages }}" />
+                <li class="page-item"><a class="page-link form-control">页</a></li>
+            </ul>
+        </nav>
     </div>
+</div>
+
+<!--tag展示-->
+<div class="modal fade" id="LogModel" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog  modal-sm modal-dialog-centered" style="max-width:1000px;">
+        <div class="modal-content">
+            <div class="modal-header">
+
+                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">新建位号</button>
+                <form class="form-inline my-2 my-lg-0">
+                    <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+                    <button class="btn btn-outline-success my-2 my-sm-0" type="submit">查询位号</button>
+                </form>
+            </div>
+            <div class="modal-body">
+
+
+                <table class="table  table-bordered">
+                    <thead id='keys'>
+
+                    </thead>
+                    <tbody id='values'>
+
+                    </tbody>
+                </table>
+
+                <div class="row mt-1 ">
+                    <div class="col-md-12 col-sm-12 ">
+                        <nav id='tag_page'>
+
+                        </nav>
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-success" onclick="hideLogModel()">
+                    关闭
+                </button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
 </div>
 <script>
     var csrftoken = $("meta[name=csrf-token]").attr("content");
 
-    function page() {
+    //显示日志模态框
+    function showLogModel(group_id) {
+        $('#LogModel').modal("show");
+        page(group_id);
 
-        var pages = $("#pages").val();
+    }
 
+    function hideLogModel() {
+        $('#LogModel').modal("hide");
+    }
+
+    function page(group_id) {
         var module_name = $("#module").val()
         $.ajax({
-            url: "{{url_for('cs.show_alarm')}}",
+            url: "{{url_for('cs.page1')}}",
             data: {
-                "id": 1,
+                "module": module_name,
+                "group_id": group_id,
             },
             headers: {
                 "X-CSRFToken": csrftoken
@@ -203,55 +200,72 @@
     }
 
     function pages_success(data) {
-        var $comm = '';
+        var $keys = '';
+        var $values = '';
         var $lis = '';
         var $lis1 = '';
-        var $option = '';
-        console.log(data.length)
-        if (count > 0) {
-            for (i in data.tags) {
-                var $td = ''
-                for (t in data.tags[i]) {
-                    $td += '<td scope="row" class="table-danger">' + data.tags[i][t] + '</td>'
+        console.log(data.paginate)
+        var tags = data.paginate.items
+        if (data.paginate.total > 0) {
+            for (i in tags) {
+                var $keys_td = ''
+                var $values_td = ''
+                for (t in tags[i]) {
+                    $keys_td += '<th scope="row" class="table-info">' + t + '</th>'
+                    $values_td += '<td scope="row" class="table-danger">' + tags[i][t] + '</td>'
                 };
-                $comm += '<tr>' + $td + '</tr>'
-                var $subject_con = $('#tags');
-                $subject_con.html($comm)
-            }
-            for (var g = 1; g < groups + 1; g++) {
-                $option += '<option>' + g + '</option>'
-                var $groups = $('#groups');
-                $groups.html($option)
-            }
-        } else {
-            $comm += '<tr>' + '<td scope="row" class="table-danger">' + '没有位号信息，请重新上传。。。' + '</td>' + '</tr>'
-            var $subject_con = $('#tags');
-            $subject_con.html($comm)
-        }
+                $keys = '<tr>' + $keys_td + '</tr>'
+                $values += '<tr>' + $values_td + '</tr>'
+                var $subject_keys = $('#keys');
+                var $subject_values = $('#values');
+                $subject_keys.html($keys)
+                $subject_values.html($values)
+            };
+            var lis = ''
+            data.paginate.iter_pages.forEach((intem, index) => {
+                       var tmp=''
+                       if(data.paginate.page==index+1){
+                        tmp=`<li class="page-item active "><a class="page-link form-control" href="/page1?page=${index+1} "> ${index+1} </a></li>`
+                       }
+                       else{
+                       tmp= `<li class="page-item "><a class="page-link form-control" href="/page1?page=${index+1} "> ${index+1} </a></li>`
+                       }
+                       lis+=tmp
+            });
+            var tag_page =
 
-        var head = '<li class="page-item "><a class="page-link form-control" onclick="pre()">' + 'Pres' + '</a></li>'
-        var tail = '<li class="page-item "><a class="page-link form-control" onclick="next()">' + 'Next' + '</a></li>'
-        if (data.max_pages > 0) {
-            for (var i = 1; i < data.max_pages + 1; i++) {
-                $lis +=
-                    '<li class="page-item"><a class="page-link form-control btn btn-info mr-2" id="page' + i +
-                    '" onclick="page(this)">' +
-                    i + '</a></li>'
-            }
-            $lis1 = head + $lis + tail
-            var $subject_con = $('#page');
-            $subject_con.html($lis1)
+                `<ul class="pagination pagination-md justify-content-end">
+                <li class="page-item ">
+                ${ data.paginate.has_prev ?
+                `<a class="page-link form-control" tabindex="-1"
+                        href="/page1?page=${data.paginate.prev_num} ">Previous</a>`: ''}
+                </li>
+                ${lis}
+                <li class="page-item ">
+                ${ data.paginate.has_next ?
+                    `<a class="page-link form-control" tabindex="-1"
+                        href="/page1?page= ${data.paginate.next_num} ">Next</a>` : ''}
+                </li>
+                <li class="page-item"><a class="page-link form-control">共</a></li>
+                <input id='total' name='total' disabled class="form-control" style="width: 60px;"
+                    value=${ data.paginate.total } />
+                <li class="page-item"><a class="page-link form-control">条</a></li>
+                <li class="page-item"><a class="page-link form-control">共</a></li>
+                <input id='max_pages' name='max_pages' disable class="form-control" style="width: 60px;"
+                    value=${ data.paginate.pages } />
+                <li class="page-item"><a class="page-link form-control">页</a></li>`;
+
+            var $tag_page = $('#tag_page');
+            $tag_page.html(tag_page);
         } else {
-            $lis1 +=
-                '<li class="page-item"><a class="page-link form-control btn btn-info" id="page1" onclick="page(this)">' +
-                '对不起，没有' + '</a></li>'
-            var $subject_con = $('#tags');
-            $subject_con.html($comm)
+            $values += '<tr>' + '<td scope="row" class="table-danger">' + '没有位号信息，请重新上传。。。' + '</td>' + '</tr>';
+            var $subject_con = $('#values');
+            $subject_con.html($values);
         }
     }
 
 
-    var int = self.setInterval("page()", 5000);
+    // var int = self.setInterval("page11()", 5000);
 
     (function () {
         'use strict'
