@@ -214,7 +214,7 @@ def read_opc_config(cfg_msg, module):
     group_infos = []
     if cfg_msg:
         try:
-            if module in client and cfg_msg:
+            if module in client:
                 main_server_ip = cfg_msg['data'][module+'.main_server_ip']
                 main_server_prgid = cfg_msg['data'][module +
                                                     '.main_server_prgid']
@@ -230,23 +230,23 @@ def read_opc_config(cfg_msg, module):
                 bak_server_clsid = cfg_msg['data'][module+'.bak_server_clsid']
                 bak_server_domain = cfg_msg['data'][module +
                                                     '.bak_server_domain']
-                bak_server_username = cfg_msg['data'][module +
+                bak_server_user = cfg_msg['data'][module +
                                                       '.bak_server_user']
                 bak_server_password = cfg_msg['data'][module +
                                                       '.bak_server_password']
 
                 opc_config = {
                     'main_server_ip': main_server_ip,
-                    'main_server_progid': main_server_prgid,
-                    'main_server_classid': main_server_clsid,
+                    'main_server_prgid': main_server_prgid,
+                    'main_server_clsid': main_server_clsid,
                     'main_server_domain': main_server_domain,
-                    'main_server_username': main_server_user,
+                    'main_server_user': main_server_user,
                     'main_server_password': main_server_password,
                     'bak_server_ip': bak_server_ip,
                     'bak_server_prgid': bak_server_prgid,
                     'bak_server_clsid': bak_server_clsid,
                     'bak_server_domain': bak_server_domain,
-                    'bak_server_username': bak_server_username,
+                    'bak_server_user': bak_server_user,
                     'bak_server_password': bak_server_password
                 }
             else:
@@ -303,7 +303,7 @@ def decode_config(cfg_msg, module):
 
             opc_config = {
                 'main_server_ip': main_server_ip,
-                'main_server_progid': main_server_prgid,
+                'main_server_prgid': main_server_prgid,
                 'main_server_classid': main_server_clsid,
                 'main_server_domain': main_server_domain,
                 'main_server_username': main_server_user,
@@ -537,8 +537,7 @@ def add_tag():
             gis=gis.pop('tags_num')  
 
     dict2 = {module+'.groups': group_infos}
-    for key in basic_config.keys():
-        key = module+key
+    basic_config= {module+'.'+key: value for key, value in basic_config.items()} 
     data = {**basic_config, **dict2}
 
     res = {
@@ -618,24 +617,23 @@ def load_opc_sev():
     return render_template("opc/opc_se_index.html", opc_da_server='bg-info')
 
 
-@cs.route('/load_opc_da', methods=['GET', 'POST'], endpoint='load_opc_da')
+@ cs.route('/load_opc_da', methods=['GET', 'POST'], endpoint='load_opc_da')
 @login_required
 def load_opc_da():
-    form = OpcForm()
     if request.method == 'POST':
         module = request.form['module']
         main_server_ip = request.form['main_server_ip']
-        main_server_prgid = request.form['main_server_progid']
-        main_server_clsid = request.form['main_server_classid']
+        main_server_prgid = request.form['main_server_prgid']
+        main_server_clsid = request.form['main_server_clsid']
         main_server_domain = request.form['main_server_domain']
-        main_server_user = request.form['main_server_username']
+        main_server_user = request.form['main_server_user']
         main_server_password = request.form['main_server_password']
-        bak_server_ip = request.form['back_server_ip']
-        bak_server_prgid = request.form['back_server_progid']
-        bak_server_clsid = request.form['back_server_classid']
-        bak_server_domain = request.form['back_server_domain']
-        bak_server_user = request.form['back_server_username']
-        bak_server_password = request.form['back_server_password']
+        bak_server_ip = request.form['bak_server_ip']
+        bak_server_prgid = request.form['bak_server_prgid']
+        bak_server_clsid = request.form['bak_server_clsid']
+        bak_server_domain = request.form['bak_server_domain']
+        bak_server_user = request.form['bak_server_user']
+        bak_server_password = request.form['bak_server_password']
 
         dict1 = {
             module+'.main_server_ip': main_server_ip,
@@ -710,27 +708,26 @@ def load_opc_da():
         tags, basic_config, _ = read_modbus_config(cfg_msg, module)
         set_config(res, module)
         return render_template("opc/opc_show.html", basic_config=dict1)
-    return render_template("opc/opc_da_index.html", form=form, opc_da_client='bg-danger')
+    return render_template("opc/opc_da_index.html", opc_da_client='bg-danger')
 
 
 @ cs.route('/load_opc_ae', methods=['GET', 'POST'], endpoint='load_opc_ae')
 @login_required
 def load_opc_ae():
     if request.method == 'POST':
-
         module = request.form['module']
         main_server_ip = request.form['main_server_ip']
-        main_server_prgid = request.form['main_server_progid']
-        main_server_clsid = request.form['main_server_classid']
+        main_server_prgid = request.form['main_server_prgid']
+        main_server_clsid = request.form['main_server_clsid']
         main_server_domain = request.form['main_server_domain']
-        main_server_user = request.form['main_server_username']
+        main_server_user = request.form['main_server_user']
         main_server_password = request.form['main_server_password']
-        bak_server_ip = request.form['back_server_ip']
-        bak_server_prgid = request.form['back_server_progid']
-        bak_server_clsid = request.form['back_server_classid']
-        bak_server_domain = request.form['back_server_domain']
-        bak_server_user = request.form['back_server_username']
-        bak_server_password = request.form['back_server_password']
+        bak_server_ip = request.form['bak_server_ip']
+        bak_server_prgid = request.form['bak_server_prgid']
+        bak_server_clsid = request.form['bak_server_clsid']
+        bak_server_domain = request.form['bak_server_domain']
+        bak_server_user = request.form['bak_server_user']
+        bak_server_password = request.form['bak_server_password']
 
         dict1 = {
             module+'.main_server_ip': main_server_ip,
@@ -768,7 +765,7 @@ def load_opc_ae():
             f.write(json.dumps(res, ensure_ascii=False,
                                sort_keys=False, indent=4))
         cfg_msg = read_json(module)
-        tags, basic_config, _ = read_modbus_config(cfg_msg, module)
+        tags, basic_config, _ = read_opc_config(cfg_msg, module)
         set_config(res, module)
         return render_template("opc/opc_show.html", basic_config=dict1)
     return render_template("opc/opc_ae_index.html", opc_ae_client='bg-warning')

@@ -266,7 +266,7 @@ class OpcForm(FlaskForm):
                                  render_kw={'class': 'form-control form-control-md',
                                             'placeholder': 'main_server_ip', 'required': 'required'}
                                  )
-    main_server_progid = SelectField('main_server_progid',
+    main_server_prgid = SelectField('main_server_progid',
                                      validators=[DataRequired()],
                                      choices=(
                                          ('Intellution.OPCiFIX.1',
@@ -285,7 +285,7 @@ class OpcForm(FlaskForm):
                                      render_kw={'class': 'form-control form-control-md custom-select',
                                                 'placeholder': 'main_server_prgid', 'required': 'required'}
                                      )
-    main_server_classid = SelectField('main_server_classid',
+    main_server_clsid = SelectField('main_server_classid',
                                       validators=[DataRequired()],
                                       choices=(
                                           ('3C5702A2-EB8E-11D4-83A4-00105A984CBD',
@@ -314,7 +314,7 @@ class OpcForm(FlaskForm):
                                      render_kw={'class': 'form-control form-control-md',
                                                 'placeholder': 'main_server_domain', 'required': 'required'}
                                      )
-    main_server_username = StringField('main_server_username',
+    main_server_user = StringField('main_server_username',
                                        validators=[DataRequired()],
                                        widget=widgets.TextInput(),
                                        render_kw={'class': 'form-control form-control-md',
@@ -327,13 +327,13 @@ class OpcForm(FlaskForm):
                                                   'placeholder': 'main_server_password', 'required': 'required'}
                                        )
 
-    back_server_ip = StringField('back_server_ip',
+    bak_server_ip = StringField('back_server_ip',
                                  validators=[DataRequired()],
                                  widget=widgets.TextInput(),
                                  render_kw={'class': 'form-control form-control-md',
                                             'placeholder': 'bak_server_ip', 'required': 'required'}
                                  )
-    back_server_progid = SelectField('back_server_progid',
+    bak_server_prgid = SelectField('back_server_progid',
                                      validators=[DataRequired()],
                                      choices=(
                                          ('Intellution.OPCiFIX.1',
@@ -352,7 +352,7 @@ class OpcForm(FlaskForm):
                                      render_kw={'class': 'form-control form-control-md custom-select',
                                                 'placeholder': 'bak_server_prgid', 'required': 'required'}
                                      )
-    back_server_classid = SelectField('back_server_classid',
+    bak_server_clsid = SelectField('back_server_classid',
                                       validators=[DataRequired()],
                                       choices=(
                                           ('3C5702A2-EB8E-11D4-83A4-00105A984CBD',
@@ -375,19 +375,19 @@ class OpcForm(FlaskForm):
                                       render_kw={'class': 'form-control form-control-md custom-select',
                                                  'placeholder': 'bak_server_clsid', 'required': 'required'}
                                       )
-    back_server_domain = StringField('back_server_domain',
+    bak_server_domain = StringField('back_server_domain',
                                      validators=[DataRequired()],
                                      widget=widgets.TextInput(),
                                      render_kw={'class': 'form-control form-control-md',
                                                 'placeholder': 'bak_server_domain', 'required': 'required'}
                                      )
-    back_server_username = StringField('back_server_username',
+    bak_server_user = StringField('back_server_username',
                                        validators=[DataRequired()],
                                        widget=widgets.TextInput(),
                                        render_kw={'class': 'form-control form-control-md',
                                                   'placeholder': 'bak_server_user', 'required': 'required'}
                                        )
-    back_server_password = StringField('back_server_password',
+    bak_server_password = StringField('back_server_password',
                                        validators=[DataRequired()],
                                        widget=widgets.TextInput(),
                                        render_kw={'class': 'form-control form-control-md',

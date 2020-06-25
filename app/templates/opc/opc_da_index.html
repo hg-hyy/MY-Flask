@@ -20,7 +20,7 @@
         <div class="form-group row">
             <label for="module" class="col-sm-2 col-form-label col-form-label-md">module_name</label>
             <div class="col-sm-4">
-                <select class="form-control form-control-md custom-select " name='module' id="module">
+                <select class="form-control form-control-md custom-select " name='module' id="module" required>
                     <option>s_opcda_client1</option>
                     <option>s_opcda_client2</option>
                     <option>s_opcda_client3</option>
@@ -37,15 +37,15 @@
                 class="col-sm-2 col-form-label col-form-label-md">Main_OPC_Server_IP_Address</label>
             <div class="col-sm-4">
                 <input type="text" name='main_server_ip' class="form-control form-control-md" id="main_server_ip"
-                    placeholder="Enter OPC Server IP address" style="width: 100%">
+                    placeholder="Enter OPC Server IP address" style="width: 100%" required>
             </div>
-            <label for="module" class="col-sm-2 col-form-label col-form-label-md">opc服务器地址</label>
+            <label for="main_server_ip" class="col-sm-2 col-form-label col-form-label-md">opc服务器地址</label>
         </div>
         <div class="form-group row">
-            <label for="main_server_progid"
+            <label for="main_server_prgid"
                 class="col-sm-2 col-form-label col-form-label-md">Main_OPC_Server_ProgID</label>
             <div class="col-sm-4">
-                <select class="form-control form-control-md custom-select" name='main_server_progid' id="main_server_progid">
+                <select class="form-control form-control-md custom-select" name='main_server_prgid' id="main_server_prgid" required>
                     <option>Intellution.OPCiFIX.1</option>
                     <option>Kepware.KEPServerEX.V6</option>
                     <option>Yokogawa.CSHIS_OPC.1</option>
@@ -53,13 +53,13 @@
                     <option>OPCSystems.NET.1</option>
                 </select>
             </div>
-            <label for="module" class="col-sm-2 col-form-label col-form-label-md">请选择opc名称</label>
+            <label for="main_server_prgid" class="col-sm-2 col-form-label col-form-label-md">请选择opc名称</label>
         </div>
         <div class="form-group row">
-            <label for="main_server_classid"
+            <label for="main_server_clsid"
                 class="col-sm-2 col-form-label col-form-label-md">Main_OPC_Server_classID</label>
             <div class="col-sm-4">
-                <select class="form-control form-control-md custom-select" name='main_server_classid' id="main_server_classid">
+                <select class="form-control form-control-md custom-select" name='main_server_clsid' id="main_server_clsid" required>
                     <option>3C5702A2-EB8E-11D4-83A4-00105A984CBD</option>
                     <option>7BC0CC8E-482C-47CA-ABDC-0FE7F9C6E729</option>
                     <option>E6C32641-F1CF-11D0-B0E4-080009CCD384</option>
@@ -68,7 +68,7 @@
                     <option>32FB9E42-29D6-4841-9218-9DA5E1515623</option>
                 </select>
             </div>
-            <label for="module" class="col-sm-2 col-form-label col-form-label-md">请选择classid名称</label>
+            <label for="main_server_clsid" class="col-sm-2 col-form-label col-form-label-md">请选择classid名称</label>
         </div>
         <div class="form-group row">
             <label for="main_server_domain"
@@ -77,16 +77,16 @@
                 <input type="text" name="main_server_domain" class="form-control form-control-md"
                     id="main_server_domain" placeholder="OPC login name">
             </div>
-            <label for="module" class="col-sm-2 col-form-label col-form-label-md">请输入域名</label>
+            <label for="main_server_domain" class="col-sm-2 col-form-label col-form-label-md">请输入域名</label>
         </div>
         <div class="form-group row">
-            <label for="main_server_username"
+            <label for="main_server_user"
                 class="col-sm-2 col-form-label col-form-label-md">Main_OPC_Server_Username</label>
             <div class="col-sm-4">
-                <input type="text" name="main_server_username" class="form-control form-control-md"
-                    id="main_server_username" placeholder="domain">
+                <input type="text" name="main_server_user" class="form-control form-control-md"
+                    id="main_server_user" placeholder="domain" required>
             </div>
-            <label for="module" class="col-sm-2 col-form-label col-form-label-md">请输入用户名</label>
+            <label for="main_server_user" class="col-sm-2 col-form-label col-form-label-md">请输入用户名</label>
         </div>
 
         <div class="form-group row">
@@ -94,25 +94,25 @@
                 class="col-sm-2 col-form-label col-form-label-md">Main_OPC_Server_Password</label>
             <div class="col-sm-4">
                 <input type="password" name="main_server_password" class="form-control form-control-md"
-                    id="main_server_password" placeholder="OPC login password">
+                    id="main_server_password" placeholder="OPC login password" required>
             </div>
-            <label for="module" class="col-sm-2 col-form-label col-form-label-md">请输入密码</label>
+            <label for="main_server_password" class="col-sm-2 col-form-label col-form-label-md">请输入密码</label>
         </div>
         <!--备用 OPC配置  -->
         <div class="form-group row">
-            <label for="back_server_ip"
+            <label for="bak_server_ip"
                 class="col-sm-2 col-form-label col-form-label-md">Back_OPC_Server_IP_Address</label>
             <div class="col-sm-4">
-                <input type="text" name='back_server_ip' class="form-control form-control-md" id="back_server_ip"
-                    placeholder="Enter OPC Server IP address" style="width: 100%">
+                <input type="text" name='bak_server_ip' class="form-control form-control-md" id="bak_server_ip"
+                    placeholder="Enter OPC Server IP address" style="width: 100%" required>
             </div>
-            <label for="module" class="col-sm-2 col-form-label col-form-label-md">这里请填写OPC地址</label>
+            <label for="bak_server_ip" class="col-sm-2 col-form-label col-form-label-md">这里请填写OPC地址</label>
         </div>
         <div class="form-group row">
-            <label for="back_server_progid"
+            <label for="bak_server_prgid"
                 class="col-sm-2 col-form-label col-form-label-md">Back_OPC_Server_ProgID</label>
             <div class="col-sm-4">
-                <select class="form-control form-control-md custom-select" name='back_server_progid' id="back_server_progid">
+                <select class="form-control form-control-md custom-select" name="bak_server_prgid" id="bak_server_prgid" required>
                     <option>Intellution.OPCiFIX.1</option>
                     <option>Kepware.KEPServerEX.V6</option>
                     <option>Yokogawa.CSHIS_OPC.1</option>
@@ -120,13 +120,13 @@
                     <option>OPCSystems.NET.1</option>
                 </select>
             </div>
-            <label for="module" class="col-sm-2 col-form-label col-form-label-md">请选择opc名称</label>
+            <label for="bak_server_prgid" class="col-sm-2 col-form-label col-form-label-md">请选择opc名称</label>
         </div>
         <div class="form-group row">
-            <label for="back_server_classid"
+            <label for="bak_server_clsid"
                 class="col-sm-2 col-form-label col-form-label-md">Back_OPC_Server_classID</label>
             <div class="col-sm-4">
-                <select class="form-control form-control-md custom-select " name='back_server_classid' id="back_server_classid">
+                <select class="form-control form-control-md custom-select " name='bak_server_clsid' id="bak_server_clsid" required>
                     <option>3C5702A2-EB8E-11D4-83A4-00105A984CBD</option>
                     <option>7BC0CC8E-482C-47CA-ABDC-0FE7F9C6E729</option>
                     <option>E6C32641-F1CF-11D0-B0E4-080009CCD384</option>
@@ -134,41 +134,41 @@
                     <option>6031BF75-9CF2-11D1-A97B-00C04FC01389</option>
                 </select>
             </div>
-            <label for="module" class="col-sm-2 col-form-label col-form-label-md">请选择classid名称</label>
+            <label for="bak_server_clsid" class="col-sm-2 col-form-label col-form-label-md">请选择classid名称</label>
         </div>
         <div class="form-group row">
-            <label for="back_server_domain"
+            <label for="bak_server_domain"
                 class="col-sm-2 col-form-label col-form-label-md">Back_OPC_Server_Domain</label>
             <div class="col-sm-4">
-                <input type="text" name="back_server_domain" class="form-control form-control-md"
-                    id="back_server_domain" placeholder="domain">
+                <input type="text" name="bak_server_domain" class="form-control form-control-md"
+                    id="bak_server_domain" placeholder="domain">
             </div>
-            <label for="module" class="col-sm-2 col-form-label col-form-label-md">请输入域名</label>
+            <label for="bak_server_domain" class="col-sm-2 col-form-label col-form-label-md">请输入域名</label>
         </div>
         <div class="form-group row">
-            <label for="back_server_username"
+            <label for="bak_server_user"
                 class="col-sm-2 col-form-label col-form-label-md">Back_OPC_Server_Username</label>
             <div class="col-sm-4">
-                <input type="text" name="back_server_username" class="form-control form-control-md"
-                    id="back_server_username" placeholder="OPC login name">
+                <input type="text" name="bak_server_user" class="form-control form-control-md"
+                    id="bak_server_user" placeholder="OPC login name" required>
             </div>
-            <label for="module" class="col-sm-2 col-form-label col-form-label-md">请输入用户名</label>
+            <label for="bak_server_user" class="col-sm-2 col-form-label col-form-label-md">请输入用户名</label>
         </div>
         <div class="form-group row">
-            <label for="back_server_password"
+            <label for="bak_server_password"
                 class="col-sm-2 col-form-label col-form-label-md">Back_OPC_Server_Password</label>
             <div class="col-sm-4">
-                <input type="password" name="back_server_password" class="form-control form-control-md"
-                    id="back_server_password" placeholder="OPC login password">
+                <input type="password" name="bak_server_password" class="form-control form-control-md"
+                    id="bak_server_password" placeholder="OPC login password" required>
             </div>
-            <label for="module" class="col-sm-2 col-form-label col-form-label-md">请输入密码</label>
+            <label for="bak_server_password" class="col-sm-2 col-form-label col-form-label-md">请输入密码</label>
         </div>
         <div class="form-group row">
             <label for="file" class="col-sm-1 col-form-label col-form-label-md">上传位号:</label>
             <div class="col-sm-4 offset-1">
                 <input type="file" name='file' class="form-control form-control-md" id="file">
             </div>
-            <label for="module" class="col-sm-2 col-form-label col-form-label-md">请选择excel上传</label>
+            <label for="file" class="col-sm-2 col-form-label col-form-label-md">请选择excel上传</label>
         </div>
 
     </fieldset>
@@ -225,20 +225,19 @@
     function success(data) {
         console.log(data.basic_config)
         $('#main_server_ip').val(data.basic_config.main_server_ip)
-        $('#main_server_progid').val(data.basic_config.main_server_progid)
-        $('#main_server_classid').val(data.basic_config.main_server_classid)
+        $('#main_server_prgid').val(data.basic_config.main_server_prgid)
+        $('#main_server_clsid').val(data.basic_config.main_server_clsid)
         $('#main_server_domain').val(data.basic_config.main_server_domain)
-        $('#main_server_username').val(data.basic_config.main_server_username)
+        $('#main_server_user').val(data.basic_config.main_server_user)
         $('#main_server_password').val(data.basic_config.main_server_password)
-        $('#back_server_ip').val(data.basic_config.bak_server_ip)
-        $('#back_server_progid').val(data.basic_config.bak_server_prgid)
-        $('#back_server_classid').val(data.basic_config.bak_server_clsid)
-        $('#back_server_domain').val(data.basic_config.bak_server_domain)
-        $('#back_server_username').val(data.basic_config.bak_server_username)
-        $('#back_server_password').val(data.basic_config.bak_server_password)
-
-
+        $('#bak_server_ip').val(data.basic_config.bak_server_ip)
+        $('#bak_server_prgid').val(data.basic_config.bak_server_prgid)
+        $('#bak_server_clsid').val(data.basic_config.bak_server_clsid)
+        $('#bak_server_domain').val(data.basic_config.bak_server_domain)
+        $('#bak_server_user').val(data.basic_config.bak_server_user)
+        $('#bak_server_password').val(data.basic_config.bak_server_password)
     }
+
     (function () {
         'use strict'
 

@@ -21,7 +21,7 @@
         <div class="form-group row">
             <label for="module" class="col-sm-2 col-form-label col-form-label-md">module_name</label>
             <div class="col-sm-4">
-                <select class="form-control form-control-md custom-select" name='module' id="module">
+                <select class="form-control form-control-md custom-select" name='module' id="module" required >
                     <option>s_opcda_server1</option>
                     <option>s_opcda_server2</option>
                     <option>s_opcda_server3</option>
@@ -36,7 +36,7 @@
         <div class="form-group row">
             <label for="enAutoTag" class="col-sm-2 col-form-label col-form-label-md">加点模式</label>
             <div class="col-sm-4">
-                <select class="form-control form-control-md custom-select" name='enAutoTag' id="enAutoTag" onchange="show_load()">
+                <select class="form-control form-control-md custom-select" name='enAutoTag' id="enAutoTag" onchange="show_load()" required>
                     <option>0</option>
                     <option>1</option>
                 </select>
@@ -50,7 +50,7 @@
         <div class="form-group row">
             <label for="isDataConvert" class="col-sm-2 col-form-label col-form-label-md">数据转换</label>
             <div class="col-sm-4">
-                <select class="form-control form-control-md custom-select" name='isDataConvert' id="isDataConvert">
+                <select class="form-control form-control-md custom-select" name='isDataConvert' id="isDataConvert" required>
                     <option>0</option>
                     <option>1</option>
                 </select>

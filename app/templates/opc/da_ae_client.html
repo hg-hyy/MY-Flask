@@ -70,8 +70,7 @@
         </form>
     </div>
     <div class="tab-pane fade" id="opc_ae">
-        <form action="{{ url_for('cs.load_opc_da') }}" method="post" id='opc_ae' enctype="multipart/form-data"
-            class="needs-validation" novalidate>
+        <form action="{{ url_for('cs.load_opc_ae') }}" method="post" id='opc_ae' class="needs-validation" novalidate>
             <fieldset disabled id='opc_ae_form'>
                 {%for f in opc_ae_form%}
                 {%if f.name == 'csrf_token' %}
@@ -182,17 +181,17 @@
     function success(data) {
         console.log(data.basic_config)
         $('#main_server_ip').val(data.basic_config.main_server_ip)
-        $('#main_server_progid').val(data.basic_config.main_server_progid)
-        $('#main_server_classid').val(data.basic_config.main_server_classid)
+        $('#main_server_prgid').val(data.basic_config.main_server_prgid)
+        $('#main_server_clsid').val(data.basic_config.main_server_clsid)
         $('#main_server_domain').val(data.basic_config.main_server_domain)
-        $('#main_server_username').val(data.basic_config.main_server_username)
+        $('#main_server_user').val(data.basic_config.main_server_user)
         $('#main_server_password').val(data.basic_config.main_server_password)
         $('#back_server_ip').val(data.basic_config.back_server_ip)
-        $('#back_server_progid').val(data.basic_config.bak_server_prgid)
-        $('#back_server_classid').val(data.basic_config.bak_server_clsid)
-        $('#back_server_domain').val(data.basic_config.bak_server_domain)
-        $('#back_server_username').val(data.basic_config.bak_server_username)
-        $('#back_server_password').val(data.basic_config.bak_server_password)
+        $('#bck_server_prgid').val(data.basic_config.bak_server_prgid)
+        $('#bck_server_clsid').val(data.basic_config.bak_server_clsid)
+        $('#bck_server_domain').val(data.basic_config.bak_server_domain)
+        $('#bck_server_user').val(data.basic_config.bak_server_user)
+        $('#bck_server_password').val(data.basic_config.bak_server_password)
 
 
     }
