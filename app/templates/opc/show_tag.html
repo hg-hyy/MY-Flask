@@ -29,7 +29,8 @@
                         <option>modbus2</option>
                     </select>
                 </div>
-                <button class="btn btn-warning" onclick="page(1)">点击查询</button>
+                <button class="btn btn-warning mx-2" onclick="page(1)">点击查询</button>
+                <button class="btn btn-danger" data-toggle="modal" data-target="#addgroup"   >添加组</button>
             </div>
         </nav>
 
@@ -176,6 +177,48 @@
     </div><!-- /.modal -->
 </div>
 
+<!--group新增-->
+<div class="modal fade" id="addgroup" tabindex="-1" role="dialog" aria-labelledby="addtag" aria-hidden="true">
+    <div class="modal-dialog  modal-sm modal-dialog-centered" style="max-width:300px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="form-inline my-2 my-lg-0">
+                    <h1 class="h4">新增组</h1>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="form-signin" action="" method="post">
+                    <div class="form-label-group" style="margin-bottom:1rem">
+                        <input class="form-control form-control-md" id="group_name" autofocus="" required="" type="text"
+                            placeholder="group_name" name="group_name">
+                        <label for="pub_name" style="display: none">组名</label>
+                    </div>
+                    <div class="form-label-group" style="margin-bottom:1rem">
+                        <label for="collect_cycle" style="display: none">采集周期</label>
+                        <select class="form-control form-control-md" name='collect_cycle' id="collect_cycle">
+                            <option>5</option>
+                            <option>10</option>
+                            <option selected>10</option>
+                            <option>15</option>
+                            <option>20</option>
+                            <option>30</option>
+                        </select>
+                    </div>
+                    <p class="h5 text-danger" id='add_error'></p>
+                    <input class="btn btn-md btn-primary btn-block" type="button" onclick="add_group()" value="新建">
+                </div>
+
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-success" onclick="hideaddgroup()">
+                    关闭
+                </button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>
+
 <!--tag新增-->
 <div class="modal fade" id="addtag" tabindex="-1" role="dialog" aria-labelledby="addtag" aria-hidden="true">
     <div class="modal-dialog  modal-sm modal-dialog-centered" style="max-width:300px;">
@@ -236,6 +279,9 @@
 
     function hideaddtag() {
         $('#addtag').modal("hide");
+    }
+    function hideaddgroup() {
+        $('#addgroup').modal("hide");
     }
 
     function Search() {
@@ -421,9 +467,38 @@
     }
 
 
+    function add_group() {
+        var module_name = $("#module").val()
+        var group_name = $("#group_name").val()
+        var collect_cycle = $("#collect_cycle").val()
+        console.log(module_name, group_name,collect_cycle)
+        $.ajax({
+            url: "{{url_for('cs.add_group')}}",
+            data: {
+                "module": module_name,
+                "group_name": group_name,
+                "collect_cycle": collect_cycle,
+            },
+            headers: {
+                "X-CSRFToken": csrftoken
+            },
+            type: 'post',
+            dataType: 'json',
+            success: add_success,
+            error: function (data) {
+                console.log(data);
+
+            },
+
+        });
+        return false;
+    }
+
+
+
     function delete_group(id) {
         var module_name = $("#module").val()
-        console.log(module_name,id)
+        console.log(module_name, id)
         $.ajax({
             url: "{{url_for('cs.delete_group')}}",
             data: {
@@ -444,6 +519,8 @@
         });
         return false;
     }
+
+
 
     function delete_tag() {
         $("#")

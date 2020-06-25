@@ -505,6 +505,78 @@ def show_tag_search():
     return {"paginate": pga_dict, 'group_infos': group_infos}
 
 
+@cs.route('/add_group', methods=['GET', 'POST'], endpoint='add_group')
+def add_group():
+    group_id = int(request.form.get('group_id', 1))
+    module = request.form.get('module')
+    group_name = request.form.get('group_name')
+    collect_cycle = request.form.get('collect_cycle')
+    cfg_msg = read_json(module)
+    if module in modbus:
+        tags, basic_config, group_infos = read_modbus_config(cfg_msg, module)
+    else:
+        tags, basic_config, group_infos = read_opc_config(cfg_msg, module)
+
+    group_id_list = []
+    group_id_lists = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    for gis in group_infos:
+        group_id_list.append(gis['group_id'])
+    group_new_list = list(set(group_id_lists).difference(set(group_id_list)))
+    if group_new_list:
+        group_new_list.sort()
+        group_info = {'group_id': group_new_list[0], 'group_name': group_name,
+                      'collect_cycle': collect_cycle, 'tags_num': 0, 'tags': []}
+
+        group_infos.append(group_info)
+        dict2 = {module+'.groups': group_infos}
+        basic_config = {module+'.'+key: value for key,
+                        value in basic_config.items()}
+        data = {**basic_config, **dict2}
+
+        res = {
+            "module": "local",
+            "data": data
+        }
+        with open(conf_path+"s_opcda_client_run_config.json", 'w', encoding='utf-8') as f:
+            f.write(json.dumps(res, ensure_ascii=False,
+                               sort_keys=False, indent=4))
+        current_app.logger.debug(f'添加组{group_name}成功')
+        return {'success': True, 'message': '添加组成功'}
+
+    current_app.logger.debug(f'添加组{group_name}失败')
+    return {'success': False, 'message': '当前不允许添加组'}
+
+
+@cs.route('/delete_group', methods=['GET', 'POST'], endpoint='delete_group')
+def delete_group():
+    group_id = int(request.form.get('group_id', 1))
+    module = request.form.get('module')
+    cfg_msg = read_json(module)
+    if module in modbus:
+        tags, basic_config, group_infos = read_modbus_config(cfg_msg, module)
+    else:
+        tags, basic_config, group_infos = read_opc_config(cfg_msg, module)
+    for index, gis in enumerate(group_infos):
+        if gis['group_id'] == group_id:
+            print(group_id)
+            del group_infos[group_id-1]
+        gis = gis.pop('tags_num')
+    dict2 = {module+'.groups': group_infos}
+    basic_config = {module+'.'+key: value for key,
+                    value in basic_config.items()}
+    data = {**basic_config, **dict2}
+
+    res = {
+        "module": "local",
+        "data": data
+    }
+    with open(conf_path+"s_opcda_client_run_config.json", 'w', encoding='utf-8') as f:
+        f.write(json.dumps(res, ensure_ascii=False,
+                           sort_keys=False, indent=4))
+    current_app.logger.debug(f'删除组:{group_id}成功')
+    return {'success': True, 'message': '删除成功'}
+
+
 @cs.route('/add_tag', methods=['GET', 'POST'], endpoint='add_tag')
 def add_tag():
     group_id = int(request.form.get('group_id', 1))
@@ -548,36 +620,6 @@ def add_tag():
                            sort_keys=False, indent=4))
     current_app.logger.debug(f'添加标签{publish_tag_name}成功')
     return {'success': True, 'message': '添加标签点成功'}
-
-
-@cs.route('/delete_group', methods=['GET', 'POST'], endpoint='delete_group')
-def delete_group():
-    group_id = int(request.form.get('group_id', 1))
-    module = request.form.get('module')
-    cfg_msg = read_json(module)
-    if module in modbus:
-        tags, basic_config, group_infos = read_modbus_config(cfg_msg, module)
-    else:
-        tags, basic_config, group_infos = read_opc_config(cfg_msg, module)
-    for index,gis in enumerate(group_infos):
-        if gis['group_id'] == group_id:
-            print(group_id)
-            del group_infos[group_id-1]
-        gis = gis.pop('tags_num')
-    dict2 = {module+'.groups': group_infos}
-    basic_config = {module+'.'+key: value for key,
-                    value in basic_config.items()}
-    data = {**basic_config, **dict2}
-
-    res = {
-        "module": "local",
-        "data": data
-    }
-    with open(conf_path+"s_opcda_client_run_config.json", 'w', encoding='utf-8') as f:
-        f.write(json.dumps(res, ensure_ascii=False,
-                           sort_keys=False, indent=4))
-    current_app.logger.debug(f'删除组:{group_id}成功')
-    return {'success': True, 'message': '删除成功'}
 
 
 @cs.route('/delete_tag', methods=['GET', 'POST'], endpoint='delete_tag')
