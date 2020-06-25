@@ -1556,7 +1556,7 @@ pre code {
 .table-borderless td,
 .table-borderless thead th,
 .table-borderless tbody + tbody {
-  border: 0;
+  border: 0;hover
 }
 
 .table-striped tbody tr:nth-of-type(odd) {

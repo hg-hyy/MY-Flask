@@ -2,17 +2,17 @@
     "module": "local",
     "data": {
         "s_opcda_client1.main_server_ip": "192.168.31.17",
-        "s_opcda_client1.main_server_prgid": "Intellution.OPCiFIX.1",
-        "s_opcda_client1.main_server_clsid": "3C5702A2-EB8E-11D4-83A4-00105A984CBD",
+        "s_opcda_client1.main_server_prgid": "Kepware.KEPServerEX.V6",
+        "s_opcda_client1.main_server_clsid": "7BC0CC8E-482C-47CA-ABDC-0FE7F9C6E729",
         "s_opcda_client1.main_server_domain": "OPC",
-        "s_opcda_client1.main_server_user": "aaa",
-        "s_opcda_client1.main_server_password": "111111",
-        "s_opcda_client1.bak_server_ip": "aaaa",
+        "s_opcda_client1.main_server_user": "adminstrator",
+        "s_opcda_client1.main_server_password": "12!@QWqw",
+        "s_opcda_client1.bak_server_ip": "192.168.31.18",
         "s_opcda_client1.bak_server_prgid": "Intellution.OPCiFIX.1",
         "s_opcda_client1.bak_server_clsid": "3C5702A2-EB8E-11D4-83A4-00105A984CBD",
-        "s_opcda_client1.bak_server_domain": "aaa",
-        "s_opcda_client1.bak_server_user": "aaa",
-        "s_opcda_client1.bak_server_password": "1111",
+        "s_opcda_client1.bak_server_domain": "ifix5.5",
+        "s_opcda_client1.bak_server_user": "administrator",
+        "s_opcda_client1.bak_server_password": "123456",
         "s_opcda_client1.groups": [
             {
                 "group_id": 1,
@@ -96,12 +96,6 @@
                         "publish_tag_name": "Local.Test.TagUShort.Value",
                         "source_tag_name": "Local.Test.TagUShort.Value",
                         "data_type": "ENUM_INT32"
-                    },
-                    {
-                        "tag_id": 13,
-                        "publish_tag_name": "Local.Test.TagBoolean.Value",
-                        "source_tag_name": "Local.Test.TagBoolean.Value",
-                        "data_type": "ENUM_INT32"
                     }
                 ]
             },
@@ -109,7 +103,6 @@
                 "group_id": 2,
                 "group_name": "group2",
                 "collect_cycle": 15,
-                "tags_num": 13,
                 "tags": [
                     {
                         "tag_id": 13,
@@ -195,7 +188,6 @@
                 "group_id": 3,
                 "group_name": "group3",
                 "collect_cycle": 5,
-                "tags_num": 13,
                 "tags": [
                     {
                         "tag_id": 26,
@@ -281,7 +273,6 @@
                 "group_id": 4,
                 "group_name": "group4",
                 "collect_cycle": 10,
-                "tags_num": 13,
                 "tags": [
                     {
                         "tag_id": 39,
@@ -367,7 +358,6 @@
                 "group_id": 5,
                 "group_name": "group5",
                 "collect_cycle": 30,
-                "tags_num": 13,
                 "tags": [
                     {
                         "tag_id": 52,
@@ -453,7 +443,6 @@
                 "group_id": 6,
                 "group_name": "group6",
                 "collect_cycle": 10,
-                "tags_num": 13,
                 "tags": [
                     {
                         "tag_id": 65,
@@ -539,7 +528,6 @@
                 "group_id": 7,
                 "group_name": "group7",
                 "collect_cycle": 15,
-                "tags_num": 13,
                 "tags": [
                     {
                         "tag_id": 78,
@@ -625,7 +613,6 @@
                 "group_id": 8,
                 "group_name": "group8",
                 "collect_cycle": 30,
-                "tags_num": 13,
                 "tags": [
                     {
                         "tag_id": 91,
@@ -711,7 +698,6 @@
                 "group_id": 9,
                 "group_name": "group9",
                 "collect_cycle": 5,
-                "tags_num": 13,
                 "tags": [
                     {
                         "tag_id": 104,

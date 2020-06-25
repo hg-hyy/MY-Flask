@@ -39,7 +39,7 @@
 
     <!-- 分组表 -->
     <div class="col-12 text-center">
-        <table class="table table-bordered table-hover">
+        <table class="table table-bordered table-hover table-secondary ">
             <thead>
                 <tr>
                     <th>group_id</th>
@@ -56,9 +56,14 @@
                     <td> {{gi['group_name']}}</td>
                     <td> {{gi['collect_cycle']}}</td>
                     <td> {{gi['tags_num']}}</td>
-                    <td>
-                        <a id="showtagmodel1" href="javascript:void(0)" onclick="showtagmodel('{{gi['group_id']}}')">查看
-
+                    <td class="p-0 m-0 align-middle">
+                        <a id="showtagmodel1" href="javascript:void(0)" onclick="showtagmodel('{{gi['group_id']}}')"
+                            class="btn btn-outline-info btn-sm p-1 m-0">
+                            编辑
+                        </a> |
+                        <a id="showtagmodel1" href="javascript:void(0)" onclick="delete_group('{{gi['group_id']}}')"
+                            class="btn btn-outline-danger btn-sm p-1 m-0">
+                            删除
                         </a>
                     </td>
                 </tr>
@@ -76,7 +81,7 @@
                     <li class="page-item ">
                         {% if paginate.has_prev %}
                         <a class="page-link form-control" tabindex="-1"
-                            href="/page1?page={{ paginate.prev_num }}">Previous</a>
+                            href="/show_tag_search?page={{ paginate.prev_num }}">Previous</a>
                         {% endif %}
                     </li>
 
@@ -86,16 +91,16 @@
                     {% if i %}
                     {%if paginate.page == i%}
                     <li class="page-item active">
-                        <a class="page-link form-control" href="/page1?page={{ i }}">{{ i }}</a>
+                        <a class="page-link form-control" href="/show_tag_search?page={{ i }}">{{ i }}</a>
                     </li>
                     {%else%}
                     <li class="page-item ">
-                        <a class="page-link form-control" href="/page1?page={{ i }}">{{ i }}</a>
+                        <a class="page-link form-control" href="/show_tag_search?page={{ i }}">{{ i }}</a>
                     </li>
                     {% endif %}
                     {% else %}
                     <li class="page-item ">
-                        <a class="page-link form-control" href="/page1?page={{ i }}">...</a>
+                        <a class="page-link form-control" href="/show_tag_search?page={{ i }}">...</a>
                     </li>
 
                     {% endif %}
@@ -103,7 +108,7 @@
                     {% endfor %}
 
                     {% if paginate.has_next %}
-                    <a class="page-link form-control" href="/page1?page={{ paginate.next_num }}">Next</a>
+                    <a class="page-link form-control" href="/show_tag_search?page={{ paginate.next_num }}">Next</a>
                     {% endif %}
 
                     </li>
@@ -121,8 +126,6 @@
         </nav>
     </div>
 </div>
-
-
 <!--tag展示-->
 <div class="modal fade" id="LogModel" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog  modal-sm modal-dialog-centered" style="max-width:1000px;">
@@ -130,22 +133,23 @@
             <div class="modal-header">
 
 
-                <div class="form-inline my-2 my-lg-0">
+                <div class="form-inline my-1 my-lg-0">
                     <label for="group_num">组号:</label>
-                    <input class="form-control mr-sm-2 col-sm-1" name='group_num' id='group_num'>
+                    <input class="form-control mr-sm-1 col-sm-1" name='group_num' id='group_num'>
                     <label for="group_num">模块名称:</label>
-                    <input class="form-control mr-sm-2 col-sm-3" name='module_name' id='module_name'>
-                    <button class="btn btn-outline-success my-2 my-sm-0" type="submit" data-toggle="modal" data-target="#addtag">新建位号</button>
+                    <input class="form-control mr-sm-1 col-sm-3" name='module_name' id='module_name'>
+                    <button class="btn btn-outline-success my-2 my-sm-0" type="submit" data-toggle="modal"
+                        data-target="#addtag">新建位号</button>
                 </div>
                 <div class="form-inline my-2 my-lg-0">
-                    <input class="form-control mr-sm-2" placeholder="tag name" name="tagname" id=tagname>
+                    <input class="form-control mr-sm-1" placeholder="tag name" name="tagname" id=tagname>
                     <button class="btn btn-outline-success my-2 my-sm-0" onclick="Search()">查询位号</button>
                 </div>
             </div>
             <div class="modal-body">
 
 
-                <table class="table  table-bordered">
+                <table class="table  table-bordered table-sm text-center">
                     <thead id='keys'>
 
                     </thead>
@@ -178,8 +182,8 @@
         <div class="modal-content">
             <div class="modal-header">
                 <div class="form-inline my-2 my-lg-0">
-                   <h1 class="h4">新增位号</h1>
-                </div> 
+                    <h1 class="h4">新增位号</h1>
+                </div>
             </div>
             <div class="modal-body">
                 <div class="form-signin" action="" method="post">
@@ -201,9 +205,10 @@
                         <input class="form-control form-control-md" id="sub_name" required="" type="sub_name"
                             placeholder="sub_name" name="sub_name">
                     </div>
+                    <p class="h5 text-danger" id='add_error'></p>
                     <input class="btn btn-md btn-primary btn-block" type="button" onclick="add()" value="新建">
                 </div>
-    
+
 
             </div>
             <div class="modal-footer">
@@ -228,6 +233,7 @@
     function hidetagmodel() {
         $('#LogModel').modal("hide");
     }
+
     function hideaddtag() {
         $('#addtag').modal("hide");
     }
@@ -237,7 +243,7 @@
         var module_name = $("#module").val();
         var group_id = $("#group_num").val()
         $.ajax({
-            url: "{{url_for('cs.search1')}}",
+            url: "{{url_for('cs.show_tag_search')}}",
             data: {
                 "tagname": tagname,
                 "module": module_name,
@@ -258,39 +264,10 @@
         $("#group_num").val(group_id)
         $("#module_name").val(module_name)
         $.ajax({
-            url: "{{url_for('cs.page1')}}",
+            url: "{{url_for('cs.show_tag_page')}}",
             data: {
                 "module": module_name,
                 "group_id": group_id,
-            },
-            headers: {
-                "X-CSRFToken": csrftoken
-            },
-            type: 'post',
-            dataType: 'json',
-            success: pages_success,
-            error: function (data) {
-                console.log(data);
-            },
-        });
-        return false
-    }
-    
-    function add() {
-        var module_name = $("#module_name").val()
-        var group_id = $("#group_num").val()
-        var pub_name =  $("#pub_name").val()
-        var data_type =  $("#data_type").val()
-        var sub_name =  $("#sub_name").val()
-        console.log(module_name)
-        $.ajax({
-            url: "{{url_for('cs.add_tag')}}",
-            data: {
-                "module": module_name,
-                "group_id": group_id,
-                "pub_name": pub_name,
-                "data_type": data_type,
-                "sub_name": sub_name,
             },
             headers: {
                 "X-CSRFToken": csrftoken
@@ -305,11 +282,51 @@
         return false
     }
 
+    function add() {
+        var module_name = $("#module_name").val()
+        var group_id = $("#group_num").val()
+        var pub_name = $("#pub_name").val().trim()
+        var data_type = $("#data_type").val()
+        var sub_name = $("#sub_name").val().trim()
+
+        $.ajax({
+            url: "{{url_for('cs.add_tag')}}",
+            data: {
+                "module": module_name,
+                "group_id": group_id,
+                "pub_name": pub_name,
+                "data_type": data_type,
+                "sub_name": sub_name,
+            },
+            headers: {
+                "X-CSRFToken": csrftoken
+            },
+            type: 'post',
+            dataType: 'json',
+            success: add_success,
+            error: function (data) {
+                console.log(data);
+
+            },
+        });
+        return false
+    }
+
+
+    function add_success(data) {
+        console.log(data.success, data.message)
+        if (data.success) {
+            $('#addtag').modal("hide");
+        }
+        $("#add_error").text(data.message)
+    }
+
+
     function model_page(page) {
         var module_name = $("#module").val()
         var group_id = $("#group_num").val()
         $.ajax({
-            url: "{{url_for('cs.page1')}}",
+            url: "{{url_for('cs.show_tag_page')}}",
             data: {
                 "module": module_name,
                 "group_id": group_id,
@@ -334,7 +351,6 @@
         var $lis = '';
         var $lis1 = '';
         console.log(data.paginate)
-
         var tags = data.paginate.items
         if (data.paginate.total > 0) {
             for (i in tags) {
@@ -342,10 +358,18 @@
                 var $values_td = ''
                 for (t in tags[i]) {
                     $keys_td += '<th scope="row" class="table-info">' + t + '</th>'
-                    $values_td += '<td scope="row" class="table-danger">' + tags[i][t] + '</td>'
+                    $values_td += '<td scope="row" class="table-info  ">' + tags[i][t] + '</td>'
                 };
-                $keys = '<tr>' + $keys_td + '</tr>'
-                $values += '<tr>' + $values_td + '</tr>'
+                $keys = '<tr>' + $keys_td +
+                    '<th scope="row" class="table-info">' +
+                    '操作' +
+                    '</th>' + '</tr>'
+                $values +=
+                    '<tr>' + $values_td +
+                    '<th scope="row" class="table-info">' +
+                    '<a class="btn btn-warning btn-sm mr-md-1 p-0 onclick="alter_tag()" >' + '修改' + '</a>' +
+                    '<a class="btn btn-danger btn-sm  p-0" onclick="delete_tag()">' + '删除' + '</a>' +
+                    '</th>' + '</tr>'
                 var $subject_keys = $('#keys');
                 var $subject_values = $('#values');
                 $subject_keys.html($keys)
@@ -395,6 +419,37 @@
             $subject_con.html($values);
         }
     }
+
+
+    function delete_group(id) {
+        var module_name = $("#module").val()
+        console.log(module_name,id)
+        $.ajax({
+            url: "{{url_for('cs.delete_group')}}",
+            data: {
+                "module": module_name,
+                "group_id": id,
+            },
+            headers: {
+                "X-CSRFToken": csrftoken
+            },
+            type: 'post',
+            dataType: 'json',
+            success: add_success,
+            error: function (data) {
+                console.log(data);
+
+            },
+
+        });
+        return false;
+    }
+
+    function delete_tag() {
+        $("#")
+        console.log()
+    }
+
 
     // var int = self.setInterval("page11()", 5000);
 

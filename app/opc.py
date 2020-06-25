@@ -231,7 +231,7 @@ def read_opc_config(cfg_msg, module):
                 bak_server_domain = cfg_msg['data'][module +
                                                     '.bak_server_domain']
                 bak_server_user = cfg_msg['data'][module +
-                                                      '.bak_server_user']
+                                                  '.bak_server_user']
                 bak_server_password = cfg_msg['data'][module +
                                                       '.bak_server_password']
 
@@ -398,11 +398,8 @@ def page():
     return {"tags": [[]], "basic_config": basic_config, "group_infos": [], "total": 0, "max_pages": 0, 'groups': 0}
 
 
-@cs.route('/page1', methods=['GET', 'POST'], endpoint='page1')
-def page1():
-    """
-    分页
-    """
+@cs.route('/show_tag_page', methods=['GET', 'POST'], endpoint='show_tag_page')
+def show_tag_page():
     group_infos = []
     if request.method == 'POST':
         group_id = int(request.form.get('group_id', 1))-1
@@ -433,7 +430,7 @@ def page1():
         return {"paginate": pga_dict, 'group_infos': group_infos}
 
     module = str(request.args.get('module', 's_opcda_client1'))
-    pages = int(request.args.get('pages', 5))
+    pages = int(request.args.get('pages', 10))
     page = int(request.args.get('page', 1))
 
     cfg_msg = read_json(module)
@@ -452,7 +449,7 @@ def page1():
                 'pages': pga.pages,
                 'total': pga.total
                 }
-    return render_template('opc/show_tag.html', paginate=pga_dict, group_infos=group_infos,group='bg-info')
+    return render_template('opc/show_tag.html', paginate=pga_dict, group_infos=group_infos, group='bg-info')
 
 
 @cs.route('/search', methods=['GET', 'POST'], endpoint='search')
@@ -473,12 +470,12 @@ def search():
     return {"tags": data}
 
 
-@cs.route('/search1', methods=['GET', 'POST'], endpoint='search1')
-def search1():
+@cs.route('/show_tag_search', methods=['GET', 'POST'], endpoint='show_tag_search')
+def show_tag_search():
     """
     查找
     """
-    group_id = int(request.args.get('group_id',1))-1
+    group_id = int(request.args.get('group_id', 1))-1
     pages = int(request.form.get('pages', 10))
     page = int(request.form.get('page', 1))
     module = request.args.get('module')
@@ -510,12 +507,12 @@ def search1():
 
 @cs.route('/add_tag', methods=['GET', 'POST'], endpoint='add_tag')
 def add_tag():
-    group_id = int(request.form.get('group_id',1))
+    group_id = int(request.form.get('group_id', 1))
     module = request.form.get('module')
-    publish_tag_name = request.form.get('pub_name')  # 标签名
-    source_tag_name = request.form.get('sub_name')  # 标签名
-    data_type = request.form.get('data_type')  # 标签名
-    print(group_id,module,publish_tag_name,source_tag_name,data_type)
+    publish_tag_name = request.form.get('pub_name')
+    source_tag_name = request.form.get('sub_name')
+    data_type = request.form.get('data_type')
+    # print(group_id,module,publish_tag_name,source_tag_name,data_type)
     cfg_msg = read_json(module)
     if module in modbus:
         tags, basic_config, group_infos = read_modbus_config(cfg_msg, module)
@@ -524,32 +521,108 @@ def add_tag():
         tags, basic_config, group_infos = read_opc_config(cfg_msg, module)
         data = search_opc_tag(publish_tag_name, tags, [])
     if data:
-        print('标签名已经存在')
+        current_app.logger.debug(f'添加标签{publish_tag_name}失败，标签已经存在！')
+        return {'success': False, 'message': '标签名已经存在'}
     for gis in group_infos:
-        if gis['group_id']==group_id:
-            tag={
-            "tag_id": len(gis['tags']),
-            "publish_tag_name": publish_tag_name,
-            "source_tag_name": source_tag_name,
-            "data_type": "ENUM_INT32"
+        if gis['group_id'] == group_id:
+            tag = {
+                "tag_id": len(gis['tags']),
+                "publish_tag_name": publish_tag_name,
+                "source_tag_name": source_tag_name,
+                "data_type": "ENUM_INT32"
             }
             gis['tags'].append(tag)
-            gis=gis.pop('tags_num')  
+        gis = gis.pop('tags_num')
 
     dict2 = {module+'.groups': group_infos}
-    basic_config= {module+'.'+key: value for key, value in basic_config.items()} 
+    basic_config = {module+'.'+key: value for key,
+                    value in basic_config.items()}
     data = {**basic_config, **dict2}
 
     res = {
-    "module": "local",
-    "data": data
+        "module": "local",
+        "data": data
     }
     with open(conf_path+"s_opcda_client_run_config.json", 'w', encoding='utf-8') as f:
         f.write(json.dumps(res, ensure_ascii=False,
-                        sort_keys=False, indent=4))
-       
-    return 'true'
+                           sort_keys=False, indent=4))
+    current_app.logger.debug(f'添加标签{publish_tag_name}成功')
+    return {'success': True, 'message': '添加标签点成功'}
 
+
+@cs.route('/delete_group', methods=['GET', 'POST'], endpoint='delete_group')
+def delete_group():
+    group_id = int(request.form.get('group_id', 1))
+    module = request.form.get('module')
+    cfg_msg = read_json(module)
+    if module in modbus:
+        tags, basic_config, group_infos = read_modbus_config(cfg_msg, module)
+    else:
+        tags, basic_config, group_infos = read_opc_config(cfg_msg, module)
+    for index,gis in enumerate(group_infos):
+        if gis['group_id'] == group_id:
+            print(group_id)
+            del group_infos[group_id-1]
+        gis = gis.pop('tags_num')
+    dict2 = {module+'.groups': group_infos}
+    basic_config = {module+'.'+key: value for key,
+                    value in basic_config.items()}
+    data = {**basic_config, **dict2}
+
+    res = {
+        "module": "local",
+        "data": data
+    }
+    with open(conf_path+"s_opcda_client_run_config.json", 'w', encoding='utf-8') as f:
+        f.write(json.dumps(res, ensure_ascii=False,
+                           sort_keys=False, indent=4))
+    current_app.logger.debug(f'删除组:{group_id}成功')
+    return {'success': True, 'message': '删除成功'}
+
+
+@cs.route('/delete_tag', methods=['GET', 'POST'], endpoint='delete_tag')
+def delete_tag():
+    group_id = int(request.form.get('group_id', 1))
+    module = request.form.get('module')
+    publish_tag_name = request.form.get('pub_name')
+    source_tag_name = request.form.get('sub_name')
+    data_type = request.form.get('data_type')
+    # print(group_id,module,publish_tag_name,source_tag_name,data_type)
+    cfg_msg = read_json(module)
+    if module in modbus:
+        tags, basic_config, group_infos = read_modbus_config(cfg_msg, module)
+        data = search_modbus_tag(publish_tag_name, tags, [])
+    else:
+        tags, basic_config, group_infos = read_opc_config(cfg_msg, module)
+        data = search_opc_tag(publish_tag_name, tags, [])
+    if data:
+        current_app.logger.debug(f'添加标签{publish_tag_name}失败，标签已经存在！')
+        return {'success': False, 'message': '标签名已经存在'}
+    for gis in group_infos:
+        if gis['group_id'] == group_id:
+            tag = {
+                "tag_id": len(gis['tags']),
+                "publish_tag_name": publish_tag_name,
+                "source_tag_name": source_tag_name,
+                "data_type": "ENUM_INT32"
+            }
+            gis['tags'].append(tag)
+        gis = gis.pop('tags_num')
+
+    dict2 = {module+'.groups': group_infos}
+    basic_config = {module+'.'+key: value for key,
+                    value in basic_config.items()}
+    data = {**basic_config, **dict2}
+
+    res = {
+        "module": "local",
+        "data": data
+    }
+    with open(conf_path+"s_opcda_client_run_config.json", 'w', encoding='utf-8') as f:
+        f.write(json.dumps(res, ensure_ascii=False,
+                           sort_keys=False, indent=4))
+    current_app.logger.debug(f'添加标签{publish_tag_name}成功')
+    return {'success': True, 'message': '添加标签点成功'}
 
 
 """
@@ -676,7 +749,8 @@ def load_opc_da():
                 nrows = st.nrows
 
                 tags_list = st.col_values(0, start_rowx=1, end_rowx=nrows)
-                group_id = int(name.split('-', 1)[0][5:len(name.split('-', 1)[0])])
+                group_id = int(name.split('-', 1)
+                               [0][5:len(name.split('-', 1)[0])])
                 group_name = name.split('-', 1)[0]
                 collect_cycle = int(name.split('-', 1)[1])
                 for m in range(len(tags_list)):
