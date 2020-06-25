@@ -44,8 +44,13 @@
                 <li class="nav-item active">
                     <a class="nav-link" href="{{url_for('index')}}">Home <span class="sr-only">(current)</span></a>
                 </li>
-
             </ul>
+            <button class="btn btn-outline-info " type="button" data-toggle="modal" data-target="#FAQ">
+                FAQ
+            </button>
+            <button class="btn btn-outline-warning " type="button" data-toggle="modal" data-target="#loginModal">
+                SIGN IN
+            </button>
             <div class="dropdown mr-2">
                 <button class="btn btn-outline-danger dropdown-toggle" type="button" id="dropdownMenuButton"
                     data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -166,6 +171,13 @@
                                 Alarms
                             </a>
                         </li>
+                        <li class="nav-item {{group}}">
+                            <a class="nav-link " href="{{url_for('cs.page1')}} "
+                                style="font-size: x-large;font-style: italic;font-family: cursive;">
+                                <span data-feather="cast" style="width: 16px; height: 16px;color:black;"></span>
+                                group
+                            </a>
+                        </li>
 
                         <h2
                             class="sidebar-heading d-flex justify-content-between align-items-center p-3 mt-1 mb-1 text-muted  ">
@@ -250,15 +262,8 @@
         </div>
     </div>
 
-    <!--modal-FAQ-->
-    <div class="helper" id='helper'>
-        <a href="#FAQ" data-toggle="modal">
-            <span class="fas fa-comments-dollar fa-3x" style="color:dodgerblue;"></span>
-        </a>
-    </div>
-
     <div class="modal fade in " id="FAQ" tabindex="-1" role="dialog" aria-labelledby="FAQ">
-        <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h4 class="modal-title" id="myModalLabel">Can I help U ?</h4>

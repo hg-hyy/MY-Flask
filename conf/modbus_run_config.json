@@ -4,11 +4,11 @@
         "modbus1.dev_id": "201",
         "modbus1.Coll_Type": "RTU",
         "modbus1.TCP": {
-            "host": "",
+            "host": "192.168.3.100",
             "port": "502"
         },
         "modbus1.RTU": {
-            "serial": "com5",
+            "serial": "",
             "baud": "9600",
             "data_bit": "8",
             "stop_bit": "1",

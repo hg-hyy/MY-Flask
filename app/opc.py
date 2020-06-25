@@ -428,10 +428,11 @@ def page1():
                     'page': pga.page,
                     'total': pga.total
                     }
-        print(pga.total,pga.pages,pga.has_prev,pga.has_next,pga.prev_num,pga.next_num,pga_dict['iter_pages'])
+        print(pga.total, pga.pages, pga.has_prev, pga.has_next,
+              pga.prev_num, pga.next_num, pga_dict['iter_pages'])
         return {"paginate": pga_dict, 'group_infos': group_infos}
 
-    module = 's_opcda_client1'
+    module = str(request.args.get('module', 's_opcda_client1'))
     pages = int(request.args.get('pages', 5))
     page = int(request.args.get('page', 1))
 
@@ -451,7 +452,7 @@ def page1():
                 'pages': pga.pages,
                 'total': pga.total
                 }
-    return render_template('opc/show_tag.html', paginate=pga_dict, group_infos=group_infos)
+    return render_template('opc/show_tag.html', paginate=pga_dict, group_infos=group_infos,group='bg-info')
 
 
 @cs.route('/search', methods=['GET', 'POST'], endpoint='search')
@@ -463,13 +464,93 @@ def search():
     tagname = request.args.get('tagname')  # 标签名
     cfg_msg = read_json(module)
     if module in modbus:
-        tags, basic_config, _ = read_modbus_config(cfg_msg, module)
+        tags, basic_config, group_infos = read_modbus_config(cfg_msg, module)
         data = search_modbus_tag(tagname, tags, [])
     else:
-        tags, basic_config, _ = read_opc_config(cfg_msg, module)
+        tags, basic_config, group_infos = read_opc_config(cfg_msg, module)
         data = search_opc_tag(tagname, tags, [])
     current_app.logger.debug(f'查询{module}位号:%s' % (tagname))
     return {"tags": data}
+
+
+@cs.route('/search1', methods=['GET', 'POST'], endpoint='search1')
+def search1():
+    """
+    查找
+    """
+    group_id = int(request.args.get('group_id',1))-1
+    pages = int(request.form.get('pages', 10))
+    page = int(request.form.get('page', 1))
+    module = request.args.get('module')
+    tagname = request.args.get('tagname')  # 标签名
+    cfg_msg = read_json(module)
+    if module in modbus:
+        tags, basic_config, group_infos = read_modbus_config(cfg_msg, module)
+        data = search_modbus_tag(tagname, tags, [])
+    else:
+        tags, basic_config, group_infos = read_opc_config(cfg_msg, module)
+        data = search_opc_tag(tagname, tags, [])
+
+    pga = paginate(data, page, pages)
+    pga_dict = {'items': pga.items,
+                'has_prev': pga.has_prev,
+                'prev_num': pga.prev_num,
+                'has_next': pga.has_next,
+                'next_num': pga.next_num,
+                'iter_pages': list(pga.iter_pages()),
+                'pages': pga.pages,
+                'page': pga.page,
+                'total': pga.total
+                }
+    print(pga.total, pga.pages, pga.has_prev, pga.has_next,
+          pga.prev_num, pga.next_num, pga_dict['iter_pages'])
+    current_app.logger.debug(f'查询{module}位号:%s' % (tagname))
+    return {"paginate": pga_dict, 'group_infos': group_infos}
+
+
+@cs.route('/add_tag', methods=['GET', 'POST'], endpoint='add_tag')
+def add_tag():
+    group_id = int(request.form.get('group_id',1))
+    module = request.form.get('module')
+    publish_tag_name = request.form.get('pub_name')  # 标签名
+    source_tag_name = request.form.get('sub_name')  # 标签名
+    data_type = request.form.get('data_type')  # 标签名
+    print(group_id,module,publish_tag_name,source_tag_name,data_type)
+    cfg_msg = read_json(module)
+    if module in modbus:
+        tags, basic_config, group_infos = read_modbus_config(cfg_msg, module)
+        data = search_modbus_tag(publish_tag_name, tags, [])
+    else:
+        tags, basic_config, group_infos = read_opc_config(cfg_msg, module)
+        data = search_opc_tag(publish_tag_name, tags, [])
+    if data:
+        print('标签名已经存在')
+    for gis in group_infos:
+        if gis['group_id']==group_id:
+            tag={
+            "tag_id": len(gis['tags']),
+            "publish_tag_name": publish_tag_name,
+            "source_tag_name": source_tag_name,
+            "data_type": "ENUM_INT32"
+            }
+            gis['tags'].append(tag)
+            gis=gis.pop('tags_num')  
+
+    dict2 = {module+'.groups': group_infos}
+    for key in basic_config.keys():
+        key = module+key
+    data = {**basic_config, **dict2}
+
+    res = {
+    "module": "local",
+    "data": data
+    }
+    with open(conf_path+"s_opcda_client_run_config.json", 'w', encoding='utf-8') as f:
+        f.write(json.dumps(res, ensure_ascii=False,
+                        sort_keys=False, indent=4))
+       
+    return 'true'
+
 
 
 """
@@ -597,9 +678,9 @@ def load_opc_da():
                 nrows = st.nrows
 
                 tags_list = st.col_values(0, start_rowx=1, end_rowx=nrows)
-                group_id = name.split('-', 1)[0][5:len(name.split('-', 1)[0])]
+                group_id = int(name.split('-', 1)[0][5:len(name.split('-', 1)[0])])
                 group_name = name.split('-', 1)[0]
-                collect_cycle = name.split('-', 1)[1]
+                collect_cycle = int(name.split('-', 1)[1])
                 for m in range(len(tags_list)):
                     tag_id = m+(int(group_id)-1)*len(tags_list)
                     source_tag_name = tags_list[m]

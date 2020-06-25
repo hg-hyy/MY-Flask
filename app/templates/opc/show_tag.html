@@ -19,7 +19,7 @@
             <span class="navbar-text">
                 Navbar text with an inline element
             </span>
-            <form action="{{request.path}}" method="get" class="form-inline my-2 my-lg-0 needs-validation" novalidate>
+            <div class="form-inline  needs-validation" novalidate>
                 <div class="form-group">
                     <select class=" custom-select" name='module' id="module" required>
                         <option>s_opcda_client1</option>
@@ -29,8 +29,8 @@
                         <option>modbus2</option>
                     </select>
                 </div>
-                <button class="btn btn-warning  my-2 my-sm-0" type="submit">点击 查询</button>
-            </form>
+                <button class="btn btn-warning" onclick="page(1)">点击查询</button>
+            </div>
         </nav>
 
         <hr class="border-bottom border-danger" />
@@ -57,8 +57,7 @@
                     <td> {{gi['collect_cycle']}}</td>
                     <td> {{gi['tags_num']}}</td>
                     <td>
-                        <!-- <a class="btn btn-info btn-sm" href="{{url_for('cs.page1',group_id=gi['group_id'])}}">编辑</a> -->
-                        <a id="showLogModel1" href="javascript:void(0)" onclick="showLogModel('{{gi['group_id']}}')">查看
+                        <a id="showtagmodel1" href="javascript:void(0)" onclick="showtagmodel('{{gi['group_id']}}')">查看
 
                         </a>
                     </td>
@@ -69,7 +68,7 @@
     </div>
 </div>
 <!-- 分页 -->
-<div class="row mt-4 ">
+<div class="row mt-2 ">
     <div class="col-md-12 col-sm-12 ">
         <nav>
             <ul class="pagination pagination-md justify-content-end">
@@ -123,17 +122,25 @@
     </div>
 </div>
 
+
 <!--tag展示-->
 <div class="modal fade" id="LogModel" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog  modal-sm modal-dialog-centered" style="max-width:1000px;">
         <div class="modal-content">
             <div class="modal-header">
 
-                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">新建位号</button>
-                <form class="form-inline my-2 my-lg-0">
-                    <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-                    <button class="btn btn-outline-success my-2 my-sm-0" type="submit">查询位号</button>
-                </form>
+
+                <div class="form-inline my-2 my-lg-0">
+                    <label for="group_num">组号:</label>
+                    <input class="form-control mr-sm-2 col-sm-2" name='group_num' id='group_num'>
+                    <label for="group_num">模块名称:</label>
+                    <input class="form-control mr-sm-2 col-sm-2" name='module_name' id='module_name'>
+                    <button class="btn btn-outline-success my-2 my-sm-0" type="submit" data-toggle="modal" data-target="#addtag">新建位号</button>
+                </div>
+                <div class="form-inline my-2 my-lg-0">
+                    <input class="form-control mr-sm-2" placeholder="tag name" name="tagname" id=tagname>
+                    <button class="btn btn-outline-success my-2 my-sm-0" onclick="Search()">查询位号</button>
+                </div>
             </div>
             <div class="modal-body">
 
@@ -157,34 +164,156 @@
 
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-outline-success" onclick="hideLogModel()">
+                <button type="button" class="btn btn-outline-success" onclick="hidetagmodel()">
                     关闭
                 </button>
             </div>
         </div><!-- /.modal-content -->
     </div><!-- /.modal -->
 </div>
+
+<!--tag新增-->
+<div class="modal fade" id="addtag" tabindex="-1" role="dialog" aria-labelledby="addtag" aria-hidden="true">
+    <div class="modal-dialog  modal-sm modal-dialog-centered" style="max-width:300px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="form-inline my-2 my-lg-0">
+                   <h1 class="h4">新增位号</h1>
+                </div> 
+            </div>
+            <div class="modal-body">
+                <div class="form-signin" action="" method="post">
+                    <div class="form-label-group" style="margin-bottom:1rem">
+                        <input class="form-control form-control-md" id="pub_name" autofocus="" required="" type="text"
+                            placeholder="pub_name" name="pub_name">
+                        <label for="pub_name" style="display: none">发布标签名</label>
+                    </div>
+                    <div class="form-label-group" style="margin-bottom:1rem">
+                        <label for="data_type" style="display: none">数据类型</label>
+                        <select class="form-control form-control-md" name='data_type' id="data_type">
+                            <option>开关量</option>
+                            <option selected>模拟量</option>
+                            <option>字符串</option>
+                        </select>
+                    </div>
+                    <div class="form-label-group" style="margin-bottom:1rem">
+                        <label for="sub_name" style="display: none">采集标签名</label>
+                        <input class="form-control form-control-md" id="sub_name" required="" type="sub_name"
+                            placeholder="sub_name" name="sub_name">
+                    </div>
+                    <input class="btn btn-md btn-primary btn-block" type="button" onclick="add()" value="新建">
+                </div>
+    
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-success" onclick="hideaddtag()">
+                    关闭
+                </button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>
+
 <script>
     var csrftoken = $("meta[name=csrf-token]").attr("content");
 
     //显示日志模态框
-    function showLogModel(group_id) {
+    function showtagmodel(group_id) {
         $('#LogModel').modal("show");
         page(group_id);
 
     }
 
-    function hideLogModel() {
+    function hidetagmodel() {
         $('#LogModel').modal("hide");
+    }
+    function hideaddtag() {
+        $('#addtag').modal("hide");
+    }
+
+    function Search() {
+        var tagname = $("#tagname").val();
+        var module_name = $("#module").val();
+        var group_id = $("#group_num").val()
+        $.ajax({
+            url: "{{url_for('cs.search1')}}",
+            data: {
+                "tagname": tagname,
+                "module": module_name,
+                "group_id": group_id,
+            },
+            type: 'get',
+            dataType: 'json',
+            success: pages_success,
+            error: function (data) {
+                console.log(data);
+            },
+        });
+        return false;
     }
 
     function page(group_id) {
         var module_name = $("#module").val()
+        $("#group_num").val(group_id)
+        $("#module_name").val(module_name)
         $.ajax({
             url: "{{url_for('cs.page1')}}",
             data: {
                 "module": module_name,
                 "group_id": group_id,
+            },
+            headers: {
+                "X-CSRFToken": csrftoken
+            },
+            type: 'post',
+            dataType: 'json',
+            success: pages_success,
+            error: function (data) {
+                console.log(data);
+            },
+        });
+        return false
+    }
+    
+    function add() {
+        var module_name = $("#module_name").val()
+        var group_id = $("#group_num").val()
+        var pub_name =  $("#pub_name").val()
+        var data_type =  $("#data_type").val()
+        var sub_name =  $("#sub_name").val()
+        console.log(module_name)
+        $.ajax({
+            url: "{{url_for('cs.add_tag')}}",
+            data: {
+                "module": module_name,
+                "group_id": group_id,
+                "pub_name": pub_name,
+                "data_type": data_type,
+                "sub_name": sub_name,
+            },
+            headers: {
+                "X-CSRFToken": csrftoken
+            },
+            type: 'post',
+            dataType: 'json',
+            success: pages_success,
+            error: function (data) {
+                console.log(data);
+            },
+        });
+        return false
+    }
+
+    function model_page(page) {
+        var module_name = $("#module").val()
+        var group_id = $("#group_num").val()
+        $.ajax({
+            url: "{{url_for('cs.page1')}}",
+            data: {
+                "module": module_name,
+                "group_id": group_id,
+                "page": page,
             },
             headers: {
                 "X-CSRFToken": csrftoken
@@ -205,6 +334,7 @@
         var $lis = '';
         var $lis1 = '';
         console.log(data.paginate)
+
         var tags = data.paginate.items
         if (data.paginate.total > 0) {
             for (i in tags) {
@@ -223,14 +353,15 @@
             };
             var lis = ''
             data.paginate.iter_pages.forEach((intem, index) => {
-                       var tmp=''
-                       if(data.paginate.page==index+1){
-                        tmp=`<li class="page-item active "><a class="page-link form-control" href="/page1?page=${index+1} "> ${index+1} </a></li>`
-                       }
-                       else{
-                       tmp= `<li class="page-item "><a class="page-link form-control" href="/page1?page=${index+1} "> ${index+1} </a></li>`
-                       }
-                       lis+=tmp
+                var tmp = ''
+                if (data.paginate.page == index + 1) {
+                    tmp =
+                        `<li class="page-item active "><a class="page-link form-control" href="javascript:model_page(${index+1}) "> ${index+1} </a></li>`
+                } else {
+                    tmp =
+                        `<li class="page-item "><a class="page-link form-control" href="javascript:model_page(${index+1})"> ${index+1} </a></li>`
+                }
+                lis += tmp
             });
             var tag_page =
 
@@ -238,13 +369,14 @@
                 <li class="page-item ">
                 ${ data.paginate.has_prev ?
                 `<a class="page-link form-control" tabindex="-1"
-                        href="/page1?page=${data.paginate.prev_num} ">Previous</a>`: ''}
+                        href="javascript:model_page(${data.paginate.prev_num},1)">Previous</a>`: ''}
+                        
                 </li>
                 ${lis}
                 <li class="page-item ">
                 ${ data.paginate.has_next ?
                     `<a class="page-link form-control" tabindex="-1"
-                        href="/page1?page= ${data.paginate.next_num} ">Next</a>` : ''}
+                    href="javascript:model_page(${data.paginate.next_num},1)">Next</a>` : ''}
                 </li>
                 <li class="page-item"><a class="page-link form-control">共</a></li>
                 <input id='total' name='total' disabled class="form-control" style="width: 60px;"
@@ -263,7 +395,6 @@
             $subject_con.html($values);
         }
     }
-
 
     // var int = self.setInterval("page11()", 5000);
 
