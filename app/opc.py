@@ -581,7 +581,7 @@ def alter_group():
         group_name = request.form.get('group_name')
         collect_cycle = int(request.form.get('collect_cycle'))
         group_id = int(request.form.get('group_id'))
-        print(module,group_name,collect_cycle,group_id)
+        print(module, group_name, collect_cycle, group_id)
         cfg_msg = read_json(module)
         if module in modbus:
             tags, basic_config, group_infos = read_modbus_config(
@@ -593,13 +593,14 @@ def alter_group():
             if gis['group_id'] == group_id:
                 new_gis = {
                     'group_id': group_id,
-                    'group_name' : group_name,
-                    'collect_cycle' : collect_cycle,
+                    'group_name': group_name,
+                    'collect_cycle': collect_cycle,
                     'tags_num': gis['tags_num'],
                     'tags': gis['tags']
                 }
 
-        group_infos = [new_gis if gis['group_id'] == group_id else gis for gis in group_infos]
+        group_infos = [new_gis if gis['group_id'] ==
+                       group_id else gis for gis in group_infos]
         for gis in group_infos:
             gis = gis.pop('tags_num')
         dict2 = {module+'.groups': group_infos}
@@ -714,12 +715,58 @@ def add_tag():
 
 @cs.route('/alter_tag', methods=['GET', 'POST'], endpoint='alter_tag')
 def alter_tag():
-    group_id = int(request.form.get('group_id', 1))
-    module = request.form.get('module')
-    publish_tag_name = request.form.get('pub_name')
-    source_tag_name = request.form.get('sub_name')
-    data_type = request.form.get('data_type')
-    # print(group_id,module,publish_tag_name,source_tag_name,data_type)
+    if request.method == 'POST':
+        group_id = int(request.form.get('group_id', 1))
+        tag_id = int(request.form.get('tag_id', 1))
+        module = request.form.get('module')
+        publish_tag_name = request.form.get('publish_tag_name')
+        source_tag_name = request.form.get('source_tag_name')
+        data_type = request.form.get('data_type')
+        print(group_id, module, publish_tag_name, source_tag_name, data_type)
+        cfg_msg = read_json(module)
+        if module in modbus:
+            tags, basic_config, group_infos = read_modbus_config(
+                cfg_msg, module)
+            data = search_modbus_tag(publish_tag_name, tags, [])
+        else:
+            tags, basic_config, group_infos = read_opc_config(cfg_msg, module)
+            data = search_opc_tag(publish_tag_name, tags, [])
+        if not data:
+            current_app.logger.debug(f'修改标签{publish_tag_name}失败，标签不存在！')
+            return {'success': False, 'message': '标签名不存在'}
+        for gis in group_infos:
+            if gis['group_id'] == group_id:
+                for index, t in enumerate(gis['tags']):
+                    if t['tag_id'] == tag_id:
+                        new_tag = {
+                            "tag_id": tag_id,
+                            "publish_tag_name": publish_tag_name,
+                            "source_tag_name": source_tag_name,
+                            "data_type": "ENUM_INT32"
+                        }
+
+                    gis['tags'] = [new_tag if t['tag_id'] ==
+                               tag_id else t for t in gis['tags']]
+        for gis in group_infos:
+            gis = gis.pop('tags_num')
+        dict2 = {module+'.groups': group_infos}
+        basic_config = {module+'.'+key: value for key,
+                        value in basic_config.items()}
+        data = {**basic_config, **dict2}
+
+        res = {
+            "module": "local",
+            "data": data
+        }
+        with open(conf_path+"s_opcda_client_run_config.json", 'w', encoding='utf-8') as f:
+            f.write(json.dumps(res, ensure_ascii=False,
+                               sort_keys=False, indent=4))
+        current_app.logger.debug(f'修改标签{publish_tag_name}成功')
+        return {'success': True, 'message': '修改标签点成功'}
+
+    module = request.args.get('module')
+    group_id = int(request.args.get('group_id', 1))
+    publish_tag_name = request.args.get('publish_tag_name')
     cfg_msg = read_json(module)
     if module in modbus:
         tags, basic_config, group_infos = read_modbus_config(cfg_msg, module)
@@ -730,39 +777,16 @@ def alter_tag():
     if not data:
         current_app.logger.debug(f'修改标签{publish_tag_name}失败，标签不存在！')
         return {'success': False, 'message': '标签名不存在'}
+        tag = {}
     for gis in group_infos:
         if gis['group_id'] == group_id:
             for index, t in enumerate(gis['tags']):
                 if t['publish_tag_name'] == publish_tag_name:
                     print(t)
-                    gis['tags'].pop(index)
+                    tag = t
                     break
-        gis = gis.pop('tags_num')
-    for gis in group_infos:
-        if gis['group_id'] == group_id:
-            tag = {
-                "tag_id": len(gis['tags']),
-                "publish_tag_name": publish_tag_name,
-                "source_tag_name": source_tag_name,
-                "data_type": "ENUM_INT32"
-            }
-            gis['tags'].append(tag)
-        gis = gis.pop('tags_num')
-
-    dict2 = {module+'.groups': group_infos}
-    basic_config = {module+'.'+key: value for key,
-                    value in basic_config.items()}
-    data = {**basic_config, **dict2}
-
-    res = {
-        "module": "local",
-        "data": data
-    }
-    with open(conf_path+"s_opcda_client_run_config.json", 'w', encoding='utf-8') as f:
-        f.write(json.dumps(res, ensure_ascii=False,
-                           sort_keys=False, indent=4))
-    current_app.logger.debug(f'添加标签{publish_tag_name}成功')
-    return {'success': True, 'message': '添加标签点成功'}
+    current_app.logger.debug(f'请求修改标签{publish_tag_name}成功')
+    return {'success': True, 'message': '请求修改标签点成功', 'tag': tag}
 
 
 @cs.route('/delete_tag', methods=['GET', 'POST'], endpoint='delete_tag')

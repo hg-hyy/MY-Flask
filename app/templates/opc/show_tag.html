@@ -330,6 +330,55 @@
     </div><!-- /.modal -->
 </div>
 
+<!--tag修改-->
+<div class="modal fade" id="altertag" tabindex="-1" role="dialog" aria-labelledby="addtag" aria-hidden="true">
+    <div class="modal-dialog  modal-sm modal-dialog-centered" style="max-width:300px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="form-inline my-2 my-lg-0">
+                    <h1 class="h4">修改位号</h1>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="form-signin" action="" method="post">
+                    <div class="form-label-group" style="margin-bottom:1rem">
+                        <input class="form-control form-control-md" id="tag_id" autofocus="" required="" type="text"
+                            placeholder="tag_id" name="tag_id">
+                        <label for="tag_id" style="display: none">tag_id</label>
+                    </div>
+                    <div class="form-label-group" style="margin-bottom:1rem">
+                        <input class="form-control form-control-md" id="publish_tag_name" autofocus="" required="" type="text"
+                            placeholder="publish_tag_name" name="publish_tag_name">
+                        <label for="publish_tag_name" style="display: none">发布标签名</label>
+                    </div>
+                    <div class="form-label-group" style="margin-bottom:1rem">
+                        <label for="data_type" style="display: none">数据类型</label>
+                        <select class="form-control form-control-md" name='data_type' id="data_type">
+                            <option>开关量</option>
+                            <option selected>模拟量</option>
+                            <option>字符串</option>
+                        </select>
+                    </div>
+                    <div class="form-label-group" style="margin-bottom:1rem">
+                        <label for="source_tag_name" style="display: none">采集标签名</label>
+                        <input class="form-control form-control-md" id="source_tag_name" required="" type="text"
+                            placeholder="source_tag_name" name="source_tag_name">
+                    </div>
+                    <p class="h5 text-danger" id='add_error'></p>
+                    <input class="btn btn-md btn-primary btn-block" type="button" onclick="alter_tag_confirm()" value="确认修改">
+                </div>
+
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-success" onclick="hidealtertag()">
+                    放弃修改
+                </button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>
+
 <!--删除确认-->
 <div class="modal fade" id="confirm" tabindex="-1" role="dialog" aria-labelledby="addtag" aria-hidden="true">
     <div class="modal-dialog  modal-sm modal-dialog-top" style="max-width:800px;">
@@ -367,6 +416,9 @@
         $('#altergroup').modal("show");
         alter_group(group_id)
     }
+    function showalerttagmodel() {
+        $('#altertag').modal("show");
+    }
 
     function hidetagmodel() {
         $('#LogModel').modal("hide");
@@ -377,6 +429,9 @@
 
     function hideaddtag() {
         $('#addtag').modal("hide");
+    }
+    function hidealtertag() {
+        $('#altertag').modal("hide");
     }
 
     function hideaddgroup() {
@@ -460,9 +515,62 @@
         });
         return false
     }
+    
+    function alter_tag(publish_tag_name) {
+        var module_name = $("#module_name").val()
+        var group_id = $("#group_num").val()
+        showalerttagmodel()
+        console.log(module_name,group_id,publish_tag_name)
+        $.ajax({
+            url: "{{url_for('cs.alter_tag')}}",
+            data: {
+                "module": module_name,
+                "group_id": group_id,
+                "publish_tag_name": publish_tag_name,
+            },
+            type: 'get',
+            dataType: 'json',
+            success: alter_tag_success,
+            error: function (data) {
+                console.log(data);
+
+            },
+        });
+        return false
+    }
+    
+    function alter_tag_confirm() {
+        var module_name = $("#module_name").val().trim()
+        var group_id = $("#group_num").val().trim()
+        var publish_tag_name = $("#publish_tag_name").val().trim()
+        var source_tag_name = $("#source_tag_name").val().trim()
+        var data_type = $("#data_type").val().trim()
+        console.log(module_name,group_id,publish_tag_name,source_tag_name,data_type)
+        $.ajax({
+            url: "{{url_for('cs.alter_tag')}}",
+            data: {
+                "module": module_name,
+                "group_id": group_id,
+                "publish_tag_name": publish_tag_name,
+                "data_type": data_type,
+                "source_tag_name": source_tag_name ,
+            },
+            headers: {
+                "X-CSRFToken": csrftoken
+            },
+            type: 'post',
+            dataType: 'json',
+            success: operate_success,
+            error: function (data) {
+                console.log(data);
+
+            },
+        });
+        return false
+    }
 
     function operate_success(data) {
-        console.log(data.success, data.message,data.tag_name,data.group_infos,data.group_id)
+        console.log(data.success, data.message,data.tag_name,data.group_infos,data.group_id,data.tag)
         if (data.success) {
             $('#addtag').modal("hide");
             $('#addgroup').modal("hide");
@@ -478,6 +586,13 @@
         $("#alter_group_name").val(data.group_info.group_name)
         $("#alter_collect_cycle").val(data.group_info.collect_cycle)
         $("#alter_group_id").val(data.group_info.group_id)
+    }
+    function alter_tag_success(data) {
+        console.log(data.success, data.message,data.tag)
+        $("#tag_id").val(data.tag.tag_id)
+        $("#publish_tag_name").val(data.tag.publish_tag_name)
+        $("#collect_cycle").val(data.tag.collect_cycle)
+        $("#source_tag_name").val(data.tag.source_tag_name)
     }
 
     function model_page(page) {
@@ -574,8 +689,6 @@
         }
     }
 
-
-
     function add_group() {
         var module_name = $("#module").val()
         var group_name = $("#group_name").val()
@@ -603,9 +716,6 @@
         return false;
     }
     
-
-
-
     function alter_group(group_id) {
         var module_name = $("#module").val()
         $.ajax({
@@ -625,7 +735,6 @@
         });
         return false;
     }
-
 
     function confirm_alter_group(group_id) {
         var module_name = $("#module").val()
@@ -655,19 +764,15 @@
         return false;
     }
 
-
     function confirm_delete(id) {
         $('#confirm').modal("show");
         $("#gl").text(id)
     }
 
-
     function delete_anyway() {
         var id = $("#gl").text()
         delete_group1(id)
     }
-
-
 
     function delete_group1(id) {
         var module_name = $("#module").val()
@@ -693,8 +798,6 @@
 
         return false;
     }
-
-
 
     function delete_group(id) {
         var module_name = $("#module").val()
@@ -723,33 +826,6 @@
         return false;
     }
 
-
-
-    function alter_tag(id) {
-        console.log(id)
-        var module_name = $("#module_name").val()
-        var group_id = $("#group_num").val()
-        var pub_name = $("#pub_name").val().trim()
-        var data_type = $("#data_type").val()
-        var sub_name = $("#sub_name").val().trim()
-        $.ajax({
-            url: "{{url_for('cs.alter_tag')}}",
-            data: {
-                "module": module_name,
-                "group_id": group_id,
-                "tag_id": id,
-
-            },
-            type: 'get',
-            dataType: 'json',
-            success: tag_page_success,
-            error: function (data) {
-                console.log(data);
-            },
-        });
-        return false;
-    }
-
     function delete_tag(publish_tag_name) {
         var module_name = $("#module_name").val()
         var group_id = $("#group_num").val()
@@ -772,8 +848,6 @@
         return false;
     }
 
-
-
     function tag_page() {
         var module_name = $("#module").val()
         $.ajax({
@@ -792,7 +866,6 @@
         });
         return false;
     }
-
 
     function tag_page_success(data) {
         var $values = '';
@@ -839,11 +912,10 @@
 
     }
 
-
     $(document).ready(function () {
         tag_page()
     })
 
-    // var int = self.setInterval("page11()", 5000);
+    var int = self.setInterval("tag_page()", 15000);
 </script>
 {% endblock %}
