@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}alarm{% endblock %}
+{% block title %}tags{% endblock %}
 {% block head %}
 <style type="text/css">
 
@@ -13,13 +13,13 @@
 
             <a class="navbar-brand">
                 <img src="/static/pic/bootstrap-solid.svg" width="30" height="30" class="d-inline align-middle" alt="">
-                alarm
+                show_tags
             </a>
 
             <span class="navbar-text">
                 Navbar text with an inline element
             </span>
-            <div class="form-inline  needs-validation" novalidate>
+            <div class="form-inline  needs-validation" novalidate method="GET" acton='/show_tag_page'>
                 <div class="form-group">
                     <select class=" custom-select" name='module' id="module" required>
                         <option>s_opcda_client1</option>
@@ -29,8 +29,8 @@
                         <option>modbus2</option>
                     </select>
                 </div>
-                <button class="btn btn-warning mx-2" onclick="page(1)">点击查询</button>
-                <button class="btn btn-danger" data-toggle="modal" data-target="#addgroup"   >添加组</button>
+                <button class="btn btn-warning mx-2" onclick="tag_page()">点击查询</button>
+                <button class="btn btn-danger" data-toggle="modal" data-target="#addgroup">添加组</button>
             </div>
         </nav>
 
@@ -50,13 +50,13 @@
                     <th>操作</th>
                 </tr>
             </thead>
-            <tbody id='alarm'>
+            <tbody id='tag_values'>
                 {% for gi in group_infos %}
                 <tr>
-                    <td> {{gi['group_id']}}</td>
-                    <td> {{gi['group_name']}}</td>
-                    <td> {{gi['collect_cycle']}}</td>
-                    <td> {{gi['tags_num']}}</td>
+                    <td data-html="true" title="组"> {{gi['group_id']}}</td>
+                    <td data-html="true" title="组名"> {{gi['group_name']}}</td>
+                    <td data-html="true" title="采集周期"> {{gi['collect_cycle']}}</td>
+                    <td data-html="true" title="标签数量"> {{gi['tags_num']}}</td>
                     <td class="p-0 m-0 align-middle">
                         <a id="showtagmodel1" href="javascript:void(0)" onclick="showtagmodel('{{gi['group_id']}}')"
                             class="btn btn-outline-info btn-sm p-1 m-0">
@@ -66,11 +66,29 @@
                             class="btn btn-outline-danger btn-sm p-1 m-0">
                             删除
                         </a>
+                        <a id="showtagmodel1" href="javascript:void(0)" onclick="confirm_delete('{{gi['group_id']}}')"
+                            class="btn btn-outline-danger btn-sm p-1 m-0">
+                            删除测试
+                        </a>
                     </td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
+
+        <!-- <table class="table table-bordered table-hover table-secondary ">
+            <thead id='tag_keys'>
+                <tr>
+                    <th>group_id</th>
+                    <th>group_name</th>
+                    <th>collect_cycle</th>
+                    <th>tags_num</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody id='tag_values'>
+            </tbody>
+        </table> -->
     </div>
 </div>
 <!-- 分页 -->
@@ -150,7 +168,7 @@
             <div class="modal-body">
 
 
-                <table class="table  table-bordered table-sm text-center">
+                <table class="table  table-bordered table-sm text-center table-hover table-info">
                     <thead id='keys'>
 
                     </thead>
@@ -204,7 +222,7 @@
                             <option>30</option>
                         </select>
                     </div>
-                    <p class="h5 text-danger" id='add_error'></p>
+                    <p class="h6 text-danger" id='add_error'></p>
                     <input class="btn btn-md btn-primary btn-block" type="button" onclick="add_group()" value="新建">
                 </div>
 
@@ -263,6 +281,30 @@
     </div><!-- /.modal -->
 </div>
 
+<!--删除确认-->
+<div class="modal fade" id="confirm" tabindex="-1" role="dialog" aria-labelledby="addtag" aria-hidden="true">
+    <div class="modal-dialog  modal-sm modal-dialog-top" style="max-width:800px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>确认删除组<span class="badge badge-info" id='gl'></span>吗？</h2>
+            </div>
+            <div class="modal-body">
+                <h1 class="dispaly-4">新建组不容易的，骚年请考虑一下。</h1>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-danger" onclick="delete_anyway()">
+                    滚犊子
+                </button>
+                <button type="button" class="btn btn-outline-success" onclick="hideconfirm()">
+                    好吧,你赢了
+                </button>
+
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>
+
 <script>
     var csrftoken = $("meta[name=csrf-token]").attr("content");
 
@@ -280,8 +322,13 @@
     function hideaddtag() {
         $('#addtag').modal("hide");
     }
+
     function hideaddgroup() {
         $('#addgroup').modal("hide");
+    }
+
+    function hideconfirm() {
+        $('#confirm').modal("hide");
     }
 
     function Search() {
@@ -363,8 +410,12 @@
         console.log(data.success, data.message)
         if (data.success) {
             $('#addtag').modal("hide");
+            $('#addgroup').modal("hide");
+            $('#confirm').modal("hide");
+        } else {
+
+            $("#add_error").text(data.message)
         }
-        $("#add_error").text(data.message)
     }
 
 
@@ -403,8 +454,8 @@
                 var $keys_td = ''
                 var $values_td = ''
                 for (t in tags[i]) {
-                    $keys_td += '<th scope="row" class="table-info">' + t + '</th>'
-                    $values_td += '<td scope="row" class="table-info  ">' + tags[i][t] + '</td>'
+                    $keys_td += '<th scope="row" class="table-info p-1">' + t + '</th>'
+                    $values_td += '<td scope="row" ">' + tags[i][t] + '</td>'
                 };
                 $keys = '<tr>' + $keys_td +
                     '<th scope="row" class="table-info">' +
@@ -412,7 +463,7 @@
                     '</th>' + '</tr>'
                 $values +=
                     '<tr>' + $values_td +
-                    '<th scope="row" class="table-info">' +
+                    '<th scope="row" >' +
                     '<a class="btn btn-warning btn-sm mr-md-1 p-0 onclick="alter_tag()" >' + '修改' + '</a>' +
                     '<a class="btn btn-danger btn-sm  p-0" onclick="delete_tag()">' + '删除' + '</a>' +
                     '</th>' + '</tr>'
@@ -471,7 +522,7 @@
         var module_name = $("#module").val()
         var group_name = $("#group_name").val()
         var collect_cycle = $("#collect_cycle").val()
-        console.log(module_name, group_name,collect_cycle)
+        console.log(module_name, group_name, collect_cycle)
         $.ajax({
             url: "{{url_for('cs.add_group')}}",
             data: {
@@ -494,11 +545,21 @@
         return false;
     }
 
+    function confirm_delete(id) {
+        $('#confirm').modal("show");
+        $("#gl").text(id)
+    }
 
 
-    function delete_group(id) {
+    function delete_anyway() {
+        var id = $("#gl").text()
+        delete_group1(id)
+    }
+
+
+
+    function delete_group1(id) {
         var module_name = $("#module").val()
-        console.log(module_name, id)
         $.ajax({
             url: "{{url_for('cs.delete_group')}}",
             data: {
@@ -517,6 +578,37 @@
             },
 
         });
+
+
+        return false;
+    }
+
+
+
+    function delete_group(id) {
+        var module_name = $("#module").val()
+        console.log(id)
+        if (confirm('添加组不容易的，少年请三思，确认删除吗？')) {
+            $.ajax({
+                url: "{{url_for('cs.delete_group')}}",
+                data: {
+                    "module": module_name,
+                    "group_id": id,
+                },
+                headers: {
+                    "X-CSRFToken": csrftoken
+                },
+                type: 'post',
+                dataType: 'json',
+                success: add_success,
+                error: function (data) {
+                    console.log(data);
+
+                },
+
+            });
+        }
+
         return false;
     }
 
@@ -528,30 +620,73 @@
     }
 
 
+
+    function tag_page() {
+        var module_name = $("#module").val()
+        $.ajax({
+            url: "{{url_for('cs.show_tag_page1')}}",
+            data: {
+                "module": module_name,
+                "pages": 10,
+                "page": 1,
+            },
+            type: 'get',
+            dataType: 'json',
+            success: tag_page_success,
+            error: function (data) {
+                console.log(data);
+            },
+        });
+        return false;
+    }
+
+
+    function tag_page_success(data) {
+        var $values = '';
+        var count = data.group_infos.length
+        console.log(data)
+        if (count > 0) {
+            for (i in data.group_infos) {
+                var $values_td = ''
+                for (t in data.group_infos[i]) {
+                    $values_td =
+                        '<td scope="row" >' + data.group_infos[i]['group_id'] + '</td>' +
+                        '<td scope="row" >' + data.group_infos[i]['group_name'] + '</td>' +
+                        '<td scope="row" >' + data.group_infos[i]['collect_cycle'] + '</td>' +
+                        '<td scope="row" >' + data.group_infos[i]['tags_num'] + '</td>' +
+                        `<td class="p-0 m-0 align-middle">
+                        <a id="showtagmodel1" href="javascript:void(0)" onclick="showtagmodel(${data.group_infos[i]['group_id']})"
+                            class="btn btn-outline-info btn-sm p-1 m-0">
+                            编辑
+                        </a> |
+                        <a id="showtagmodel1" href="javascript:void(0)" onclick="delete_group(${data.group_infos[i]['group_id']})"
+                            class="btn btn-outline-danger btn-sm p-1 m-0">
+                            删除
+                        </a>
+                        <a id="showtagmodel1" href="javascript:void(0)" onclick="confirm_delete(${data.group_infos[i]['group_id']})"
+                            class="btn btn-outline-danger btn-sm p-1 m-0">
+                            删除测试
+                        </a>
+                    </td>`
+                };
+                $values += '<tr>' + $values_td + '</tr>'
+                var $subject_con = $('#tag_values');
+                $subject_con.html($values)
+
+            }
+        } else {
+            $values += '<tr>' + '<td scope="row" class="table-danger">' + '没有位号信息，请重新上传。。。' + '</td>' + '</tr>'
+            var $subject_con = $('#tag_values');
+            $subject_con.html($values)
+        }
+
+    }
+
+
+    $(document).ready(function () {
+        tag_page()
+    })
+
     // var int = self.setInterval("page11()", 5000);
-
-    (function () {
-        'use strict'
-
-        window.addEventListener('load',
-            function () {
-                // Fetch all the forms we want to apply custom Bootstrap validation styles to
-                var forms = document.getElementsByClassName('needs-validation')
-
-                // Loop over them and prevent submission
-                Array.prototype.filter.call(
-                    forms,
-                    function (form) {
-                        form.addEventListener('submit',
-                            function (event) {
-                                if (form.checkValidity() === false) {
-                                    event.preventDefault()
-                                    event.stopPropagation()
-                                }
-                                form.classList.add('was-validated')
-                            }, false)
-                    })
-            }, false)
-    }())
 </script>
 {% endblock %}

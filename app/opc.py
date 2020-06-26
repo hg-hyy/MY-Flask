@@ -452,6 +452,33 @@ def show_tag_page():
     return render_template('opc/show_tag.html', paginate=pga_dict, group_infos=group_infos, group='bg-info')
 
 
+
+@cs.route('/show_tag_page1', methods=['GET', 'POST'], endpoint='show_tag_page1')
+def show_tag_page1():
+    group_infos = []
+    module = str(request.args.get('module', 's_opcda_client1'))
+    pages = int(request.args.get('pages', 10))
+    page = int(request.args.get('page', 1))
+
+    cfg_msg = read_json(module)
+    if module in modbus:
+        tags, basic_config, group_infos = read_modbus_config(
+            cfg_msg, module)
+    else:
+        tags, basic_config, group_infos = read_opc_config(cfg_msg, module)
+    pga = paginate(group_infos, page, pages)
+    pga_dict = {'items': pga.items,
+                'has_prev': pga.has_prev,
+                'prev_num': pga.prev_num,
+                'has_next': pga.has_next,
+                'next_num': pga.next_num,
+                'iter_pages': list(pga.iter_pages()),
+                'pages': pga.pages,
+                'total': pga.total
+                }
+    return {"paginate": pga_dict, 'group_infos': group_infos}
+
+
 @cs.route('/search', methods=['GET', 'POST'], endpoint='search')
 def search():
     """
@@ -507,10 +534,9 @@ def show_tag_search():
 
 @cs.route('/add_group', methods=['GET', 'POST'], endpoint='add_group')
 def add_group():
-    group_id = int(request.form.get('group_id', 1))
     module = request.form.get('module')
     group_name = request.form.get('group_name')
-    collect_cycle = request.form.get('collect_cycle')
+    collect_cycle = int(request.form.get('collect_cycle'))
     cfg_msg = read_json(module)
     if module in modbus:
         tags, basic_config, group_infos = read_modbus_config(cfg_msg, module)
@@ -521,13 +547,14 @@ def add_group():
     group_id_lists = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
     for gis in group_infos:
         group_id_list.append(gis['group_id'])
+        gis = gis.pop('tags_num')
     group_new_list = list(set(group_id_lists).difference(set(group_id_list)))
     if group_new_list:
         group_new_list.sort()
         group_info = {'group_id': group_new_list[0], 'group_name': group_name,
-                      'collect_cycle': collect_cycle, 'tags_num': 0, 'tags': []}
+                      'collect_cycle': collect_cycle, 'tags': []}
 
-        group_infos.append(group_info)
+        group_infos.insert(group_new_list[0]-1,group_info)
         dict2 = {module+'.groups': group_infos}
         basic_config = {module+'.'+key: value for key,
                         value in basic_config.items()}
@@ -544,7 +571,7 @@ def add_group():
         return {'success': True, 'message': '添加组成功'}
 
     current_app.logger.debug(f'添加组{group_name}失败')
-    return {'success': False, 'message': '当前不允许添加组'}
+    return {'success': False, 'message': '当前不允许添加组,最大组数10'}
 
 
 @cs.route('/delete_group', methods=['GET', 'POST'], endpoint='delete_group')
@@ -891,16 +918,16 @@ def load_opc_ae():
 @login_required
 def load_modbus():
     if request.method == 'POST':
-        module = request.form['module']
+        module = request.form.get('module','modbus1')
         dev_id = request.form['id']
         Coll_Type = request.form['type']
         host = request.form['ip']
-        port = request.form['port']
+        port = request.form.get('port',502)
         serial = request.form['com']
-        baud = request.form['baud']
-        data_bit = request.form['data_bit']
-        stop_bit = request.form['stop_bit']
-        parity = request.form['parity']
+        baud = request.form.get('baud',9600)
+        data_bit = request.form.get('data_bit',8)
+        stop_bit = request.form.get('stop_bit',1)
+        parity = request.form.get('parity',None)
 
         dict1 = {
             module+'.dev_id': dev_id,
