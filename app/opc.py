@@ -452,7 +452,6 @@ def show_tag_page():
     return render_template('opc/show_tag.html', paginate=pga_dict, group_infos=group_infos, group='bg-info')
 
 
-
 @cs.route('/show_tag_page1', methods=['GET', 'POST'], endpoint='show_tag_page1')
 def show_tag_page1():
     group_infos = []
@@ -554,7 +553,7 @@ def add_group():
         group_info = {'group_id': group_new_list[0], 'group_name': group_name,
                       'collect_cycle': collect_cycle, 'tags': []}
 
-        group_infos.insert(group_new_list[0]-1,group_info)
+        group_infos.insert(group_new_list[0]-1, group_info)
         dict2 = {module+'.groups': group_infos}
         basic_config = {module+'.'+key: value for key,
                         value in basic_config.items()}
@@ -572,6 +571,54 @@ def add_group():
 
     current_app.logger.debug(f'添加组{group_name}失败')
     return {'success': False, 'message': '当前不允许添加组,最大组数10'}
+
+
+@cs.route('/alter_group', methods=['GET', 'POST'], endpoint='alter_group')
+def alter_group():
+
+    if request.method == 'POST':
+        module = request.form.get('module')
+        group_name = request.form.get('alter_group_name')
+        collect_cycle = int(request.form.get('collect_cycle'))
+        group_id = int(request.form.get('group_id'))
+
+        cfg_msg = read_json(module)
+        if module in modbus:
+            tags, basic_config, group_infos = read_modbus_config(
+                cfg_msg, module)
+        else:
+            tags, basic_config, group_infos = read_opc_config(cfg_msg, module)
+
+        for gis in group_infos:
+            if gis['group_id'] == group_id:
+                new_gis = {
+                    'group_id': group_id,
+                    'group_name' : group_name,
+                    'collect_cycle' : collect_cycle,
+                    'tags': gis['tags']
+                }
+        [new_gis if gis['group_id'] == group_id else gis for gis in group_infos]
+        current_app.logger.debug(f'找组{group_id}失败')
+        return {'success': False, 'message': '没有找到组', 'group_id': group_id}
+
+    module = request.args.get('module')
+    group_id = int(request.args.get('group_id'))
+
+    cfg_msg = read_json(module)
+    if module in modbus:
+        tags, basic_config, group_infos = read_modbus_config(cfg_msg, module)
+    else:
+        tags, basic_config, group_infos = read_opc_config(cfg_msg, module)
+
+    group_info = {}
+    for gis in group_infos:
+        if gis['group_id'] == group_id:
+            group_info = gis
+    if group_info:
+        current_app.logger.debug(f'找到组{group_id}')
+        return {'success': True, 'message': '找到组', 'group_info': group_info}
+    current_app.logger.debug(f'找组{group_id}失败')
+    return {'success': False, 'message': '没有找到组', 'group_info': group_info}
 
 
 @cs.route('/delete_group', methods=['GET', 'POST'], endpoint='delete_group')
@@ -649,8 +696,8 @@ def add_tag():
     return {'success': True, 'message': '添加标签点成功'}
 
 
-@cs.route('/delete_tag', methods=['GET', 'POST'], endpoint='delete_tag')
-def delete_tag():
+@cs.route('/alter_tag', methods=['GET', 'POST'], endpoint='alter_tag')
+def alter_tag():
     group_id = int(request.form.get('group_id', 1))
     module = request.form.get('module')
     publish_tag_name = request.form.get('pub_name')
@@ -664,9 +711,17 @@ def delete_tag():
     else:
         tags, basic_config, group_infos = read_opc_config(cfg_msg, module)
         data = search_opc_tag(publish_tag_name, tags, [])
-    if data:
-        current_app.logger.debug(f'添加标签{publish_tag_name}失败，标签已经存在！')
-        return {'success': False, 'message': '标签名已经存在'}
+    if not data:
+        current_app.logger.debug(f'修改标签{publish_tag_name}失败，标签不存在！')
+        return {'success': False, 'message': '标签名不存在'}
+    for gis in group_infos:
+        if gis['group_id'] == group_id:
+            for index, t in enumerate(gis['tags']):
+                if t['publish_tag_name'] == publish_tag_name:
+                    print(t)
+                    gis['tags'].pop(index)
+                    break
+        gis = gis.pop('tags_num')
     for gis in group_infos:
         if gis['group_id'] == group_id:
             tag = {
@@ -692,6 +747,47 @@ def delete_tag():
                            sort_keys=False, indent=4))
     current_app.logger.debug(f'添加标签{publish_tag_name}成功')
     return {'success': True, 'message': '添加标签点成功'}
+
+
+@cs.route('/delete_tag', methods=['GET', 'POST'], endpoint='delete_tag')
+def delete_tag():
+    group_id = int(request.args.get('group_id', 1))
+    module = request.args.get('module')
+    publish_tag_name = request.args.get('publish_tag_name')
+
+    # print(group_id,module,publish_tag_name)
+    cfg_msg = read_json(module)
+    if module in modbus:
+        tags, basic_config, group_infos = read_modbus_config(cfg_msg, module)
+        data = search_modbus_tag(publish_tag_name, tags, [])
+    else:
+        tags, basic_config, group_infos = read_opc_config(cfg_msg, module)
+        data = search_opc_tag(publish_tag_name, tags, [])
+    if not data:
+        current_app.logger.debug(f'标签{publish_tag_name}不存在')
+        return {'success': False, 'message': '标签名不存在'}
+    for gis in group_infos:
+        if gis['group_id'] == group_id:
+            for index, t in enumerate(gis['tags']):
+                if t['publish_tag_name'] == publish_tag_name:
+                    print(t)
+                    gis['tags'].pop(index)
+                    break
+        gis = gis.pop('tags_num')
+
+    dict2 = {module+'.groups': group_infos}
+    basic_config = {module+'.'+key: value for key,
+                    value in basic_config.items()}
+    data = {**basic_config, **dict2}
+    res = {
+        "module": "local",
+        "data": data
+    }
+    with open(conf_path+"s_opcda_client_run_config.json", 'w', encoding='utf-8') as f:
+        f.write(json.dumps(res, ensure_ascii=False,
+                           sort_keys=False, indent=4))
+    current_app.logger.debug(f'删除标签{publish_tag_name}成功')
+    return {'success': True, 'message': '删除标签点成功', 'tag_name': publish_tag_name}
 
 
 """
@@ -918,16 +1014,16 @@ def load_opc_ae():
 @login_required
 def load_modbus():
     if request.method == 'POST':
-        module = request.form.get('module','modbus1')
+        module = request.form.get('module', 'modbus1')
         dev_id = request.form['id']
         Coll_Type = request.form['type']
         host = request.form['ip']
-        port = request.form.get('port',502)
+        port = request.form.get('port', 502)
         serial = request.form['com']
-        baud = request.form.get('baud',9600)
-        data_bit = request.form.get('data_bit',8)
-        stop_bit = request.form.get('stop_bit',1)
-        parity = request.form.get('parity',None)
+        baud = request.form.get('baud', 9600)
+        data_bit = request.form.get('data_bit', 8)
+        stop_bit = request.form.get('stop_bit', 1)
+        parity = request.form.get('parity', None)
 
         dict1 = {
             module+'.dev_id': dev_id,

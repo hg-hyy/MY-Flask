@@ -62,6 +62,10 @@
                             class="btn btn-outline-info btn-sm p-1 m-0">
                             编辑
                         </a> |
+                        <a id="showtagmodel1" href="javascript:void(0)" onclick="showtagmodel('{{gi['group_id']}}')"
+                            class="btn btn-outline-info btn-sm p-1 m-0">
+                            修改
+                        </a> |
                         <a id="showtagmodel1" href="javascript:void(0)" onclick="delete_group('{{gi['group_id']}}')"
                             class="btn btn-outline-danger btn-sm p-1 m-0">
                             删除
@@ -236,6 +240,51 @@
         </div><!-- /.modal-content -->
     </div><!-- /.modal -->
 </div>
+<!--group修改-->
+<div class="modal fade" id="altergroup" tabindex="-1" role="dialog" aria-labelledby="addtag" aria-hidden="true">
+    <div class="modal-dialog  modal-sm modal-dialog-centered" style="max-width:300px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="form-inline my-2 my-lg-0">
+                    <h1 class="h4">修改组参数</h1>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="form-signin" action="" method="post">
+                    <div class="form-label-group" style="margin-bottom:1rem">
+                        <input class="form-control form-control-md" id="alter_group_id" autofocus="" required="" type="text"
+                            placeholder="alter_group_id" name="alter_group_id">
+                        <label for="alter_group_id" style="display: none">组ID</label>
+                    </div>
+                    <div class="form-label-group" style="margin-bottom:1rem">
+                        <input class="form-control form-control-md" id="alter_group_name" autofocus="" required="" type="text"
+                            placeholder="alter_group_name" name="alter_group_name">
+                        <label for="alter_group_name" style="display: none">组名</label>
+                    </div>
+                    <div class="form-label-group" style="margin-bottom:1rem">
+                        <label for="alter_collect_cycle" style="display: none">采集周期</label>
+                        <select class="form-control form-control-md" name='alter_collect_cycle' id="alter_collect_cycle">
+                            <option>5</option>
+                            <option selected>10</option>
+                            <option>15</option>
+                            <option>20</option>
+                            <option>30</option>
+                        </select>
+                    </div>
+                    <p class="h6 text-danger" id='add_error'></p>
+                    <input class="btn btn-md btn-primary btn-block" type="button" onclick="confirm_alter_group()" value="修改">
+                </div>
+
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-success" onclick="hidealtermodel()">
+                    关闭
+                </button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>
 
 <!--tag新增-->
 <div class="modal fade" id="addtag" tabindex="-1" role="dialog" aria-labelledby="addtag" aria-hidden="true">
@@ -267,7 +316,7 @@
                             placeholder="sub_name" name="sub_name">
                     </div>
                     <p class="h5 text-danger" id='add_error'></p>
-                    <input class="btn btn-md btn-primary btn-block" type="button" onclick="add()" value="新建">
+                    <input class="btn btn-md btn-primary btn-block" type="button" onclick="add_tag()" value="新建">
                 </div>
 
 
@@ -314,9 +363,16 @@
         page(group_id);
 
     }
+    function showalertgroupmodel(group_id) {
+        $('#altergroup').modal("show");
+        alter_group(group_id)
+    }
 
     function hidetagmodel() {
         $('#LogModel').modal("hide");
+    }
+    function hidealtermodel() {
+        $('#altergroup').modal("hide");
     }
 
     function hideaddtag() {
@@ -375,7 +431,7 @@
         return false
     }
 
-    function add() {
+    function add_tag() {
         var module_name = $("#module_name").val()
         var group_id = $("#group_num").val()
         var pub_name = $("#pub_name").val().trim()
@@ -396,7 +452,7 @@
             },
             type: 'post',
             dataType: 'json',
-            success: add_success,
+            success: operate_success,
             error: function (data) {
                 console.log(data);
 
@@ -405,19 +461,23 @@
         return false
     }
 
-
-    function add_success(data) {
-        console.log(data.success, data.message)
+    function operate_success(data) {
+        console.log(data.success, data.message,data.tag_name,data.group_info)
         if (data.success) {
             $('#addtag').modal("hide");
             $('#addgroup').modal("hide");
             $('#confirm').modal("hide");
         } else {
-
             $("#add_error").text(data.message)
         }
     }
-
+    
+    function alter_group_success(data) {
+        console.log(data.success, data.message,data.group_info)
+        $("#alter_group_name").val(data.group_info.group_name)
+        $("#alter_collect_cycle").val(data.group_info.collect_cycle)
+        $("#alter_group_id").val(data.group_info.group_id)
+    }
 
     function model_page(page) {
         var module_name = $("#module").val()
@@ -451,22 +511,18 @@
         var tags = data.paginate.items
         if (data.paginate.total > 0) {
             for (i in tags) {
-                var $keys_td = ''
-                var $values_td = ''
+                var keys_td = ''
+                var values_td = ''
                 for (t in tags[i]) {
-                    $keys_td += '<th scope="row" class="table-info p-1">' + t + '</th>'
-                    $values_td += '<td scope="row" ">' + tags[i][t] + '</td>'
+                    keys_td += '<th scope="row" class="table-info p-1">' + t + '</th>'
+                    values_td += '<td scope="row" ">' + tags[i][t] + '</td>'
                 };
-                $keys = '<tr>' + $keys_td +
-                    '<th scope="row" class="table-info">' +
-                    '操作' +
-                    '</th>' + '</tr>'
+                $keys = `<tr>${keys_td }<th scope="row" class="table-info">操作</th></tr>`
                 $values +=
-                    '<tr>' + $values_td +
-                    '<th scope="row" >' +
-                    '<a class="btn btn-warning btn-sm mr-md-1 p-0 onclick="alter_tag()" >' + '修改' + '</a>' +
-                    '<a class="btn btn-danger btn-sm  p-0" onclick="delete_tag()">' + '删除' + '</a>' +
-                    '</th>' + '</tr>'
+                    `<tr>'${values_td}<th scope="row" >
+                    <a class="btn btn-outline-warning btn-sm p-0" onclick="alter_tag('${tags[i]['publish_tag_name']}')" >修改</a> |
+                    <a class="btn btn-outline-danger  btn-sm p-0" onclick="delete_tag('${tags[i]['publish_tag_name']}')">删除</a>
+                    </th></tr>`
                 var $subject_keys = $('#keys');
                 var $subject_values = $('#values');
                 $subject_keys.html($keys)
@@ -518,6 +574,7 @@
     }
 
 
+
     function add_group() {
         var module_name = $("#module").val()
         var group_name = $("#group_name").val()
@@ -535,7 +592,7 @@
             },
             type: 'post',
             dataType: 'json',
-            success: add_success,
+            success: operate_success,
             error: function (data) {
                 console.log(data);
 
@@ -544,6 +601,59 @@
         });
         return false;
     }
+    
+
+
+
+    function alter_group(group_id) {
+        var module_name = $("#module").val()
+        $.ajax({
+            url: "{{url_for('cs.alter_group')}}",
+            data: {
+                "module": module_name,
+                "group_id": group_id,
+            },
+            type: 'get',
+            dataType: 'json',
+            success: alter_group_success,
+            error: function (data) {
+                console.log(data);
+
+            },
+
+        });
+        return false;
+    }
+
+
+    function confirm_alter_group(group_id) {
+        var module_name = $("#module").val()
+        var alter_group_name = $("#alter_group_name").val()
+        var alter_collect_cycle = $("#alter_collect_cycle").val()
+        var alter_group_id = $("#alter_group_id").val()
+        $.ajax({
+            url: "{{url_for('cs.alter_group')}}",
+            data: {
+                "module": module_name,
+                "collect_cycle": alter_collect_cycle,
+                "group_name": alter_group_name,
+                "group_id": alter_group_id,
+            },
+            headers: {
+                "X-CSRFToken": csrftoken
+            },
+            type: 'post',
+            dataType: 'json',
+            success: operate_success,
+            error: function (data) {
+                console.log(data);
+
+            },
+
+        });
+        return false;
+    }
+
 
     function confirm_delete(id) {
         $('#confirm').modal("show");
@@ -571,7 +681,7 @@
             },
             type: 'post',
             dataType: 'json',
-            success: add_success,
+            success: operate_success,
             error: function (data) {
                 console.log(data);
 
@@ -600,7 +710,7 @@
                 },
                 type: 'post',
                 dataType: 'json',
-                success: add_success,
+                success: operate_success,
                 error: function (data) {
                     console.log(data);
 
@@ -614,9 +724,51 @@
 
 
 
-    function delete_tag() {
-        $("#")
-        console.log()
+    function alter_tag(id) {
+        console.log(id)
+        var module_name = $("#module_name").val()
+        var group_id = $("#group_num").val()
+        var pub_name = $("#pub_name").val().trim()
+        var data_type = $("#data_type").val()
+        var sub_name = $("#sub_name").val().trim()
+        $.ajax({
+            url: "{{url_for('cs.alter_tag')}}",
+            data: {
+                "module": module_name,
+                "group_id": group_id,
+                "tag_id": id,
+
+            },
+            type: 'get',
+            dataType: 'json',
+            success: tag_page_success,
+            error: function (data) {
+                console.log(data);
+            },
+        });
+        return false;
+    }
+
+    function delete_tag(publish_tag_name) {
+        var module_name = $("#module_name").val()
+        var group_id = $("#group_num").val()
+        console.log(publish_tag_name,module_name,group_id)
+        
+        $.ajax({
+            url: "{{url_for('cs.delete_tag')}}",
+            data: {
+                "module": module_name,
+                "group_id": group_id,
+                "publish_tag_name": publish_tag_name,
+            },
+            type: 'get',
+            dataType: 'json',
+            success: operate_success,
+            error: function (data) {
+                console.log(data);
+            },
+        });
+        return false;
     }
 
 
@@ -657,7 +809,11 @@
                         `<td class="p-0 m-0 align-middle">
                         <a id="showtagmodel1" href="javascript:void(0)" onclick="showtagmodel(${data.group_infos[i]['group_id']})"
                             class="btn btn-outline-info btn-sm p-1 m-0">
-                            编辑
+                            查看
+                        </a> |
+                        <a id="showtagmodel1" href="javascript:void(0)" onclick="showalertgroupmodel(${data.group_infos[i]['group_id']})"
+                            class="btn btn-outline-info btn-sm p-1 m-0">
+                            修改
                         </a> |
                         <a id="showtagmodel1" href="javascript:void(0)" onclick="delete_group(${data.group_infos[i]['group_id']})"
                             class="btn btn-outline-danger btn-sm p-1 m-0">
