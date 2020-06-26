@@ -578,10 +578,10 @@ def alter_group():
 
     if request.method == 'POST':
         module = request.form.get('module')
-        group_name = request.form.get('alter_group_name')
+        group_name = request.form.get('group_name')
         collect_cycle = int(request.form.get('collect_cycle'))
         group_id = int(request.form.get('group_id'))
-
+        print(module,group_name,collect_cycle,group_id)
         cfg_msg = read_json(module)
         if module in modbus:
             tags, basic_config, group_infos = read_modbus_config(
@@ -595,11 +595,27 @@ def alter_group():
                     'group_id': group_id,
                     'group_name' : group_name,
                     'collect_cycle' : collect_cycle,
+                    'tags_num': gis['tags_num'],
                     'tags': gis['tags']
                 }
-        [new_gis if gis['group_id'] == group_id else gis for gis in group_infos]
-        current_app.logger.debug(f'找组{group_id}失败')
-        return {'success': False, 'message': '没有找到组', 'group_id': group_id}
+
+        group_infos = [new_gis if gis['group_id'] == group_id else gis for gis in group_infos]
+        for gis in group_infos:
+            gis = gis.pop('tags_num')
+        dict2 = {module+'.groups': group_infos}
+        basic_config = {module+'.'+key: value for key,
+                        value in basic_config.items()}
+        data = {**basic_config, **dict2}
+
+        res = {
+            "module": "local",
+            "data": data
+        }
+        with open(conf_path+"s_opcda_client_run_config.json", 'w', encoding='utf-8') as f:
+            f.write(json.dumps(res, ensure_ascii=False,
+                               sort_keys=False, indent=4))
+        current_app.logger.debug(f'修改组{group_name}成功')
+        return {'success': True, 'message': '修改组成功'}
 
     module = request.args.get('module')
     group_id = int(request.args.get('group_id'))

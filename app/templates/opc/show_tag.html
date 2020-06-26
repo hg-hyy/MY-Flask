@@ -462,11 +462,12 @@
     }
 
     function operate_success(data) {
-        console.log(data.success, data.message,data.tag_name,data.group_info)
+        console.log(data.success, data.message,data.tag_name,data.group_infos,data.group_id)
         if (data.success) {
             $('#addtag').modal("hide");
             $('#addgroup').modal("hide");
             $('#confirm').modal("hide");
+            $('#altergroup').modal("hide");
         } else {
             $("#add_error").text(data.message)
         }
