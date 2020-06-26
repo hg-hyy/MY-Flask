@@ -406,7 +406,7 @@ def show_tag_page():
         module = request.form.get('module', 's_opcda_client1')
         pages = int(request.form.get('pages', 10))
         page = int(request.form.get('page', 1))
-        print(group_id, module, pages, page)
+        # print(group_id, module, pages, page)
         cfg_msg = read_json(module)
         if module in modbus:
             tags, basic_config, group_infos = read_modbus_config(
@@ -425,8 +425,8 @@ def show_tag_page():
                     'page': pga.page,
                     'total': pga.total
                     }
-        print(pga.total, pga.pages, pga.has_prev, pga.has_next,
-              pga.prev_num, pga.next_num, pga_dict['iter_pages'])
+        # print(pga.total, pga.pages, pga.has_prev, pga.has_next,
+        #       pga.prev_num, pga.next_num, pga_dict['iter_pages'])
         return {"paginate": pga_dict, 'group_infos': group_infos}
 
     module = str(request.args.get('module', 's_opcda_client1'))
@@ -722,7 +722,7 @@ def alter_tag():
         publish_tag_name = request.form.get('publish_tag_name')
         source_tag_name = request.form.get('source_tag_name')
         data_type = request.form.get('data_type')
-        print(group_id, module, publish_tag_name, source_tag_name, data_type)
+        print(group_id,tag_id, module, publish_tag_name, source_tag_name, data_type)
         cfg_msg = read_json(module)
         if module in modbus:
             tags, basic_config, group_infos = read_modbus_config(
@@ -731,9 +731,9 @@ def alter_tag():
         else:
             tags, basic_config, group_infos = read_opc_config(cfg_msg, module)
             data = search_opc_tag(publish_tag_name, tags, [])
-        if not data:
-            current_app.logger.debug(f'修改标签{publish_tag_name}失败，标签不存在！')
-            return {'success': False, 'message': '标签名不存在'}
+        if  data:
+            current_app.logger.debug(f'修改标签{publish_tag_name}失败，标签已经存在！')
+            return {'success': False, 'message': '标签名已经存在'}
         for gis in group_infos:
             if gis['group_id'] == group_id:
                 for index, t in enumerate(gis['tags']):
@@ -745,7 +745,7 @@ def alter_tag():
                             "data_type": "ENUM_INT32"
                         }
 
-                    gis['tags'] = [new_tag if t['tag_id'] ==
+                        gis['tags'] = [new_tag if t['tag_id'] ==
                                tag_id else t for t in gis['tags']]
         for gis in group_infos:
             gis = gis.pop('tags_num')

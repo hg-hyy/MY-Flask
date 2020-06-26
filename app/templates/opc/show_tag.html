@@ -520,7 +520,7 @@
         var module_name = $("#module_name").val()
         var group_id = $("#group_num").val()
         showalerttagmodel()
-        console.log(module_name,group_id,publish_tag_name)
+        // console.log(module_name,group_id,publish_tag_name)
         $.ajax({
             url: "{{url_for('cs.alter_tag')}}",
             data: {
@@ -540,17 +540,19 @@
     }
     
     function alter_tag_confirm() {
-        var module_name = $("#module_name").val().trim()
         var group_id = $("#group_num").val().trim()
+        var tag_id = $("#tag_id").val().trim()
+        var module_name = $("#module_name").val().trim()
         var publish_tag_name = $("#publish_tag_name").val().trim()
         var source_tag_name = $("#source_tag_name").val().trim()
         var data_type = $("#data_type").val().trim()
-        console.log(module_name,group_id,publish_tag_name,source_tag_name,data_type)
+        console.log(module_name,group_id,tag_id,publish_tag_name,source_tag_name,data_type)
         $.ajax({
             url: "{{url_for('cs.alter_tag')}}",
             data: {
-                "module": module_name,
                 "group_id": group_id,
+                "tag_id": tag_id,
+                "module": module_name,
                 "publish_tag_name": publish_tag_name,
                 "data_type": data_type,
                 "source_tag_name": source_tag_name ,
@@ -570,12 +572,13 @@
     }
 
     function operate_success(data) {
-        console.log(data.success, data.message,data.tag_name,data.group_infos,data.group_id,data.tag)
+        // console.log(data.success, data.message,data.tag_name,data.group_infos,data.group_id,data.tag)
         if (data.success) {
             $('#addtag').modal("hide");
             $('#addgroup').modal("hide");
             $('#confirm').modal("hide");
             $('#altergroup').modal("hide");
+            $('#altertag').modal("hide");
         } else {
             $("#add_error").text(data.message)
         }
@@ -587,8 +590,9 @@
         $("#alter_collect_cycle").val(data.group_info.collect_cycle)
         $("#alter_group_id").val(data.group_info.group_id)
     }
+    
     function alter_tag_success(data) {
-        console.log(data.success, data.message,data.tag)
+        // console.log(data.success, data.message,data.tag)
         $("#tag_id").val(data.tag.tag_id)
         $("#publish_tag_name").val(data.tag.publish_tag_name)
         $("#collect_cycle").val(data.tag.collect_cycle)
@@ -623,7 +627,7 @@
         var $values = '';
         var $lis = '';
         var $lis1 = '';
-        console.log(data.paginate)
+        // console.log(data.paginate)
         var tags = data.paginate.items
         if (data.paginate.total > 0) {
             for (i in tags) {
@@ -870,7 +874,7 @@
     function tag_page_success(data) {
         var $values = '';
         var count = data.group_infos.length
-        console.log(data)
+        // console.log(data)
         if (count > 0) {
             for (i in data.group_infos) {
                 var $values_td = ''
@@ -916,6 +920,6 @@
         tag_page()
     })
 
-    var int = self.setInterval("tag_page()", 15000);
+    // var int = self.setInterval("tag_page()", 15000);
 </script>
 {% endblock %}
