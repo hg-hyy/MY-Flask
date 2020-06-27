@@ -722,7 +722,8 @@ def alter_tag():
         publish_tag_name = request.form.get('publish_tag_name')
         source_tag_name = request.form.get('source_tag_name')
         data_type = request.form.get('data_type')
-        print(group_id,tag_id, module, publish_tag_name, source_tag_name, data_type)
+        print(group_id, tag_id, module, publish_tag_name,
+              source_tag_name, data_type)
         cfg_msg = read_json(module)
         if module in modbus:
             tags, basic_config, group_infos = read_modbus_config(
@@ -731,7 +732,7 @@ def alter_tag():
         else:
             tags, basic_config, group_infos = read_opc_config(cfg_msg, module)
             data = search_opc_tag(publish_tag_name, tags, [])
-        if  data:
+        if data:
             current_app.logger.debug(f'修改标签{publish_tag_name}失败，标签已经存在！')
             return {'success': False, 'message': '标签名已经存在'}
         for gis in group_infos:
@@ -1413,17 +1414,7 @@ def logs():
             logs = lg.read().splitlines()
         for l in logs:
             logs_list.append(l.rsplit('  '))
-        return render_template('log/log.html', logs_list=logs_list[:4], log='bg-info')
-
-
-def log1():
-    loglevel = []
-    for root, dirs, files in os.walk(log_path):
-        loglist = files
-    for lv in loglist:
-        loglevel.append(lv.split('-')[0])
-    dicts = dict(zip(loglevel, loglist))
-    current_app.logger.debug('访问日志系统.')
+        return render_template('log/log.html', logs_list=logs_list[:9], log='bg-info')
 
 
 def check_log():

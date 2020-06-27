@@ -15,7 +15,7 @@ import jwt
 import datetime
 from .model import db
 from .settings import Config
-
+from .utils import log_class
 
 
 def create_log(log_path,log_level):
@@ -77,16 +77,17 @@ def create_app(test_config=None):
     CSRFProtect(app)
     CORS(app)
     create_log(Config.log_path,Config.log_level)
-
+    app.add_template_filter(log_class, "log_class")
 
     """
     蓝图注册
     """
-    from app import opc, user, auth, issue
+    from app import opc, user, auth, issue,charts
     app.register_blueprint(auth.auth)
     app.register_blueprint(user.admin)
     app.register_blueprint(opc.cs)
     app.register_blueprint(issue.faq)
+    app.register_blueprint(charts.ct)
 
     def make_toke():
         csrf_token = generate_csrf()

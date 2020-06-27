@@ -1,8 +1,20 @@
 {% extends "base.html" %}
-{% block title %}modbus参数{% endblock %}
+{% block title %}Log{% endblock %}
 {% block head %}
 <style type="text/css">
+.first{
+    background: #f33;
+    color:#fff;
+}
 
+.second{
+    background:#ff722b;
+    color:#fff;
+}
+
+.third{
+    background:#fa3;
+    color:#fff;}
 </style>
 {% endblock %}
 {% block content %}
@@ -15,7 +27,7 @@
     </div>
 
     <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 text-center">
-        <!-- 参数表 -->
+        <!-- 工具栏 -->
         <form id='log_form'>
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
             <div class=" justify-content-between flex-wrap flex-md-nowrap align-items-center mb-3">
@@ -59,26 +71,23 @@
         </form>
 
 
-        <!-- 标签表 -->
+        <!-- 日志展示表-->
         <table id='table' class="table table-bordered table-hover">
-            <caption>List of log</caption>
             <thead>
                 <tr>
                     <th scope="col">#ID</th>
                     <th scope="col">日志时间</th>
                     <th scope="col">日志级别</th>
                     <th scope="col">日志内容</th>
-
-
                 </tr>
             </thead>
             <tbody id='logs'>
                 {% for log in logs_list %}
-                <tr>
-                    <td scope="row" class="table-light">{{loop.index}}</td>
-                    <td scope="row" class="table-success">{{log[0]}}</td>
-                    <td class="table-info">{{log[1]}}</td>
-                    <td class="table-secondary">{{log[2]}}</td>
+                <tr >
+                    <td class="table-secondary">{{loop.index}}</td>
+                    <td class="table-success">{{log[0]}}</td>
+                    <td class="{{ log[1]|log_class}}">{{log[1]}}</td>
+                    <td class="table-info">{{log[2]}}</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -86,8 +95,7 @@
 
     </div>
 </div>
-
-<!-- 分页 -->
+<!-- 日志分页 -->
 <div class="row">
     <div class="col-md-12 col-sm-12 ">
         <nav>
@@ -118,7 +126,6 @@
         </nav>
     </div>
 </div>
-
 
 <script>
     var csrftoken = $("meta[name=csrf-token]").attr("content");
@@ -297,7 +304,7 @@
         var $comm = '';
         // var $td = '';
         var $option = '';
-        var count = data.total //组数
+        var count = data.total
         $("#total").val(count)
         $("#max_pages").val(data.max_pages)
         if (count > 0) {
@@ -308,13 +315,13 @@
                     $td +=
                         '<td scope="row" class="table-warning">' + data.logs_list[i][j] + '</td>'
                 };
-                $comm += '<tr>' + '<td scope="row" class="table-info">' + i + '</td>' + $td + '</tr>'
+                $comm += '<tr>' + '<td class="table-info">' + i + '</td>' + $td + '</tr>'
                 var $subject_con = $('#logs');
                 $subject_con.html($comm)
             }
 
         } else {
-            $comm += '<tr>' + '<td scope="row" class="table-danger">' + '没有位号信息，请重新上传。。。' + '</td>' + '</tr>'
+            $comm += '<tr>' + '<td class="table-danger">' + '当前没有日志信息。。。' + '</td>' + '</tr>'
             var $subject_con = $('#tags');
             $subject_con.html($comm)
         }
@@ -336,12 +343,12 @@
                     $td +=
                         '<td scope="row" class="table-warning">' + data.logs_list[i][j] + '</td>'
                 };
-                $comm += '<tr>' + '<td scope="row" class="table-info">' + i + '</td>' + $td + '</tr>'
+                $comm += '<tr>' + '<td class="table-info">' + i + '</td>' + $td + '</tr>'
                 var $subject_con = $('#logs');
                 $subject_con.html($comm)
             }
         } else {
-            $comm += '<tr>' + '<td scope="row" class="table-danger">' + '没有找到搜索的信息。。。' + '</td>' + '</tr>'
+            $comm += '<tr>' + '<td class="table-danger">' + '没有找到搜索的信息。。。' + '</td>' + '</tr>'
             var $subject_con = $('#logs');
             $subject_con.html($comm)
             alarms(data.msg)
@@ -362,7 +369,7 @@
         } else {
             $lis1 +=
                 '<li class="page-item"><a class="page-link form-control btn btn-info" id="page1" onclick="page(this)">' +
-                '对不起，没有' + '</a></li>'
+                '暂无日志' + '</a></li>'
             var $subject_con = $('#logs');
             $subject_con.html($comm)
         }

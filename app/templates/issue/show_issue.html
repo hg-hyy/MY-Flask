@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}issues{% endblock %}
+{% block title %}FAQ{% endblock %}
 {% block head %}
 <style type="text/css">
 
@@ -176,7 +176,7 @@
                         <h6 class="my-0">{{category.name}}</h6>
                         <small class="text-muted">{{category.created}}</small>
                     </div>
-                    <span class="badge badge-primary badge-pill">14</span>
+                    <span class="badge badge-primary badge-pill">{{category.issue|length}}</span>
                 </a>
                 {% endfor %}
             </ul>
