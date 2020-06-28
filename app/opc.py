@@ -189,15 +189,15 @@ def read_modbus_config(cfg_msg, module):
                     'fstop_bit': RTU['stop_bit'],
                     'gparity': RTU['parity'],
                 }
-            for d in cfg_msg["data"][module+'.data']:
-                slave_id = d['slave_id']
-                block = d['block']
+            for b in cfg_msg["data"][module+'.data']:
+                slave_id = b['slave_id']
+                block_list = b['block']
 
-                for b in block:
-                    fun_code = b['fun_code']
-                    tag_list.append(b['tags'])
+                for b_l in block_list:
+                    fun_code = b_l['fun_code']
+                    tag_list.append(b_l['tags'])
                     group_info = {'group_id': slave_id, 'group_name': fun_code,
-                                  'collect_cycle': 10, 'tags_num': len(b['tags']), 'tags': b['tags']}
+                                  'collect_cycle': 10, 'tags_num': len(b_l['tags']), 'tags': b_l['tags']}
                     group_infos.append(group_info)
 
             return tag_list, basic_config, group_infos
@@ -256,7 +256,7 @@ def read_opc_config(cfg_msg, module):
                     'enAutoTag': enAutoTag,
                     'isDataConvert': isDataConvert,
                 }
-            if module in ['s_opcda_client1', 's_opcda_client1', 's_opcda_client1']:
+            if module in client:
                 for g in cfg_msg['data'][module+'.groups']:
                     group_id = g['group_id']
                     group_name = g['group_name']
@@ -458,7 +458,6 @@ def show_tag_page1():
     module = str(request.args.get('module', 's_opcda_client1'))
     pages = int(request.args.get('pages', 10))
     page = int(request.args.get('page', 1))
-
     cfg_msg = read_json(module)
     if module in modbus:
         tags, basic_config, group_infos = read_modbus_config(
@@ -1056,11 +1055,11 @@ def load_opc_ae():
 def load_modbus():
     if request.method == 'POST':
         module = request.form.get('module', 'modbus1')
-        dev_id = request.form['id']
-        Coll_Type = request.form['type']
-        host = request.form['ip']
+        dev_id = request.form.get('id',1)
+        Coll_Type = request.form.get('type','RTU')
+        host = request.form.get('ip','172.16.2.100')
         port = request.form.get('port', 502)
-        serial = request.form['com']
+        serial = request.form.get('com','com1')
         baud = request.form.get('baud', 9600)
         data_bit = request.form.get('data_bit', 8)
         stop_bit = request.form.get('stop_bit', 1)
@@ -1078,8 +1077,8 @@ def load_modbus():
                             'parity': parity}
         }
         dict2 = {}
-        f = request.files['file']
         data = []
+        f = request.files['file']
         if f and allowed_file(f.filename):
             f.save(conf_path+secure_filename(f.filename))
 
@@ -1095,7 +1094,7 @@ def load_modbus():
             d_type_2 = ['INT32', 'UINT32', 'FLOAT', 'DOUBLE']
 
             data_dict = {}
-            block = []
+            block_list = []
             block_dict = {}
             tags = []
 
@@ -1114,8 +1113,8 @@ def load_modbus():
                 tags.append(tag)
 
             block_dict = {'fun_code': int(fun_code[0]), 'tags': tags}
-            block.append(block_dict)
-            data_dict = {"slave_id": int(slave_id[0]), "block": block}
+            block_list.append(block_dict)
+            data_dict = {"slave_id": int(slave_id[0]), "block": block_list}
             data.append(data_dict)
 
         dict2 = {module+'.data': data}

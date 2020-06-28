@@ -378,7 +378,6 @@
             </div>
             <div class="modal-body">
                 <h1 class="dispaly-4">新建组不容易的，骚年请考虑一下。</h1>
-
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-outline-danger" onclick="delete_anyway()">
@@ -908,7 +907,7 @@
 
             }
         } else {
-            $values += '<tr>' + '<td scope="row" class="table-danger">' + '没有位号信息，请重新上传。。。' + '</td>' + '</tr>'
+            $values += '<tr>' + '<td scope="row" class="table-danger">' + '没有位号信息，请先配置。。。' + '</td>' + '</tr>'
             var $subject_con = $('#tag_values');
             $subject_con.html($values)
         }

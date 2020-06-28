@@ -1,19 +1,19 @@
 {
     "module": "local",
     "data": {
-        "s_opcda_client1.main_server_ip": "192.168.31.17",
-        "s_opcda_client1.main_server_prgid": "Kepware.KEPServerEX.V6",
-        "s_opcda_client1.main_server_clsid": "7BC0CC8E-482C-47CA-ABDC-0FE7F9C6E729",
-        "s_opcda_client1.main_server_domain": "OPC",
-        "s_opcda_client1.main_server_user": "adminstrator",
-        "s_opcda_client1.main_server_password": "12!@QWqw",
-        "s_opcda_client1.bak_server_ip": "192.168.31.18",
-        "s_opcda_client1.bak_server_prgid": "Intellution.OPCiFIX.1",
-        "s_opcda_client1.bak_server_clsid": "3C5702A2-EB8E-11D4-83A4-00105A984CBD",
-        "s_opcda_client1.bak_server_domain": "ifix5.5",
-        "s_opcda_client1.bak_server_user": "administrator",
-        "s_opcda_client1.bak_server_password": "123456",
-        "s_opcda_client1.groups": [
+        "s_opcda_client2.main_server_ip": "192.168.31.17",
+        "s_opcda_client2.main_server_prgid": "Intellution.OPCiFIX.1",
+        "s_opcda_client2.main_server_clsid": "3C5702A2-EB8E-11D4-83A4-00105A984CBD",
+        "s_opcda_client2.main_server_domain": "OPC",
+        "s_opcda_client2.main_server_user": "aaa",
+        "s_opcda_client2.main_server_password": "111",
+        "s_opcda_client2.bak_server_ip": "aaaa",
+        "s_opcda_client2.bak_server_prgid": "Intellution.OPCiFIX.1",
+        "s_opcda_client2.bak_server_clsid": "3C5702A2-EB8E-11D4-83A4-00105A984CBD",
+        "s_opcda_client2.bak_server_domain": "aaa",
+        "s_opcda_client2.bak_server_user": "aaa",
+        "s_opcda_client2.bak_server_password": "111",
+        "s_opcda_client2.groups": [
             {
                 "group_id": 1,
                 "group_name": "group1",
@@ -21,760 +21,446 @@
                 "tags": [
                     {
                         "tag_id": 0,
-                        "publish_tag_name": "Local.Test.TagBool.Value",
-                        "source_tag_name": "Local.Test.TagBool.Value",
+                        "publish_tag_name": "AI00020001.PV",
+                        "source_tag_name": "AI00020001.PV",
                         "data_type": "ENUM_INT32"
                     },
                     {
                         "tag_id": 1,
-                        "publish_tag_name": "Local.Test.TagByte.Value",
-                        "source_tag_name": "Local.Test.TagByte.Value",
+                        "publish_tag_name": "AI00020002.PV",
+                        "source_tag_name": "AI00020002.PV",
                         "data_type": "ENUM_INT32"
                     },
                     {
                         "tag_id": 2,
-                        "publish_tag_name": "Local.Test.TagBytes.Value",
-                        "source_tag_name": "Local.Test.TagBytes.Value",
+                        "publish_tag_name": "AI00020003.PV",
+                        "source_tag_name": "AI00020003.PV",
                         "data_type": "ENUM_INT32"
                     },
                     {
                         "tag_id": 3,
-                        "publish_tag_name": "Local.Test.TagDouble.Value",
-                        "source_tag_name": "Local.Test.TagDouble.Value",
+                        "publish_tag_name": "AI00020004.PV",
+                        "source_tag_name": "AI00020004.PV",
                         "data_type": "ENUM_INT32"
                     },
                     {
                         "tag_id": 4,
-                        "publish_tag_name": "Local.Test.TagFloat.Value",
-                        "source_tag_name": "Local.Test.TagFloat.Value",
+                        "publish_tag_name": "AI00020005.PV",
+                        "source_tag_name": "AI00020005.PV",
                         "data_type": "ENUM_INT32"
                     },
                     {
                         "tag_id": 5,
-                        "publish_tag_name": "Local.Test.TagInt32.Value",
-                        "source_tag_name": "Local.Test.TagInt32.Value",
+                        "publish_tag_name": "AI00020006.PV",
+                        "source_tag_name": "AI00020006.PV",
                         "data_type": "ENUM_INT32"
                     },
                     {
                         "tag_id": 6,
-                        "publish_tag_name": "Local.Test.TagLong.Value",
-                        "source_tag_name": "Local.Test.TagLong.Value",
+                        "publish_tag_name": "AI00020007.PV",
+                        "source_tag_name": "AI00020007.PV",
                         "data_type": "ENUM_INT32"
                     },
                     {
                         "tag_id": 7,
-                        "publish_tag_name": "Local.Test.TagSByte.Value",
-                        "source_tag_name": "Local.Test.TagSByte.Value",
+                        "publish_tag_name": "AO00020000.OUT",
+                        "source_tag_name": "AO00020000.OUT",
                         "data_type": "ENUM_INT32"
                     },
                     {
                         "tag_id": 8,
-                        "publish_tag_name": "Local.Test.TagShort.Value",
-                        "source_tag_name": "Local.Test.TagShort.Value",
+                        "publish_tag_name": "AO00020001.OUT",
+                        "source_tag_name": "AO00020001.OUT",
                         "data_type": "ENUM_INT32"
                     },
                     {
                         "tag_id": 9,
-                        "publish_tag_name": "Local.Test.TagString.Value",
-                        "source_tag_name": "Local.Test.TagString.Value",
+                        "publish_tag_name": "AO00020002.OUT",
+                        "source_tag_name": "AO00020002.OUT",
                         "data_type": "ENUM_INT32"
                     },
                     {
                         "tag_id": 10,
-                        "publish_tag_name": "Local.Test.TagUInt32.Value",
-                        "source_tag_name": "Local.Test.TagUInt32.Value",
+                        "publish_tag_name": "AO00020003.OUT",
+                        "source_tag_name": "AO00020003.OUT",
                         "data_type": "ENUM_INT32"
                     },
                     {
                         "tag_id": 11,
-                        "publish_tag_name": "Local.Test.TagULong.Value",
-                        "source_tag_name": "Local.Test.TagULong.Value",
+                        "publish_tag_name": "AO00020004.OUT",
+                        "source_tag_name": "AO00020004.OUT",
                         "data_type": "ENUM_INT32"
                     },
                     {
                         "tag_id": 12,
-                        "publish_tag_name": "Local.Test.TagUShort.Value",
-                        "source_tag_name": "Local.Test.TagUShort.Value",
+                        "publish_tag_name": "AO00020005.OUT",
+                        "source_tag_name": "AO00020005.OUT",
                         "data_type": "ENUM_INT32"
-                    }
-                ]
-            },
-            {
-                "group_id": 2,
-                "group_name": "group2",
-                "collect_cycle": 15,
-                "tags": [
+                    },
                     {
                         "tag_id": 13,
-                        "publish_tag_name": "Local.Test.TagBool.Value",
-                        "source_tag_name": "Local.Test.TagBool.Value",
+                        "publish_tag_name": "AO00020006.OUT",
+                        "source_tag_name": "AO00020006.OUT",
                         "data_type": "ENUM_INT32"
                     },
                     {
                         "tag_id": 14,
-                        "publish_tag_name": "Local.Test.TagByte.Value",
-                        "source_tag_name": "Local.Test.TagByte.Value",
+                        "publish_tag_name": "AO00020007.OUT",
+                        "source_tag_name": "AO00020007.OUT",
                         "data_type": "ENUM_INT32"
                     },
                     {
                         "tag_id": 15,
-                        "publish_tag_name": "Local.Test.TagBytes.Value",
-                        "source_tag_name": "Local.Test.TagBytes.Value",
+                        "publish_tag_name": "DI00020000.PV",
+                        "source_tag_name": "DI00020000.PV",
                         "data_type": "ENUM_INT32"
                     },
                     {
                         "tag_id": 16,
-                        "publish_tag_name": "Local.Test.TagDouble.Value",
-                        "source_tag_name": "Local.Test.TagDouble.Value",
+                        "publish_tag_name": "DI00020001.PV",
+                        "source_tag_name": "DI00020001.PV",
                         "data_type": "ENUM_INT32"
                     },
                     {
                         "tag_id": 17,
-                        "publish_tag_name": "Local.Test.TagFloat.Value",
-                        "source_tag_name": "Local.Test.TagFloat.Value",
+                        "publish_tag_name": "DI00020002.PV",
+                        "source_tag_name": "DI00020002.PV",
                         "data_type": "ENUM_INT32"
                     },
                     {
                         "tag_id": 18,
-                        "publish_tag_name": "Local.Test.TagInt32.Value",
-                        "source_tag_name": "Local.Test.TagInt32.Value",
+                        "publish_tag_name": "DI00020003.PV",
+                        "source_tag_name": "DI00020003.PV",
                         "data_type": "ENUM_INT32"
                     },
                     {
                         "tag_id": 19,
-                        "publish_tag_name": "Local.Test.TagLong.Value",
-                        "source_tag_name": "Local.Test.TagLong.Value",
+                        "publish_tag_name": "DI00020004.PV",
+                        "source_tag_name": "DI00020004.PV",
                         "data_type": "ENUM_INT32"
                     },
                     {
                         "tag_id": 20,
-                        "publish_tag_name": "Local.Test.TagSByte.Value",
-                        "source_tag_name": "Local.Test.TagSByte.Value",
+                        "publish_tag_name": "DI00020005.PV",
+                        "source_tag_name": "DI00020005.PV",
                         "data_type": "ENUM_INT32"
                     },
                     {
                         "tag_id": 21,
-                        "publish_tag_name": "Local.Test.TagShort.Value",
-                        "source_tag_name": "Local.Test.TagShort.Value",
+                        "publish_tag_name": "DI00020006.PV",
+                        "source_tag_name": "DI00020006.PV",
                         "data_type": "ENUM_INT32"
                     },
                     {
                         "tag_id": 22,
-                        "publish_tag_name": "Local.Test.TagString.Value",
-                        "source_tag_name": "Local.Test.TagString.Value",
+                        "publish_tag_name": "DI00020007.PV",
+                        "source_tag_name": "DI00020007.PV",
                         "data_type": "ENUM_INT32"
                     },
                     {
                         "tag_id": 23,
-                        "publish_tag_name": "Local.Test.TagUInt32.Value",
-                        "source_tag_name": "Local.Test.TagUInt32.Value",
+                        "publish_tag_name": "DI00020008.PV",
+                        "source_tag_name": "DI00020008.PV",
                         "data_type": "ENUM_INT32"
                     },
                     {
                         "tag_id": 24,
-                        "publish_tag_name": "Local.Test.TagULong.Value",
-                        "source_tag_name": "Local.Test.TagULong.Value",
+                        "publish_tag_name": "DI00020009.PV",
+                        "source_tag_name": "DI00020009.PV",
                         "data_type": "ENUM_INT32"
                     },
                     {
                         "tag_id": 25,
-                        "publish_tag_name": "Local.Test.TagUShort.Value",
-                        "source_tag_name": "Local.Test.TagUShort.Value",
+                        "publish_tag_name": "DI00020010.PV",
+                        "source_tag_name": "DI00020010.PV",
                         "data_type": "ENUM_INT32"
-                    }
-                ]
-            },
-            {
-                "group_id": 3,
-                "group_name": "group3",
-                "collect_cycle": 5,
-                "tags": [
+                    },
                     {
                         "tag_id": 26,
-                        "publish_tag_name": "Local.Test.TagBool.Value",
-                        "source_tag_name": "Local.Test.TagBool.Value",
+                        "publish_tag_name": "DI00020011.PV",
+                        "source_tag_name": "DI00020011.PV",
                         "data_type": "ENUM_INT32"
                     },
                     {
                         "tag_id": 27,
-                        "publish_tag_name": "Local.Test.TagByte.Value",
-                        "source_tag_name": "Local.Test.TagByte.Value",
+                        "publish_tag_name": "DI00020012.PV",
+                        "source_tag_name": "DI00020012.PV",
                         "data_type": "ENUM_INT32"
                     },
                     {
                         "tag_id": 28,
-                        "publish_tag_name": "Local.Test.TagBytes.Value",
-                        "source_tag_name": "Local.Test.TagBytes.Value",
+                        "publish_tag_name": "DI00020013.PV",
+                        "source_tag_name": "DI00020013.PV",
                         "data_type": "ENUM_INT32"
                     },
                     {
                         "tag_id": 29,
-                        "publish_tag_name": "Local.Test.TagDouble.Value",
-                        "source_tag_name": "Local.Test.TagDouble.Value",
+                        "publish_tag_name": "DI00020014.PV",
+                        "source_tag_name": "DI00020014.PV",
                         "data_type": "ENUM_INT32"
                     },
                     {
                         "tag_id": 30,
-                        "publish_tag_name": "Local.Test.TagFloat.Value",
-                        "source_tag_name": "Local.Test.TagFloat.Value",
+                        "publish_tag_name": "DI00020015.PV",
+                        "source_tag_name": "DI00020015.PV",
                         "data_type": "ENUM_INT32"
                     },
                     {
                         "tag_id": 31,
-                        "publish_tag_name": "Local.Test.TagInt32.Value",
-                        "source_tag_name": "Local.Test.TagInt32.Value",
+                        "publish_tag_name": "DI00020016.PV",
+                        "source_tag_name": "DI00020016.PV",
                         "data_type": "ENUM_INT32"
                     },
                     {
                         "tag_id": 32,
-                        "publish_tag_name": "Local.Test.TagLong.Value",
-                        "source_tag_name": "Local.Test.TagLong.Value",
+                        "publish_tag_name": "DI00020017.PV",
+                        "source_tag_name": "DI00020017.PV",
                         "data_type": "ENUM_INT32"
                     },
                     {
                         "tag_id": 33,
-                        "publish_tag_name": "Local.Test.TagSByte.Value",
-                        "source_tag_name": "Local.Test.TagSByte.Value",
+                        "publish_tag_name": "DI00020018.PV",
+                        "source_tag_name": "DI00020018.PV",
                         "data_type": "ENUM_INT32"
                     },
                     {
                         "tag_id": 34,
-                        "publish_tag_name": "Local.Test.TagShort.Value",
-                        "source_tag_name": "Local.Test.TagShort.Value",
+                        "publish_tag_name": "DI00020019.PV",
+                        "source_tag_name": "DI00020019.PV",
                         "data_type": "ENUM_INT32"
                     },
                     {
                         "tag_id": 35,
-                        "publish_tag_name": "Local.Test.TagString.Value",
-                        "source_tag_name": "Local.Test.TagString.Value",
+                        "publish_tag_name": "DI00020020.PV",
+                        "source_tag_name": "DI00020020.PV",
                         "data_type": "ENUM_INT32"
                     },
                     {
                         "tag_id": 36,
-                        "publish_tag_name": "Local.Test.TagUInt32.Value",
-                        "source_tag_name": "Local.Test.TagUInt32.Value",
+                        "publish_tag_name": "DI00020021.PV",
+                        "source_tag_name": "DI00020021.PV",
                         "data_type": "ENUM_INT32"
                     },
                     {
                         "tag_id": 37,
-                        "publish_tag_name": "Local.Test.TagULong.Value",
-                        "source_tag_name": "Local.Test.TagULong.Value",
+                        "publish_tag_name": "DI00020022.PV",
+                        "source_tag_name": "DI00020022.PV",
                         "data_type": "ENUM_INT32"
                     },
                     {
                         "tag_id": 38,
-                        "publish_tag_name": "Local.Test.TagUShort.Value",
-                        "source_tag_name": "Local.Test.TagUShort.Value",
+                        "publish_tag_name": "DI00020023.PV",
+                        "source_tag_name": "DI00020023.PV",
                         "data_type": "ENUM_INT32"
-                    }
-                ]
-            },
-            {
-                "group_id": 4,
-                "group_name": "group4",
-                "collect_cycle": 10,
-                "tags": [
+                    },
                     {
                         "tag_id": 39,
-                        "publish_tag_name": "Local.Test.TagBool.Value",
-                        "source_tag_name": "Local.Test.TagBool.Value",
+                        "publish_tag_name": "DI00020024.PV",
+                        "source_tag_name": "DI00020024.PV",
                         "data_type": "ENUM_INT32"
                     },
                     {
                         "tag_id": 40,
-                        "publish_tag_name": "Local.Test.TagByte.Value",
-                        "source_tag_name": "Local.Test.TagByte.Value",
+                        "publish_tag_name": "DI00020025.PV",
+                        "source_tag_name": "DI00020025.PV",
                         "data_type": "ENUM_INT32"
                     },
                     {
                         "tag_id": 41,
-                        "publish_tag_name": "Local.Test.TagBytes.Value",
-                        "source_tag_name": "Local.Test.TagBytes.Value",
+                        "publish_tag_name": "DI00020026.PV",
+                        "source_tag_name": "DI00020026.PV",
                         "data_type": "ENUM_INT32"
                     },
                     {
                         "tag_id": 42,
-                        "publish_tag_name": "Local.Test.TagDouble.Value",
-                        "source_tag_name": "Local.Test.TagDouble.Value",
+                        "publish_tag_name": "DI00020027.PV",
+                        "source_tag_name": "DI00020027.PV",
                         "data_type": "ENUM_INT32"
                     },
                     {
                         "tag_id": 43,
-                        "publish_tag_name": "Local.Test.TagFloat.Value",
-                        "source_tag_name": "Local.Test.TagFloat.Value",
+                        "publish_tag_name": "DI00020028.PV",
+                        "source_tag_name": "DI00020028.PV",
                         "data_type": "ENUM_INT32"
                     },
                     {
                         "tag_id": 44,
-                        "publish_tag_name": "Local.Test.TagInt32.Value",
-                        "source_tag_name": "Local.Test.TagInt32.Value",
+                        "publish_tag_name": "DI00020029.PV",
+                        "source_tag_name": "DI00020029.PV",
                         "data_type": "ENUM_INT32"
                     },
                     {
                         "tag_id": 45,
-                        "publish_tag_name": "Local.Test.TagLong.Value",
-                        "source_tag_name": "Local.Test.TagLong.Value",
+                        "publish_tag_name": "DI00020030.PV",
+                        "source_tag_name": "DI00020030.PV",
                         "data_type": "ENUM_INT32"
                     },
                     {
                         "tag_id": 46,
-                        "publish_tag_name": "Local.Test.TagSByte.Value",
-                        "source_tag_name": "Local.Test.TagSByte.Value",
+                        "publish_tag_name": "DI00020031.PV",
+                        "source_tag_name": "DI00020031.PV",
                         "data_type": "ENUM_INT32"
                     },
                     {
                         "tag_id": 47,
-                        "publish_tag_name": "Local.Test.TagShort.Value",
-                        "source_tag_name": "Local.Test.TagShort.Value",
+                        "publish_tag_name": "DO00020000.OUT",
+                        "source_tag_name": "DO00020000.OUT",
                         "data_type": "ENUM_INT32"
                     },
                     {
                         "tag_id": 48,
-                        "publish_tag_name": "Local.Test.TagString.Value",
-                        "source_tag_name": "Local.Test.TagString.Value",
+                        "publish_tag_name": "DO00020001.OUT",
+                        "source_tag_name": "DO00020001.OUT",
                         "data_type": "ENUM_INT32"
                     },
                     {
                         "tag_id": 49,
-                        "publish_tag_name": "Local.Test.TagUInt32.Value",
-                        "source_tag_name": "Local.Test.TagUInt32.Value",
+                        "publish_tag_name": "DO00020002.OUT",
+                        "source_tag_name": "DO00020002.OUT",
                         "data_type": "ENUM_INT32"
                     },
                     {
                         "tag_id": 50,
-                        "publish_tag_name": "Local.Test.TagULong.Value",
-                        "source_tag_name": "Local.Test.TagULong.Value",
+                        "publish_tag_name": "DO00020003.OUT",
+                        "source_tag_name": "DO00020003.OUT",
                         "data_type": "ENUM_INT32"
                     },
                     {
                         "tag_id": 51,
-                        "publish_tag_name": "Local.Test.TagUShort.Value",
-                        "source_tag_name": "Local.Test.TagUShort.Value",
+                        "publish_tag_name": "DO00020004.OUT",
+                        "source_tag_name": "DO00020004.OUT",
                         "data_type": "ENUM_INT32"
-                    }
-                ]
-            },
-            {
-                "group_id": 5,
-                "group_name": "group5",
-                "collect_cycle": 30,
-                "tags": [
+                    },
                     {
                         "tag_id": 52,
-                        "publish_tag_name": "Local.Test.TagBool.Value",
-                        "source_tag_name": "Local.Test.TagBool.Value",
+                        "publish_tag_name": "DO00020005.OUT",
+                        "source_tag_name": "DO00020005.OUT",
                         "data_type": "ENUM_INT32"
                     },
                     {
                         "tag_id": 53,
-                        "publish_tag_name": "Local.Test.TagByte.Value",
-                        "source_tag_name": "Local.Test.TagByte.Value",
+                        "publish_tag_name": "DO00020006.OUT",
+                        "source_tag_name": "DO00020006.OUT",
                         "data_type": "ENUM_INT32"
                     },
                     {
                         "tag_id": 54,
-                        "publish_tag_name": "Local.Test.TagBytes.Value",
-                        "source_tag_name": "Local.Test.TagBytes.Value",
+                        "publish_tag_name": "DO00020007.OUT",
+                        "source_tag_name": "DO00020007.OUT",
                         "data_type": "ENUM_INT32"
                     },
                     {
                         "tag_id": 55,
-                        "publish_tag_name": "Local.Test.TagDouble.Value",
-                        "source_tag_name": "Local.Test.TagDouble.Value",
+                        "publish_tag_name": "DO00020008.OUT",
+                        "source_tag_name": "DO00020008.OUT",
                         "data_type": "ENUM_INT32"
                     },
                     {
                         "tag_id": 56,
-                        "publish_tag_name": "Local.Test.TagFloat.Value",
-                        "source_tag_name": "Local.Test.TagFloat.Value",
+                        "publish_tag_name": "DO00020009.OUT",
+                        "source_tag_name": "DO00020009.OUT",
                         "data_type": "ENUM_INT32"
                     },
                     {
                         "tag_id": 57,
-                        "publish_tag_name": "Local.Test.TagInt32.Value",
-                        "source_tag_name": "Local.Test.TagInt32.Value",
+                        "publish_tag_name": "DO00020010.OUT",
+                        "source_tag_name": "DO00020010.OUT",
                         "data_type": "ENUM_INT32"
                     },
                     {
                         "tag_id": 58,
-                        "publish_tag_name": "Local.Test.TagLong.Value",
-                        "source_tag_name": "Local.Test.TagLong.Value",
+                        "publish_tag_name": "DO00020011.OUT",
+                        "source_tag_name": "DO00020011.OUT",
                         "data_type": "ENUM_INT32"
                     },
                     {
                         "tag_id": 59,
-                        "publish_tag_name": "Local.Test.TagSByte.Value",
-                        "source_tag_name": "Local.Test.TagSByte.Value",
+                        "publish_tag_name": "DO00020012.OUT",
+                        "source_tag_name": "DO00020012.OUT",
                         "data_type": "ENUM_INT32"
                     },
                     {
                         "tag_id": 60,
-                        "publish_tag_name": "Local.Test.TagShort.Value",
-                        "source_tag_name": "Local.Test.TagShort.Value",
+                        "publish_tag_name": "DO00020013.OUT",
+                        "source_tag_name": "DO00020013.OUT",
                         "data_type": "ENUM_INT32"
                     },
                     {
                         "tag_id": 61,
-                        "publish_tag_name": "Local.Test.TagString.Value",
-                        "source_tag_name": "Local.Test.TagString.Value",
+                        "publish_tag_name": "DO00020014.OUT",
+                        "source_tag_name": "DO00020014.OUT",
                         "data_type": "ENUM_INT32"
                     },
                     {
                         "tag_id": 62,
-                        "publish_tag_name": "Local.Test.TagUInt32.Value",
-                        "source_tag_name": "Local.Test.TagUInt32.Value",
+                        "publish_tag_name": "DO00020015.OUT",
+                        "source_tag_name": "DO00020015.OUT",
                         "data_type": "ENUM_INT32"
                     },
                     {
                         "tag_id": 63,
-                        "publish_tag_name": "Local.Test.TagULong.Value",
-                        "source_tag_name": "Local.Test.TagULong.Value",
+                        "publish_tag_name": "ND00020000.VALUE",
+                        "source_tag_name": "ND00020000.VALUE",
                         "data_type": "ENUM_INT32"
                     },
                     {
                         "tag_id": 64,
-                        "publish_tag_name": "Local.Test.TagUShort.Value",
-                        "source_tag_name": "Local.Test.TagUShort.Value",
+                        "publish_tag_name": "ND00020001.VALUE",
+                        "source_tag_name": "ND00020001.VALUE",
                         "data_type": "ENUM_INT32"
-                    }
-                ]
-            },
-            {
-                "group_id": 6,
-                "group_name": "group6",
-                "collect_cycle": 10,
-                "tags": [
+                    },
                     {
                         "tag_id": 65,
-                        "publish_tag_name": "Local.Test.TagBool.Value",
-                        "source_tag_name": "Local.Test.TagBool.Value",
+                        "publish_tag_name": "ND00020002.VALUE",
+                        "source_tag_name": "ND00020002.VALUE",
                         "data_type": "ENUM_INT32"
                     },
                     {
                         "tag_id": 66,
-                        "publish_tag_name": "Local.Test.TagByte.Value",
-                        "source_tag_name": "Local.Test.TagByte.Value",
+                        "publish_tag_name": "NN00020000.VALUE",
+                        "source_tag_name": "NN00020000.VALUE",
                         "data_type": "ENUM_INT32"
                     },
                     {
                         "tag_id": 67,
-                        "publish_tag_name": "Local.Test.TagBytes.Value",
-                        "source_tag_name": "Local.Test.TagBytes.Value",
+                        "publish_tag_name": "NN00020001.VALUE",
+                        "source_tag_name": "NN00020001.VALUE",
                         "data_type": "ENUM_INT32"
                     },
                     {
                         "tag_id": 68,
-                        "publish_tag_name": "Local.Test.TagDouble.Value",
-                        "source_tag_name": "Local.Test.TagDouble.Value",
+                        "publish_tag_name": "NN00020002.VALUE",
+                        "source_tag_name": "NN00020002.VALUE",
                         "data_type": "ENUM_INT32"
                     },
                     {
                         "tag_id": 69,
-                        "publish_tag_name": "Local.Test.TagFloat.Value",
-                        "source_tag_name": "Local.Test.TagFloat.Value",
+                        "publish_tag_name": "NN00020003.VALUE",
+                        "source_tag_name": "NN00020003.VALUE",
                         "data_type": "ENUM_INT32"
                     },
                     {
                         "tag_id": 70,
-                        "publish_tag_name": "Local.Test.TagInt32.Value",
-                        "source_tag_name": "Local.Test.TagInt32.Value",
+                        "publish_tag_name": "NN00020004.VALUE",
+                        "source_tag_name": "NN00020004.VALUE",
                         "data_type": "ENUM_INT32"
                     },
                     {
                         "tag_id": 71,
-                        "publish_tag_name": "Local.Test.TagLong.Value",
-                        "source_tag_name": "Local.Test.TagLong.Value",
+                        "publish_tag_name": "NN00020005.VALUE",
+                        "source_tag_name": "NN00020005.VALUE",
                         "data_type": "ENUM_INT32"
                     },
                     {
                         "tag_id": 72,
-                        "publish_tag_name": "Local.Test.TagSByte.Value",
-                        "source_tag_name": "Local.Test.TagSByte.Value",
+                        "publish_tag_name": "NN00020006.VALUE",
+                        "source_tag_name": "NN00020006.VALUE",
                         "data_type": "ENUM_INT32"
                     },
                     {
                         "tag_id": 73,
-                        "publish_tag_name": "Local.Test.TagShort.Value",
-                        "source_tag_name": "Local.Test.TagShort.Value",
-                        "data_type": "ENUM_INT32"
-                    },
-                    {
-                        "tag_id": 74,
-                        "publish_tag_name": "Local.Test.TagString.Value",
-                        "source_tag_name": "Local.Test.TagString.Value",
-                        "data_type": "ENUM_INT32"
-                    },
-                    {
-                        "tag_id": 75,
-                        "publish_tag_name": "Local.Test.TagUInt32.Value",
-                        "source_tag_name": "Local.Test.TagUInt32.Value",
-                        "data_type": "ENUM_INT32"
-                    },
-                    {
-                        "tag_id": 76,
-                        "publish_tag_name": "Local.Test.TagULong.Value",
-                        "source_tag_name": "Local.Test.TagULong.Value",
-                        "data_type": "ENUM_INT32"
-                    },
-                    {
-                        "tag_id": 77,
-                        "publish_tag_name": "Local.Test.TagUShort.Value",
-                        "source_tag_name": "Local.Test.TagUShort.Value",
-                        "data_type": "ENUM_INT32"
-                    }
-                ]
-            },
-            {
-                "group_id": 7,
-                "group_name": "group7",
-                "collect_cycle": 15,
-                "tags": [
-                    {
-                        "tag_id": 78,
-                        "publish_tag_name": "Local.Test.TagBool.Value",
-                        "source_tag_name": "Local.Test.TagBool.Value",
-                        "data_type": "ENUM_INT32"
-                    },
-                    {
-                        "tag_id": 79,
-                        "publish_tag_name": "Local.Test.TagByte.Value",
-                        "source_tag_name": "Local.Test.TagByte.Value",
-                        "data_type": "ENUM_INT32"
-                    },
-                    {
-                        "tag_id": 80,
-                        "publish_tag_name": "Local.Test.TagBytes.Value",
-                        "source_tag_name": "Local.Test.TagBytes.Value",
-                        "data_type": "ENUM_INT32"
-                    },
-                    {
-                        "tag_id": 81,
-                        "publish_tag_name": "Local.Test.TagDouble.Value",
-                        "source_tag_name": "Local.Test.TagDouble.Value",
-                        "data_type": "ENUM_INT32"
-                    },
-                    {
-                        "tag_id": 82,
-                        "publish_tag_name": "Local.Test.TagFloat.Value",
-                        "source_tag_name": "Local.Test.TagFloat.Value",
-                        "data_type": "ENUM_INT32"
-                    },
-                    {
-                        "tag_id": 83,
-                        "publish_tag_name": "Local.Test.TagInt32.Value",
-                        "source_tag_name": "Local.Test.TagInt32.Value",
-                        "data_type": "ENUM_INT32"
-                    },
-                    {
-                        "tag_id": 84,
-                        "publish_tag_name": "Local.Test.TagLong.Value",
-                        "source_tag_name": "Local.Test.TagLong.Value",
-                        "data_type": "ENUM_INT32"
-                    },
-                    {
-                        "tag_id": 85,
-                        "publish_tag_name": "Local.Test.TagSByte.Value",
-                        "source_tag_name": "Local.Test.TagSByte.Value",
-                        "data_type": "ENUM_INT32"
-                    },
-                    {
-                        "tag_id": 86,
-                        "publish_tag_name": "Local.Test.TagShort.Value",
-                        "source_tag_name": "Local.Test.TagShort.Value",
-                        "data_type": "ENUM_INT32"
-                    },
-                    {
-                        "tag_id": 87,
-                        "publish_tag_name": "Local.Test.TagString.Value",
-                        "source_tag_name": "Local.Test.TagString.Value",
-                        "data_type": "ENUM_INT32"
-                    },
-                    {
-                        "tag_id": 88,
-                        "publish_tag_name": "Local.Test.TagUInt32.Value",
-                        "source_tag_name": "Local.Test.TagUInt32.Value",
-                        "data_type": "ENUM_INT32"
-                    },
-                    {
-                        "tag_id": 89,
-                        "publish_tag_name": "Local.Test.TagULong.Value",
-                        "source_tag_name": "Local.Test.TagULong.Value",
-                        "data_type": "ENUM_INT32"
-                    },
-                    {
-                        "tag_id": 90,
-                        "publish_tag_name": "Local.Test.TagUShort.Value",
-                        "source_tag_name": "Local.Test.TagUShort.Value",
-                        "data_type": "ENUM_INT32"
-                    }
-                ]
-            },
-            {
-                "group_id": 8,
-                "group_name": "group8",
-                "collect_cycle": 30,
-                "tags": [
-                    {
-                        "tag_id": 91,
-                        "publish_tag_name": "Local.Test.TagBool.Value",
-                        "source_tag_name": "Local.Test.TagBool.Value",
-                        "data_type": "ENUM_INT32"
-                    },
-                    {
-                        "tag_id": 92,
-                        "publish_tag_name": "Local.Test.TagByte.Value",
-                        "source_tag_name": "Local.Test.TagByte.Value",
-                        "data_type": "ENUM_INT32"
-                    },
-                    {
-                        "tag_id": 93,
-                        "publish_tag_name": "Local.Test.TagBytes.Value",
-                        "source_tag_name": "Local.Test.TagBytes.Value",
-                        "data_type": "ENUM_INT32"
-                    },
-                    {
-                        "tag_id": 94,
-                        "publish_tag_name": "Local.Test.TagDouble.Value",
-                        "source_tag_name": "Local.Test.TagDouble.Value",
-                        "data_type": "ENUM_INT32"
-                    },
-                    {
-                        "tag_id": 95,
-                        "publish_tag_name": "Local.Test.TagFloat.Value",
-                        "source_tag_name": "Local.Test.TagFloat.Value",
-                        "data_type": "ENUM_INT32"
-                    },
-                    {
-                        "tag_id": 96,
-                        "publish_tag_name": "Local.Test.TagInt32.Value",
-                        "source_tag_name": "Local.Test.TagInt32.Value",
-                        "data_type": "ENUM_INT32"
-                    },
-                    {
-                        "tag_id": 97,
-                        "publish_tag_name": "Local.Test.TagLong.Value",
-                        "source_tag_name": "Local.Test.TagLong.Value",
-                        "data_type": "ENUM_INT32"
-                    },
-                    {
-                        "tag_id": 98,
-                        "publish_tag_name": "Local.Test.TagSByte.Value",
-                        "source_tag_name": "Local.Test.TagSByte.Value",
-                        "data_type": "ENUM_INT32"
-                    },
-                    {
-                        "tag_id": 99,
-                        "publish_tag_name": "Local.Test.TagShort.Value",
-                        "source_tag_name": "Local.Test.TagShort.Value",
-                        "data_type": "ENUM_INT32"
-                    },
-                    {
-                        "tag_id": 100,
-                        "publish_tag_name": "Local.Test.TagString.Value",
-                        "source_tag_name": "Local.Test.TagString.Value",
-                        "data_type": "ENUM_INT32"
-                    },
-                    {
-                        "tag_id": 101,
-                        "publish_tag_name": "Local.Test.TagUInt32.Value",
-                        "source_tag_name": "Local.Test.TagUInt32.Value",
-                        "data_type": "ENUM_INT32"
-                    },
-                    {
-                        "tag_id": 102,
-                        "publish_tag_name": "Local.Test.TagULong.Value",
-                        "source_tag_name": "Local.Test.TagULong.Value",
-                        "data_type": "ENUM_INT32"
-                    },
-                    {
-                        "tag_id": 103,
-                        "publish_tag_name": "Local.Test.TagUShort.Value",
-                        "source_tag_name": "Local.Test.TagUShort.Value",
-                        "data_type": "ENUM_INT32"
-                    }
-                ]
-            },
-            {
-                "group_id": 9,
-                "group_name": "group9",
-                "collect_cycle": 5,
-                "tags": [
-                    {
-                        "tag_id": 104,
-                        "publish_tag_name": "Local.Test.TagBool.Value",
-                        "source_tag_name": "Local.Test.TagBool.Value",
-                        "data_type": "ENUM_INT32"
-                    },
-                    {
-                        "tag_id": 105,
-                        "publish_tag_name": "Local.Test.TagByte.Value",
-                        "source_tag_name": "Local.Test.TagByte.Value",
-                        "data_type": "ENUM_INT32"
-                    },
-                    {
-                        "tag_id": 106,
-                        "publish_tag_name": "Local.Test.TagBytes.Value",
-                        "source_tag_name": "Local.Test.TagBytes.Value",
-                        "data_type": "ENUM_INT32"
-                    },
-                    {
-                        "tag_id": 107,
-                        "publish_tag_name": "Local.Test.TagDouble.Value",
-                        "source_tag_name": "Local.Test.TagDouble.Value",
-                        "data_type": "ENUM_INT32"
-                    },
-                    {
-                        "tag_id": 108,
-                        "publish_tag_name": "Local.Test.TagFloat.Value",
-                        "source_tag_name": "Local.Test.TagFloat.Value",
-                        "data_type": "ENUM_INT32"
-                    },
-                    {
-                        "tag_id": 109,
-                        "publish_tag_name": "Local.Test.TagInt32.Value",
-                        "source_tag_name": "Local.Test.TagInt32.Value",
-                        "data_type": "ENUM_INT32"
-                    },
-                    {
-                        "tag_id": 110,
-                        "publish_tag_name": "Local.Test.TagLong.Value",
-                        "source_tag_name": "Local.Test.TagLong.Value",
-                        "data_type": "ENUM_INT32"
-                    },
-                    {
-                        "tag_id": 111,
-                        "publish_tag_name": "Local.Test.TagSByte.Value",
-                        "source_tag_name": "Local.Test.TagSByte.Value",
-                        "data_type": "ENUM_INT32"
-                    },
-                    {
-                        "tag_id": 112,
-                        "publish_tag_name": "Local.Test.TagShort.Value",
-                        "source_tag_name": "Local.Test.TagShort.Value",
-                        "data_type": "ENUM_INT32"
-                    },
-                    {
-                        "tag_id": 113,
-                        "publish_tag_name": "Local.Test.TagString.Value",
-                        "source_tag_name": "Local.Test.TagString.Value",
-                        "data_type": "ENUM_INT32"
-                    },
-                    {
-                        "tag_id": 114,
-                        "publish_tag_name": "Local.Test.TagUInt32.Value",
-                        "source_tag_name": "Local.Test.TagUInt32.Value",
-                        "data_type": "ENUM_INT32"
-                    },
-                    {
-                        "tag_id": 115,
-                        "publish_tag_name": "Local.Test.TagULong.Value",
-                        "source_tag_name": "Local.Test.TagULong.Value",
-                        "data_type": "ENUM_INT32"
-                    },
-                    {
-                        "tag_id": 116,
-                        "publish_tag_name": "Local.Test.TagUShort.Value",
-                        "source_tag_name": "Local.Test.TagUShort.Value",
+                        "publish_tag_name": "NN00020007.VALUE",
+                        "source_tag_name": "NN00020007.VALUE",
                         "data_type": "ENUM_INT32"
                     }
                 ]
