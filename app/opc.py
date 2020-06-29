@@ -17,7 +17,6 @@ import re
 import functools
 import linecache
 import requests
-
 from pathlib import Path
 from flask import request, render_template, Blueprint, session, url_for
 from flask import Markup, make_response, jsonify, flash, current_app, redirect, g
@@ -174,32 +173,31 @@ def read_modbus_config(cfg_msg, module):
 
             if Coll_Type == 'TCP':
                 basic_config = {
-                    'adev_id': dev_id,
-                    'bColl_Type': Coll_Type,
-                    'chost': TCP['host'],
-                    'dport': TCP['port']
+                    'dev_id': dev_id,
+                    'Coll_Type': Coll_Type,
+                    'host': TCP['host'],
+                    'port': TCP['port']
                 }
             else:
                 basic_config = {
-                    'adev_id': dev_id,
-                    'bColl_Type': Coll_Type,
-                    'cserial': RTU['serial'],
-                    'dbaud': RTU['baud'],
-                    'edata_bit': RTU['data_bit'],
-                    'fstop_bit': RTU['stop_bit'],
-                    'gparity': RTU['parity'],
+                    'dev_id': dev_id,
+                    'Coll_Type': Coll_Type,
+                    'serial': RTU['serial'],
+                    'baud': RTU['baud'],
+                    'data_bit': RTU['data_bit'],
+                    'stop_bit': RTU['stop_bit'],
+                    'parity': RTU['parity'],
                 }
-            for b in cfg_msg["data"][module+'.data']:
-                slave_id = b['slave_id']
-                block_list = b['block']
-
-                for b_l in block_list:
-                    fun_code = b_l['fun_code']
-                    tag_list.append(b_l['tags'])
-                    group_info = {'group_id': slave_id, 'group_name': fun_code,
-                                  'collect_cycle': 10, 'tags_num': len(b_l['tags']), 'tags': b_l['tags']}
+            i=1
+            for data in cfg_msg["data"][module+'.data']:
+                slave_id = data['slave_id']
+                for d_b in data['block']:
+                    fun_code = d_b['fun_code']
+                    tag_list.append(d_b['tags'])
+                    group_info = {'group_id': i,'slave_id': slave_id, 'group_name': fun_code,
+                                  'collect_cycle': 5, 'tags_num': len(d_b['tags']), 'tags': d_b['tags']}
                     group_infos.append(group_info)
-
+                    i+=1
             return tag_list, basic_config, group_infos
         except Exception as e:
             print(str(e), '------error in read modbus conf----------')
@@ -474,7 +472,7 @@ def show_tag_page1():
                 'pages': pga.pages,
                 'total': pga.total
                 }
-    return {"paginate": pga_dict, 'group_infos': group_infos}
+    return {"paginate": pga_dict, 'group_infos': group_infos,'module':module}
 
 
 @cs.route('/search', methods=['GET', 'POST'], endpoint='search')
@@ -535,6 +533,7 @@ def add_group():
     module = request.form.get('module')
     group_name = request.form.get('group_name')
     collect_cycle = int(request.form.get('collect_cycle'))
+    print(module,group_name,collect_cycle)
     cfg_msg = read_json(module)
     if module in modbus:
         tags, basic_config, group_infos = read_modbus_config(cfg_msg, module)
@@ -562,7 +561,7 @@ def add_group():
             "module": "local",
             "data": data
         }
-        with open(conf_path+"s_opcda_client_run_config.json", 'w', encoding='utf-8') as f:
+        with open(conf_path+module[:-1]+"_run_config.json", 'w', encoding='utf-8') as f:
             f.write(json.dumps(res, ensure_ascii=False,
                                sort_keys=False, indent=4))
         current_app.logger.debug(f'添加组{group_name}成功')
@@ -1077,7 +1076,6 @@ def load_modbus():
                             'parity': parity}
         }
         dict2 = {}
-        data = []
         f = request.files['file']
         if f and allowed_file(f.filename):
             f.save(conf_path+secure_filename(f.filename))
@@ -1086,38 +1084,42 @@ def load_modbus():
             for T in xl:
                 wb = xlrd.open_workbook(T)
                 names = wb.sheet_names()
+            data_list=[]      # 站 号
+            data_dict = {"slave_id": 0, "block":[] }
+            block_dict = {'fun_code': 0, 'tags': []}
+            for name in names:
+                st = wb.sheet_by_name(name)
+                nrows = st.nrows
+                ncols = st.ncols
+                d_type_1 = ['INT16', 'UINT16']
+                d_type_2 = ['INT32', 'UINT32', 'FLOAT', 'DOUBLE']
 
-            st = wb.sheet_by_name(names[0])
-            nrows = st.nrows
-            ncols = st.ncols
-            d_type_1 = ['INT16', 'UINT16']
-            d_type_2 = ['INT32', 'UINT32', 'FLOAT', 'DOUBLE']
+                tags = []
+                block_list = []   # 功能码
+                for i in range(1, nrows):
+                    tags_list = st.row_values(i, start_colx=0, end_colx=None)
+                    tag = {
+                        'tag': tags_list[0],
+                        "start": int(tags_list[4]),
+                        "register_number": 1 if tags_list[1] in d_type_1 else 2,
+                        "data_type": tags_list[1],
+                        "data_format": int(tags_list[5]),
+                        "desc": tags_list[6],
+                    }
+                    slave_id = tags_list[2],
+                    fun_code = tags_list[3],
+                    tags.append(tag)
 
-            data_dict = {}
-            block_list = []
-            block_dict = {}
-            tags = []
+                if not data_dict['slave_id'] ==int(slave_id[0]):
+                    data_dict = {"slave_id": int(slave_id[0]), "block": block_list}
+                    data_list.append(data_dict)
+                
+                for index,dt in enumerate(data_list):
+                    if dt['slave_id'] == int(slave_id[0]):
+                        block_dict = {'fun_code': int(fun_code[0]), 'tags': tags}
+                        dt['block'].append(block_dict)
 
-            for i in range(1, nrows):
-                tags_list = st.row_values(i, start_colx=0, end_colx=None)
-                tag = {
-                    'tag': tags_list[0],
-                    "start": int(tags_list[4]),
-                    "register_number": 1 if tags_list[1] in d_type_1 else 2,
-                    "data_type": tags_list[1],
-                    "data_format": int(tags_list[5]),
-                    "desc": tags_list[6],
-                }
-                slave_id = tags_list[2],
-                fun_code = tags_list[3],
-                tags.append(tag)
-
-            block_dict = {'fun_code': int(fun_code[0]), 'tags': tags}
-            block_list.append(block_dict)
-            data_dict = {"slave_id": int(slave_id[0]), "block": block_list}
-            data.append(data_dict)
-
-        dict2 = {module+'.data': data}
+        dict2 = {module+'.data': data_list}
         data = {**dict1, **dict2}
         res = {
             "module": "local",

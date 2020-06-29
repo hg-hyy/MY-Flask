@@ -1,0 +1,322 @@
+{
+    "module": "local",
+    "data": {
+        "modbus1.dev_id": "201",
+        "modbus1.Coll_Type": "RTU",
+        "modbus1.TCP": {
+            "host": "",
+            "port": "502"
+        },
+        "modbus1.RTU": {
+            "serial": "com5",
+            "baud": "9600",
+            "data_bit": "8",
+            "stop_bit": "1",
+            "parity": "none"
+        },
+        "modbus1.data": [
+            {
+                "slave_id": 1,
+                "block": [
+                    {
+                        "fun_code": 3,
+                        "tags": [
+                            {
+                                "tag": "modbus_1",
+                                "start": 40001,
+                                "register_number": 2,
+                                "data_type": "FLOAT",
+                                "data_format": 3412,
+                                "desc": "有功点度量"
+                            },
+                            {
+                                "tag": "modbus_2",
+                                "start": 40003,
+                                "register_number": 2,
+                                "data_type": "FLOAT",
+                                "data_format": 3412,
+                                "desc": "有功点度量"
+                            },
+                            {
+                                "tag": "modbus_3",
+                                "start": 40005,
+                                "register_number": 2,
+                                "data_type": "FLOAT",
+                                "data_format": 3412,
+                                "desc": "有功点度量"
+                            },
+                            {
+                                "tag": "modbus_4",
+                                "start": 40007,
+                                "register_number": 2,
+                                "data_type": "FLOAT",
+                                "data_format": 3412,
+                                "desc": "有功点度量"
+                            },
+                            {
+                                "tag": "modbus_5",
+                                "start": 40009,
+                                "register_number": 2,
+                                "data_type": "FLOAT",
+                                "data_format": 3412,
+                                "desc": "有功点度量"
+                            },
+                            {
+                                "tag": "modbus_6",
+                                "start": 40011,
+                                "register_number": 2,
+                                "data_type": "FLOAT",
+                                "data_format": 3412,
+                                "desc": "有功点度量"
+                            },
+                            {
+                                "tag": "modbus_7",
+                                "start": 40013,
+                                "register_number": 2,
+                                "data_type": "FLOAT",
+                                "data_format": 3412,
+                                "desc": "有功点度量"
+                            },
+                            {
+                                "tag": "modbus_8",
+                                "start": 40015,
+                                "register_number": 2,
+                                "data_type": "FLOAT",
+                                "data_format": 3412,
+                                "desc": "有功点度量"
+                            },
+                            {
+                                "tag": "modbus_9",
+                                "start": 40017,
+                                "register_number": 2,
+                                "data_type": "FLOAT",
+                                "data_format": 3412,
+                                "desc": "有功点度量"
+                            },
+                            {
+                                "tag": "modbus_10",
+                                "start": 40019,
+                                "register_number": 2,
+                                "data_type": "FLOAT",
+                                "data_format": 3412,
+                                "desc": "有功点度量"
+                            }
+                        ]
+                    },
+                    {
+                        "fun_code": 4,
+                        "tags": [
+                            {
+                                "tag": "modbus_11",
+                                "start": 40001,
+                                "register_number": 2,
+                                "data_type": "FLOAT",
+                                "data_format": 3412,
+                                "desc": "有功点度量"
+                            },
+                            {
+                                "tag": "modbus_12",
+                                "start": 40003,
+                                "register_number": 2,
+                                "data_type": "FLOAT",
+                                "data_format": 3412,
+                                "desc": "有功点度量"
+                            },
+                            {
+                                "tag": "modbus_13",
+                                "start": 40005,
+                                "register_number": 2,
+                                "data_type": "FLOAT",
+                                "data_format": 3412,
+                                "desc": "有功点度量"
+                            },
+                            {
+                                "tag": "modbus_14",
+                                "start": 40007,
+                                "register_number": 2,
+                                "data_type": "FLOAT",
+                                "data_format": 3412,
+                                "desc": "有功点度量"
+                            },
+                            {
+                                "tag": "modbus_15",
+                                "start": 40009,
+                                "register_number": 2,
+                                "data_type": "FLOAT",
+                                "data_format": 3412,
+                                "desc": "有功点度量"
+                            },
+                            {
+                                "tag": "modbus_16",
+                                "start": 40011,
+                                "register_number": 2,
+                                "data_type": "FLOAT",
+                                "data_format": 3412,
+                                "desc": "有功点度量"
+                            },
+                            {
+                                "tag": "modbus_17",
+                                "start": 40013,
+                                "register_number": 2,
+                                "data_type": "FLOAT",
+                                "data_format": 3412,
+                                "desc": "有功点度量"
+                            },
+                            {
+                                "tag": "modbus_18",
+                                "start": 40015,
+                                "register_number": 2,
+                                "data_type": "FLOAT",
+                                "data_format": 3412,
+                                "desc": "有功点度量"
+                            },
+                            {
+                                "tag": "modbus_19",
+                                "start": 40017,
+                                "register_number": 2,
+                                "data_type": "FLOAT",
+                                "data_format": 3412,
+                                "desc": "有功点度量"
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "slave_id": 2,
+                "block": [
+                    {
+                        "fun_code": 3,
+                        "tags": [
+                            {
+                                "tag": "modbus_21",
+                                "start": 40001,
+                                "register_number": 2,
+                                "data_type": "FLOAT",
+                                "data_format": 3412,
+                                "desc": "有功点度量"
+                            },
+                            {
+                                "tag": "modbus_22",
+                                "start": 40003,
+                                "register_number": 2,
+                                "data_type": "FLOAT",
+                                "data_format": 3412,
+                                "desc": "有功点度量"
+                            },
+                            {
+                                "tag": "modbus_23",
+                                "start": 40005,
+                                "register_number": 2,
+                                "data_type": "FLOAT",
+                                "data_format": 3412,
+                                "desc": "有功点度量"
+                            },
+                            {
+                                "tag": "modbus_24",
+                                "start": 40007,
+                                "register_number": 2,
+                                "data_type": "FLOAT",
+                                "data_format": 3412,
+                                "desc": "有功点度量"
+                            },
+                            {
+                                "tag": "modbus_25",
+                                "start": 40009,
+                                "register_number": 2,
+                                "data_type": "FLOAT",
+                                "data_format": 3412,
+                                "desc": "有功点度量"
+                            },
+                            {
+                                "tag": "modbus_26",
+                                "start": 40011,
+                                "register_number": 2,
+                                "data_type": "FLOAT",
+                                "data_format": 3412,
+                                "desc": "有功点度量"
+                            },
+                            {
+                                "tag": "modbus_27",
+                                "start": 40013,
+                                "register_number": 2,
+                                "data_type": "FLOAT",
+                                "data_format": 3412,
+                                "desc": "有功点度量"
+                            },
+                            {
+                                "tag": "modbus_28",
+                                "start": 40015,
+                                "register_number": 2,
+                                "data_type": "FLOAT",
+                                "data_format": 3412,
+                                "desc": "有功点度量"
+                            }
+                        ]
+                    },
+                    {
+                        "fun_code": 4,
+                        "tags": [
+                            {
+                                "tag": "modbus_31",
+                                "start": 40001,
+                                "register_number": 2,
+                                "data_type": "FLOAT",
+                                "data_format": 3412,
+                                "desc": "有功点度量"
+                            },
+                            {
+                                "tag": "modbus_32",
+                                "start": 40003,
+                                "register_number": 2,
+                                "data_type": "FLOAT",
+                                "data_format": 3412,
+                                "desc": "有功点度量"
+                            },
+                            {
+                                "tag": "modbus_33",
+                                "start": 40005,
+                                "register_number": 2,
+                                "data_type": "FLOAT",
+                                "data_format": 3412,
+                                "desc": "有功点度量"
+                            },
+                            {
+                                "tag": "modbus_34",
+                                "start": 40007,
+                                "register_number": 2,
+                                "data_type": "FLOAT",
+                                "data_format": 3412,
+                                "desc": "有功点度量"
+                            },
+                            {
+                                "tag": "modbus_35",
+                                "start": 40009,
+                                "register_number": 2,
+                                "data_type": "FLOAT",
+                                "data_format": 3412,
+                                "desc": "有功点度量"
+                            },
+                            {
+                                "tag": "modbus_36",
+                                "start": 40011,
+                                "register_number": 2,
+                                "data_type": "FLOAT",
+                                "data_format": 3412,
+                                "desc": "有功点度量"
+                            },
+                            {
+                                "tag": "modbus_37",
+                                "start": 40013,
+                                "register_number": 2,
+                                "data_type": "FLOAT",
+                                "data_format": 3412,
+                                "desc": "有功点度量"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+}

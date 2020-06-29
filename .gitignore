@@ -9,7 +9,6 @@ instance/
 htmlcov/
 dist/
 logs/
-conf/
 build/
 *.egg-info/
 .idea/

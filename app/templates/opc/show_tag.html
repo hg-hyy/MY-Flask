@@ -42,8 +42,8 @@
     <!-- 分组表 -->
     <div class="col-12 text-center">
         <table class="table table-bordered table-hover table-secondary ">
-            <thead>
-                <tr>
+            <thead id='tag_keys'>
+                <tr > 
                     <th>group_id</th>
                     <th>group_name</th>
                     <th>collect_cycle</th>
@@ -872,13 +872,39 @@
     function tag_page_success(data) {
         var $values = '';
         var count = data.group_infos.length
-        // console.log(data)
+        console.log(data)
+        $("#max_pages").val(data.paginate.pages)
+        $("#total").val(data.paginate.total)
+        var $keys = ''
+        if (data.module == 'modbus1') {
+            $keys =
+                `<tr>
+                    <th>slave_id</th>
+                    <th>fun_code</th>
+                    <th>collect_cycle</th>
+                    <th>tags_num</th>
+                    <th>操作</th>
+                    </tr>`
+        }
+        else{
+            $keys =
+                `<tr>
+                    <th>group_id</th>
+                    <th>group_name</th>
+                    <th>collect_cycle</th>
+                    <th>tags_num</th>
+                    <th>操作</th>
+                </tr>`
+        }
+        var $subject_keys = $('#tag_keys');
+        $subject_keys.html($keys)
         if (count > 0) {
             for (i in data.group_infos) {
+                var $keys = ''
                 var $values_td = ''
                 for (t in data.group_infos[i]) {
                     $values_td =
-                        '<td scope="row" >' + data.group_infos[i]['group_id'] + '</td>' +
+                        '<td scope="row" >' + data.group_infos[i]['slave_id'] + '</td>' +
                         '<td scope="row" >' + data.group_infos[i]['group_name'] + '</td>' +
                         '<td scope="row" >' + data.group_infos[i]['collect_cycle'] + '</td>' +
                         '<td scope="row" >' + data.group_infos[i]['tags_num'] + '</td>' +
@@ -901,6 +927,7 @@
                         </a>
                     </td>`
                 };
+
                 $values += '<tr>' + $values_td + '</tr>'
                 var $subject_con = $('#tag_values');
                 $subject_con.html($values)
@@ -918,7 +945,7 @@
         tag_page()
     })
 
-    var int = self.setInterval("tag_page()", 15000);
+    // var int = self.setInterval("tag_page()", 10000);
 </script>
 
 {% endblock %}
