@@ -188,16 +188,16 @@ def read_modbus_config(cfg_msg, module):
                     'stop_bit': RTU['stop_bit'],
                     'parity': RTU['parity'],
                 }
-            i=1
+            i = 1
             for data in cfg_msg["data"][module+'.data']:
                 slave_id = data['slave_id']
                 for d_b in data['block']:
                     fun_code = d_b['fun_code']
                     tag_list.append(d_b['tags'])
-                    group_info = {'group_id': i,'slave_id': slave_id, 'group_name': fun_code,
+                    group_info = {'group_id': i, 'slave_id': slave_id, 'group_name': fun_code,
                                   'collect_cycle': 5, 'tags_num': len(d_b['tags']), 'tags': d_b['tags']}
                     group_infos.append(group_info)
-                    i+=1
+                    i += 1
             return tag_list, basic_config, group_infos
         except Exception as e:
             print(str(e), '------error in read modbus conf----------')
@@ -411,21 +411,20 @@ def show_tag_page():
                 cfg_msg, module)
         else:
             tags, basic_config, group_infos = read_opc_config(cfg_msg, module)
-
-        pga = paginate(group_infos[group_id]['tags'], page, pages)
-        pga_dict = {'items': pga.items,
-                    'has_prev': pga.has_prev,
-                    'prev_num': pga.prev_num,
-                    'has_next': pga.has_next,
-                    'next_num': pga.next_num,
-                    'iter_pages': list(pga.iter_pages()),
-                    'pages': pga.pages,
-                    'page': pga.page,
-                    'total': pga.total
-                    }
-        # print(pga.total, pga.pages, pga.has_prev, pga.has_next,
-        #       pga.prev_num, pga.next_num, pga_dict['iter_pages'])
-        return {"paginate": pga_dict, 'group_infos': group_infos}
+        if group_infos:
+            pga = paginate(group_infos[group_id]['tags'], page, pages)
+            pga_dict = {'items': pga.items,
+                        'has_prev': pga.has_prev,
+                        'prev_num': pga.prev_num,
+                        'has_next': pga.has_next,
+                        'next_num': pga.next_num,
+                        'iter_pages': list(pga.iter_pages()),
+                        'pages': pga.pages,
+                        'page': pga.page,
+                        'total': pga.total
+                        }
+            return {"paginate": pga_dict, 'group_infos': group_infos, 'module': module}
+        return {"paginate": [], 'group_infos': [], 'module': module}
 
     module = str(request.args.get('module', 's_opcda_client1'))
     pages = int(request.args.get('pages', 10))
@@ -448,31 +447,6 @@ def show_tag_page():
                 'total': pga.total
                 }
     return render_template('opc/show_tag.html', paginate=pga_dict, group_infos=group_infos, group='bg-info')
-
-
-@cs.route('/show_tag_page1', methods=['GET', 'POST'], endpoint='show_tag_page1')
-def show_tag_page1():
-    group_infos = []
-    module = str(request.args.get('module', 's_opcda_client1'))
-    pages = int(request.args.get('pages', 10))
-    page = int(request.args.get('page', 1))
-    cfg_msg = read_json(module)
-    if module in modbus:
-        tags, basic_config, group_infos = read_modbus_config(
-            cfg_msg, module)
-    else:
-        tags, basic_config, group_infos = read_opc_config(cfg_msg, module)
-    pga = paginate(group_infos, page, pages)
-    pga_dict = {'items': pga.items,
-                'has_prev': pga.has_prev,
-                'prev_num': pga.prev_num,
-                'has_next': pga.has_next,
-                'next_num': pga.next_num,
-                'iter_pages': list(pga.iter_pages()),
-                'pages': pga.pages,
-                'total': pga.total
-                }
-    return {"paginate": pga_dict, 'group_infos': group_infos,'module':module}
 
 
 @cs.route('/search', methods=['GET', 'POST'], endpoint='search')
@@ -533,7 +507,7 @@ def add_group():
     module = request.form.get('module')
     group_name = request.form.get('group_name')
     collect_cycle = int(request.form.get('collect_cycle'))
-    print(module,group_name,collect_cycle)
+    print(module, group_name, collect_cycle)
     cfg_msg = read_json(module)
     if module in modbus:
         tags, basic_config, group_infos = read_modbus_config(cfg_msg, module)
@@ -745,7 +719,7 @@ def alter_tag():
                         }
 
                         gis['tags'] = [new_tag if t['tag_id'] ==
-                               tag_id else t for t in gis['tags']]
+                                       tag_id else t for t in gis['tags']]
         for gis in group_infos:
             gis = gis.pop('tags_num')
         dict2 = {module+'.groups': group_infos}
@@ -1054,11 +1028,11 @@ def load_opc_ae():
 def load_modbus():
     if request.method == 'POST':
         module = request.form.get('module', 'modbus1')
-        dev_id = request.form.get('id',1)
-        Coll_Type = request.form.get('type','RTU')
-        host = request.form.get('ip','172.16.2.100')
+        dev_id = request.form.get('id', 1)
+        Coll_Type = request.form.get('type', 'RTU')
+        host = request.form.get('ip', '172.16.2.100')
         port = request.form.get('port', 502)
-        serial = request.form.get('com','com1')
+        serial = request.form.get('com', 'com1')
         baud = request.form.get('baud', 9600)
         data_bit = request.form.get('data_bit', 8)
         stop_bit = request.form.get('stop_bit', 1)
@@ -1084,8 +1058,8 @@ def load_modbus():
             for T in xl:
                 wb = xlrd.open_workbook(T)
                 names = wb.sheet_names()
-            data_list=[]      # 站 号
-            data_dict = {"slave_id": 0, "block":[] }
+            data_list = []      # 站 号
+            data_dict = {"slave_id": 0, "block": []}
             block_dict = {'fun_code': 0, 'tags': []}
             for name in names:
                 st = wb.sheet_by_name(name)
@@ -1110,13 +1084,15 @@ def load_modbus():
                     fun_code = tags_list[3],
                     tags.append(tag)
 
-                if not data_dict['slave_id'] ==int(slave_id[0]):
-                    data_dict = {"slave_id": int(slave_id[0]), "block": block_list}
+                if not data_dict['slave_id'] == int(slave_id[0]):
+                    data_dict = {"slave_id": int(
+                        slave_id[0]), "block": block_list}
                     data_list.append(data_dict)
-                
-                for index,dt in enumerate(data_list):
+
+                for index, dt in enumerate(data_list):
                     if dt['slave_id'] == int(slave_id[0]):
-                        block_dict = {'fun_code': int(fun_code[0]), 'tags': tags}
+                        block_dict = {'fun_code': int(
+                            fun_code[0]), 'tags': tags}
                         dt['block'].append(block_dict)
 
         dict2 = {module+'.data': data_list}
@@ -1372,7 +1348,17 @@ def set_config(cfg_msg, module):
 
 @ cs.route('/log', methods=['GET', 'POST'], endpoint='log')
 @login_required
-def logs():
+def log():
+    log_list = {'items': [],
+                'has_prev': False,
+                'prev_num': 0,
+                'has_next': False,
+                'next_num': 0,
+                'iter_pages': [],
+                'pages': 0,
+                'page': 0,
+                'total': 0
+                }
     if request.method == 'POST':
         logs_list = []
         log_level = request.form.get('log_level', 'ALL')
@@ -1385,37 +1371,52 @@ def logs():
         key = request.form.get('key')
         log_name = log_path+'\\'+'{}.log'.format(log_day)
         if not all((log_day, log_day_start, log_day_end)):
-            return {'logs_list': [], 'total': 0, 'max_pages': 0, 'msg': f'请输入查询日期和时间'}
+            return {'paginate': log_list ,'msg': f'请输入查询日期和时间'}
         try:
             with open(log_name, 'r', encoding='utf-8') as lg:
                 logs = lg.read().splitlines()
         except Exception as e:
-            return {'logs_list': [], 'total': 0, 'max_page': 0, 'msg': f'OOOPS..[{log_day}]没有日志,被外星人偷走了？？'}
+            return {'paginate': log_list , 'msg': f'OOOPS..[{log_day}]没有日志,被外星人偷走了？？'}
         text = linecache.getline(log_name, 2)[1:-1]
         logs_list = check_day_log(
             log_day_start, log_day_end, logs, log_level, key)
-        data, total, max_pages = [], 0, 0
-        # print(len(logs_list))
         if logs_list:
-            total = len(logs_list)  # 总计条目数
-            max_pages, a = divmod(total, pages)
-            if a > 0:
-                max_pages = max_pages + 1
-            # print(pages, page, total, max_pages)
-            start = (page-1) * pages
-            end = page*pages
-            data = logs_list[start:end]
-            return {'logs_list': data, 'total': total, 'max_pages': max_pages, 'msg': f'查询到{total}条日志'}
+            pga = paginate(logs_list, page, pages)
+            log_list = {'items': pga.items,
+                        'has_prev': pga.has_prev,
+                        'prev_num': pga.prev_num,
+                        'has_next': pga.has_next,
+                        'next_num': pga.next_num,
+                        'iter_pages': list(pga.iter_pages()),
+                        'pages': pga.pages,
+                        'page': pga.page,
+                        'total': pga.total
+                        }
+            return {"paginate": log_list, 'msg': f'查询到{pga.total}条日志'}
         else:
-            return {'logs_list': data, 'total': total, 'max_pages': max_pages, 'msg': f'查询到{total}条日志'}
+            return {'paginate': log_list, 'msg': f'查询到0条日志'}
 
     else:
+        pages = int(request.args.get('pages', 5))
+        page = int(request.args.get('page', 1))
         logs_list = []
         with open(log_path+'\\'+'{}.log'.format(time.strftime('%Y-%m-%d')), 'r', encoding='utf-8') as lg:
             logs = lg.read().splitlines()
         for l in logs:
             logs_list.append(l.rsplit('  '))
-        return render_template('log/log.html', logs_list=logs_list[:9], log='bg-info')
+            pga = paginate(logs_list, page, pages)
+            log_list = {
+                'items': pga.items,
+                'has_prev': pga.has_prev,
+                'prev_num': pga.prev_num,
+                'has_next': pga.has_next,
+                'next_num': pga.next_num,
+                'iter_pages': list(pga.iter_pages()),
+                'pages': pga.pages,
+                'page': pga.page,
+                'total': pga.total
+            }
+        return render_template('log/log.html', paginate=log_list, log='bg-info')
 
 
 def check_log():

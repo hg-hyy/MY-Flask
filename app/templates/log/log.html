@@ -2,19 +2,6 @@
 {% block title %}Log{% endblock %}
 {% block head %}
 <style type="text/css">
-.first{
-    background: #f33;
-    color:#fff;
-}
-
-.second{
-    background:#ff722b;
-    color:#fff;
-}
-
-.third{
-    background:#fa3;
-    color:#fff;}
 </style>
 {% endblock %}
 {% block content %}
@@ -23,67 +10,66 @@
         <h5 class="h2  d-inline">
             <span class="text-muted ">日志</span>
         </h5>
-        <hr class="border-bottom border-danger"/>
+        <hr class="border-bottom border-danger" />
     </div>
 
-    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 text-center">
+    <div class="col-md-12 text-center">
         <!-- 工具栏 -->
-        <form id='log_form'>
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-            <div class=" justify-content-between flex-wrap flex-md-nowrap align-items-center mb-3">
-                <div class="form-group form-inline mb-0">
-                    <label class="form-input-label mr-1" for="log_level">日志级别:</label>
-                    <select class="form-control mr-1 col-1" id="log_level" name='log_level'>
-                        <option>INFO</option>
-                        <option>ERROR</option>
-                        <option>DEBUG</option>
-                        <option selected>ALL</option>
-                    </select>
-                    <label class="form-input-label mr-1" for="log_day">日志日期:</label>
-                    <input class="form-control col-1" type="text" name="log_day" id="log_day" value="">
 
-                    <label class="form-input-label mr-1" for="log_day_start">开始时间:</label>
-                    <input class="form-control col-1" type="text" name="log_day_start" id="log_day_start" value="">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+        <div class=" justify-content-between flex-wrap flex-md-nowrap align-items-center mb-3">
+            <div class="form-group form-inline mb-0">
+                <label class="form-input-label mr-1" for="log_level">日志级别:</label>
+                <select class="form-control mr-1 col-1" id="log_level" name='log_level'>
+                    <option>INFO</option>
+                    <option>ERROR</option>
+                    <option>DEBUG</option>
+                    <option selected>ALL</option>
+                </select>
+                <label class="form-input-label mr-1" for="log_day">日志日期:</label>
+                <input class="form-control col-1" type="text" name="log_day" id="log_day" value="">
 
-                    <label class="form-input-label mr-1" for="log_day_end">结束时间:</label>
-                    <input class="form-control col-1" type="text" name="log_day_end" id="log_day_end" value="">
+                <label class="form-input-label mr-1" for="log_day_start">开始时间:</label>
+                <input class="form-control col-1" type="text" name="log_day_start" id="log_day_start" value="">
+
+                <label class="form-input-label mr-1" for="log_day_end">结束时间:</label>
+                <input class="form-control col-1" type="text" name="log_day_end" id="log_day_end" value="">
 
 
-                    <button type="button" class="btn btn-outline-info ml-1 " onclick="select_log()">
-                        <span data-feather="upload"></span>
-                        开始查询
-                    </button>
-                    <button type="button" class="btn btn-outline-success ml-1 ">
-                        <span data-feather="calendar"></span>
-                        导出配置
-                    </button>
-                    <label class="form-input-label mr-1" for="key"></label>
-                    <input class="form-control col-2" type="text" name="key" id="key"" value="">
+                <button type="button" class="btn btn-outline-info ml-1 " onclick="select_log()">
+                    <span data-feather="upload"></span>
+                    开始查询
+                </button>
+                <button type="button" class="btn btn-outline-success ml-1 ">
+                    <span data-feather="calendar"></span>
+                    导出配置
+                </button>
+                <label class="form-input-label mr-1" for="key"></label>
+                <input class="form-control col-2" type="text" name="key" id="key"" value="">
                         
 
-                        <button type=" button" class="btn btn-outline-success ml-1 " onclick="search()">
-                    <span data-feather="calendar"></span>搜索日志
-                    </button>
+                    <button type=" button" class="btn btn-outline-success ml-1 " onclick="search()">
+                <span data-feather="calendar"></span>搜索日志
+                </button>
 
 
-                </div>
             </div>
-        </form>
+        </div>
 
 
         <!-- 日志展示表-->
-        <table id='table' class="table table-bordered table-hover">
+        <table id='table' class="table table-bordered table-hover table-warning">
             <thead>
                 <tr>
-                    <th scope="col">#ID</th>
-                    <th scope="col">日志时间</th>
-                    <th scope="col">日志级别</th>
-                    <th scope="col">日志内容</th>
+                    <th>#ID</th>
+                    <th>日志时间</th>
+                    <th>日志级别</th>
+                    <th>日志内容</th>
                 </tr>
             </thead>
             <tbody id='logs'>
-                {% for log in logs_list %}
-                <tr >
+                {% for log in paginate['items'] %}
+                <tr>
                     <td class="table-secondary">{{loop.index}}</td>
                     <td class="table-success">{{log[0]}}</td>
                     <td class="{{ log[1]|log_class}}">{{log[1]}}</td>
@@ -95,37 +81,62 @@
 
     </div>
 </div>
-<!-- 日志分页 -->
-<div class="row">
-    <div class="col-md-12 col-sm-12 ">
-        <nav>
-            <ul class="pagination justify-content-end">
-                <select class="form-control " name='pages' id="pages" onchange="pages(this)"
-                    style="width: fit-content;">
-                    <option selected>5</option>
-                    <option>10</option>
-                    <option>12</option>
-                    <option>20</option>
-                    <option>50</option>
-                </select>
 
+<!-- 分页 -->
+<div class="row mt-2 ">
+    <div class="col-md-12 col-sm-12 ">
+        <nav id='log_page'>
+            <ul class="pagination pagination-md justify-content-end">
                 <ul class="pagination  justify-content-end" id='page'>
-                    <li class="page-item "><a class="page-link form-control ">Pres</a></li>
-                    <li class="page-item"><a class="page-link form-control btn btn-info" id='page1'
-                            onclick="page(this)">1</a></li>
-                    <li class="page-item"><a class="page-link form-control" href="#">Next</a></li>
+                    <li class="page-item ">
+                        {% if paginate.has_prev %}
+                        <a class="page-link form-control" tabindex="-1"
+                            href="/log?page={{ paginate.prev_num }}">Previous</a>
+                        {% endif %}
+                    </li>
+                    {%  for i in  paginate.iter_pages %}
+                    {% if i %}
+                    {%if paginate.page == i%}
+                    <li class="page-item active">
+                        <a class="page-link form-control" href="/log?page={{ i }}">{{ i }}</a>
+                    </li>
+                    {%else%}
+                    <li class="page-item ">
+                        <a class="page-link form-control" href="/log?page={{ i }}">{{ i }}</a>
+                    </li>
+                    {% endif %}
+                    {% else %}
+                    <li class="page-item ">
+                        <a class="page-link form-control" href="/log?page={{ i }}">...</a>
+                    </li>
+
+                    {% endif %}
+
+                    {% endfor %}
+
+                    {% if paginate.has_next %}
+                    <a class="page-link form-control" href="/log?page={{ paginate.next_num }}">Next</a>
+                    {% endif %}
+
+                    </li>
                 </ul>
 
                 <li class="page-item"><a class="page-link form-control">共</a></li>
-                <input id='total' name='total' class="form-control" style="width: 60px;" />
+                <input id='nums' name='nums' class="form-control" style="width: 60px;" />
                 <li class="page-item"><a class="page-link form-control">条</a></li>
                 <li class="page-item"><a class="page-link form-control">共</a></li>
-                <input id='max_pages' name='max_pages' class="form-control" style="width: 60px;" />
+                <input id='total' name='total' disabled class="form-control" style="width: 60px;"
+                    value="{{ paginate.total }}" />
+                <li class="page-item"><a class="page-link form-control">条</a></li>
+                <li class="page-item"><a class="page-link form-control">共</a></li>
+                <input id='pages' name='pages' disable class="form-control" style="width: 60px;"
+                    value="{{ paginate.pages }}" />
                 <li class="page-item"><a class="page-link form-control">页</a></li>
             </ul>
         </nav>
     </div>
 </div>
+
 
 <script>
     var csrftoken = $("meta[name=csrf-token]").attr("content");
@@ -170,12 +181,7 @@
         $.datetimepicker.setLocale('zh');
     });
 
-
-    $(document).ready(function () {})
-
-
     function select_log() {
-
         var log_level = $("#log_level").val();
         var log_day = $("#log_day").val();
         var log_day_start = $("#log_day_start").val();
@@ -200,7 +206,7 @@
             headers: {
                 "X-CSRFToken": csrftoken
             },
-            success: pages_success,
+            success: model_page_success,
             error: function (data) {
                 console.log(data);
             },
@@ -208,12 +214,11 @@
         return false;
     }
 
-    function search(obj) {
+    function search() {
         var log_level = $("#log_level").val();
         var log_day = $("#log_day").val();
         var log_day_start = $("#log_day_start").val();
         var log_day_end = $("#log_day_end").val();
-        var pages = $("#pages").val();
         var key = $("#key").val();
         // var $subject_con = $('#logs');
         // $subject_con.html('')
@@ -225,7 +230,7 @@
                 "log_day": log_day,
                 "log_day_start": log_day_start,
                 "log_day_end": log_day_end,
-                "pages": pages,
+                "pages": 10,
                 "page": 1,
             },
             type: 'post',
@@ -233,7 +238,7 @@
                 "X-CSRFToken": csrftoken
             },
             dataType: 'json',
-            success: pages_success,
+            success: model_page_success,
             error: function (data) {
                 console.log(data);
             },
@@ -241,13 +246,11 @@
         return false;
     }
 
-    function page(obj) {
+    function click_page(page) {
         var log_level = $("#log_level").val();
         var log_day = $("#log_day").val();
         var log_day_start = $("#log_day_start").val();
         var log_day_end = $("#log_day_end").val();
-        var pages = $("#pages").val();
-        var page = $(obj).text();
         $.ajax({
             url: "{{url_for('cs.log')}}",
             data: {
@@ -255,124 +258,88 @@
                 "log_day": log_day,
                 "log_day_start": log_day_start,
                 "log_day_end": log_day_end,
-                "pages": pages,
+                "pages": 10,
                 "page": page,
             },
-            type: 'post',
-            headers: {
-                "X-CSRFToken": csrftoken
-            },
-            dataType: 'json',
-            success: page_success,
-            error: function (data) {
-                console.log(data);
-            },
-        });
-        return false;
-    }
-
-    function pages(obj) {
-        var log_level = $("#log_level").val();
-        var log_day = $("#log_day").val();
-        var log_day_start = $("#log_day_start").val();
-        var log_day_end = $("#log_day_end").val();
-        var pages = $(obj).val();
-        $.ajax({
-            url: "{{url_for('cs.log')}}",
-            data: {
-                "log_level": log_level,
-                "log_day": log_day,
-                "log_day_start": log_day_start,
-                "log_day_end": log_day_end,
-                "pages": pages,
-                "page": 1,
-            },
             headers: {
                 "X-CSRFToken": csrftoken
             },
             type: 'post',
             dataType: 'json',
-            success: pages_success,
+            success: model_page_success,
             error: function (data) {
                 console.log(data);
             },
         });
-        return false;
+        return false
     }
 
-    function page_success(data) {
-        var $comm = '';
-        // var $td = '';
-        var $option = '';
-        var count = data.total
-        $("#total").val(count)
-        $("#max_pages").val(data.max_pages)
-        if (count > 0) {
-            var $comm = '';
-            for (var i = 0; i < data.logs_list.length; i++) {
-                var $td = ''
-                for (var j = 0; j < data.logs_list[i].length; j++) {
-                    $td +=
-                        '<td scope="row" class="table-warning">' + data.logs_list[i][j] + '</td>'
-                };
-                $comm += '<tr>' + '<td class="table-info">' + i + '</td>' + $td + '</tr>'
-                var $subject_con = $('#logs');
-                $subject_con.html($comm)
-            }
-
-        } else {
-            $comm += '<tr>' + '<td class="table-danger">' + '当前没有日志信息。。。' + '</td>' + '</tr>'
-            var $subject_con = $('#tags');
-            $subject_con.html($comm)
-        }
-    }
-
-    function pages_success(data) {
-        var $comm = '';
+    function model_page_success(data) {
+        var $trs = '';
         var $lis = '';
-        var $lis1 = '';
-        var count = data.total //条数
-        console.log(data.logs_list, data.total, data.max_pages, data.msg)
-        $("#total").val(count)
-        $("#max_pages").val(data.max_pages)
-        if (count > 0) {
-            var $comm = '';
-            for (var i = 0; i < data.logs_list.length; i++) {
-                var $td = ''
-                for (var j = 0; j < data.logs_list[i].length; j++) {
-                    $td +=
-                        '<td scope="row" class="table-warning">' + data.logs_list[i][j] + '</td>'
-                };
-                $comm += '<tr>' + '<td class="table-info">' + i + '</td>' + $td + '</tr>'
-                var $subject_con = $('#logs');
-                $subject_con.html($comm)
+        console.log(data)
+        if (data.paginate.items.length>0) {
+            // for (let i of data.paginate.items) {
+            //     $values += `<tr><td> ${i[0]}</td><td> ${i[1]}</td><td>${i[2]}</td></tr>`
+            // }
+            for (let i in data.paginate.items) {
+                $trs +=
+                    `<tr>
+                    <td> ${i}</td>
+                    <td> ${data.paginate.items[i][0]}</td>
+                    <td> ${data.paginate.items[i][1]}</td>
+                    <td> ${data.paginate.items[i][2]}</td>
+                    </tr>`
             }
-        } else {
-            $comm += '<tr>' + '<td class="table-danger">' + '没有找到搜索的信息。。。' + '</td>' + '</tr>'
-            var $subject_con = $('#logs');
-            $subject_con.html($comm)
-            alarms(data.msg)
-        }
 
-        var head = '<li class="page-item "><a class="page-link form-control">' + 'Pres' + '</a></li>'
-        var tail = '<li class="page-item "><a class="page-link form-control">' + 'Next' + '</a></li>'
-        if (data.max_pages > 0) {
-            for (var i = 1; i < data.max_pages + 1; i++) {
-                $lis +=
-                    '<li class="page-item"><a class="page-link form-control btn btn-info" id="page1" onclick="page(this)">' +
-                    i + '</a></li>'
-            }
-            $lis1 = head + $lis + tail
-            var $subject_con = $('#page');
-            $subject_con.html($lis1)
-            alarms(data.msg);
+            var $logs = $('#logs');
+            $logs.html($trs)
+
+            var lis = ''
+            data.paginate.iter_pages.forEach((item, index) => {
+                var tmp = ''
+                if (data.paginate.page == index + 1) {
+                    tmp =
+                        `<li class="page-item active "><a class="page-link form-control" href="javascript:click_page(${index+1}) "> ${index+1} </a></li>`
+                } else {
+                    tmp =
+                        `<li class="page-item "><a class="page-link form-control" href="javascript:click_page(${index+1})"> ${index+1} </a></li>`
+                }
+                lis += tmp
+            });
+            var log_page =
+
+                `<ul class="pagination pagination-md justify-content-end">
+                <li class="page-item ">
+                ${ data.paginate.has_prev ?
+                `<a class="page-link form-control" tabindex="-1"
+                        href="javascript:click_page(${data.paginate.prev_num},1)">Previous</a>`: ''}
+                        
+                </li>
+                ${lis}
+                <li class="page-item ">
+                ${ data.paginate.has_next ?
+                    `<a class="page-link form-control" tabindex="-1"
+                    href="javascript:click_page(${data.paginate.next_num},1)">Next</a>` : ''}
+                </li>
+                <li class="page-item"><a class="page-link form-control">共</a></li>
+                <input id='total' name='total' disabled class="form-control" style="width: 60px;"
+                    value=${ data.paginate.total } />
+                <li class="page-item"><a class="page-link form-control">条</a></li>
+                <li class="page-item"><a class="page-link form-control">共</a></li>
+                <input id='max_pages' name='max_pages' disable class="form-control" style="width: 60px;"
+                    value=${ data.paginate.pages } />
+                <li class="page-item"><a class="page-link form-control">页</a></li>`;
+
+            var $log_page = $('#log_page');
+            $log_page.html(log_page);
         } else {
-            $lis1 +=
-                '<li class="page-item"><a class="page-link form-control btn btn-info" id="page1" onclick="page(this)">' +
-                '暂无日志' + '</a></li>'
-            var $subject_con = $('#logs');
-            $subject_con.html($comm)
+            $trs += '<tr>' + '<td scope="row" class="table-danger">' + '没有日志信息，请稍后重试' + '</td>' + '</tr>';
+            var $logs = $('#logs');
+            $logs.html($trs);
         }
     }
+
+    // var int = self.setInterval("select_log()", 5000);
 </script>
 {% endblock %}

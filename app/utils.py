@@ -26,10 +26,10 @@ from flask import Markup, make_response, jsonify, flash, current_app, redirect, 
 def log_class(level):
     """自定义过滤器"""
     if level == '[DEBUG]':
-        return "table-danger"
-    elif index == '[INFO ]':
+        return "table-warning"
+    elif level == '[INFO ]':
         return "table-info"
-    elif index == '[ERROR]':
+    elif level == '[ERROR]':
         return "table-danger"
     else:
         return "table-info"

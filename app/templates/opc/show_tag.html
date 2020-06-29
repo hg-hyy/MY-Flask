@@ -820,6 +820,8 @@
             $subject_con.html($values);
         }
     }
+    
+    
     // 操作结果
     function operate_success(data) {
         // console.log(data.success, data.message,data.tag_name,data.group_infos,data.group_id,data.tag)
@@ -853,13 +855,16 @@
     function tag_page() {
         var module_name = $("#module").val()
         $.ajax({
-            url: "{{url_for('cs.show_tag_page1')}}",
+            url: "{{url_for('cs.show_tag_page')}}",
             data: {
                 "module": module_name,
                 "pages": 10,
                 "page": 1,
             },
-            type: 'get',
+            headers: {
+                "X-CSRFToken": csrftoken
+            },
+            type: 'post',
             dataType: 'json',
             success: tag_page_success,
             error: function (data) {
@@ -904,7 +909,7 @@
                 var $values_td = ''
                 for (t in data.group_infos[i]) {
                     $values_td =
-                        '<td scope="row" >' + data.group_infos[i]['slave_id'] + '</td>' +
+                        '<td scope="row" >' + data.group_infos[i]['group_id'] + '</td>' +
                         '<td scope="row" >' + data.group_infos[i]['group_name'] + '</td>' +
                         '<td scope="row" >' + data.group_infos[i]['collect_cycle'] + '</td>' +
                         '<td scope="row" >' + data.group_infos[i]['tags_num'] + '</td>' +
@@ -945,7 +950,7 @@
         tag_page()
     })
 
-    // var int = self.setInterval("tag_page()", 10000);
+    var int = self.setInterval("tag_page()", 10000);
 </script>
 
 {% endblock %}
