@@ -20,20 +20,11 @@
             <span class="navbar-text">
                 Navbar text with an inline element
             </span>
-            <form action="{{request.path}}" method="get" class="form-inline my-2 my-lg-0 needs-validation" novalidate>
+            <div action="{{request.path}}" method="get" class="form-inline my-2 my-lg-0 needs-validation" novalidate>
                 <div class="form-group">
-                    <select class=" custom-select" name='module' id="module" required>
-                        <option value="">select module</option>
-                        <option>s_opcda_client1</option>
-                        <option>s_opcda_client1</option>
-                        <option>s_opcda_client2</option>
-                        <option>s_opcda_client3</option>
-                        <option>modbus1</option>
-                        <option>modbus2</option>
-                    </select>
                 </div>
                 <button class="btn btn-warning  my-2 my-sm-0" type="submit">点击 查询</button>
-            </form>
+            </div>
         </nav>
         <!-- 功能表单 -->
 
@@ -45,14 +36,14 @@
             <div class="card border-success mb-3" style="max-width: 30rem;">
                 <div class="card-header bg-transparent border-success">
                     <h3>
-                        <span class="text-muted">报警类别:</span>
+                        <span class="text-muted">data_type:</span>
                         <span class="badge badge-info badge-pill">
                             {{sensor.data_type}}</span>
                     </h3>
                 </div>
                 <div class="card-body text-success">
                     <h5 class="card-title text-info">
-                        <span class="badge badge-info badge-pill">关键字:</span>
+                        <span class="badge badge-info badge-pill">quality:</span>
                         {{ sensor['quality'] }}
                     </h5>
                     <blockquote class="blockquote mb-0">
@@ -93,7 +84,7 @@
                             {% endif %}
                             {% else %}
                             <li class="page-item ">
-                                <a class="page-link form-control" href="/show_sensor?page={{ i }}">...</a>
+                                <a class="page-link form-control" href="javascript:void(0)">...</a>
                             </li>
 
                             {% endif %}
@@ -123,52 +114,23 @@
 
     <div class="col-12">
         <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th>tag</th>
-                    <th>value</th>
-                    <th>data_type</th>
-                    <th>quality</th>
-                    <th>timestamp</th>
-                    <th>操作</th>
-                </tr>
+            <thead id=keys>
+
             </thead>
-            <tbody id='sensor'>
+            <tbody id='values'>
             </tbody>
         </table>
     </div>
-    <!-- 分页 -->
-    <div class="row mt-5">
-        <div class="col-md-12 col-sm-12 ">
-            <nav>
-                <ul class="pagination justify-content-end">
-                    <select class="form-control " name='pages' id="pages" onchange="pages(this)"
-                        style="width: fit-content;">
-                        <option selected>5</option>
-                        <option>10</option>
-                        <option>12</option>
-                        <option>20</option>
-                        <option>50</option>
-                    </select>
+</div>
+<!-- 分页 -->
+<div class="row mt-2">
+    <div class="col-md-12 col-sm-12 ">
+        <nav id=tag_page>
 
-                    <ul class="pagination  justify-content-end" id='alarm_page'>
-                        <li class="page-item "><a class="page-link form-control " onclick=" pre()">Pres</a></li>
-                        <li class="page-item"><a class="page-link form-control btn btn-info" id='page1'
-                                onclick="page(this)">1</a></li>
-                        <li class="page-item"><a class="page-link form-control" onclick=" next()">Next</a></li>
-                    </ul>
-
-                    <li class="page-item"><a class="page-link form-control">共</a></li>
-                    <input id='nums' name='nums' class="form-control" style="width: 60px;" />
-                    <li class="page-item"><a class="page-link form-control">条</a></li>
-                    <li class="page-item"><a class="page-link form-control">共</a></li>
-                    <input id='max_pages' name='max_pages' class="form-control" style="width: 60px;" />
-                    <li class="page-item"><a class="page-link form-control">页</a></li>
-                </ul>
-            </nav>
-        </div>
+        </nav>
     </div>
 </div>
+
 <script>
     var csrftoken = $("meta[name=csrf-token]").attr("content");
 
@@ -191,51 +153,104 @@
         return false
     }
 
+    // 分页
     function pages_success(data) {
-        var $comm = '';
+        var $keys = '';
+        var $values = '';
         var $lis = '';
         var $lis1 = '';
-        var $option = '';
-        var count = data.tags.length
-        console.log(count)
-        if (count > 0) {
-            for (i in data.tags) {
-                var $td = ''
-                for (t in data.tags[i]) {
-                    $td += '<td scope="row" class="table-warning">' + data.tags[i][t] + '</td>'
+        console.log(data.paginate)
+        var tags = data.paginate.items
+        if (data.paginate.total > 0) {
+            for (i in tags) {
+                var keys_td = ''
+                var values_td = ''
+                for (t in tags[i]) {
+                    keys_td += '<th scope="row" class="table-info p-1">' + t + '</th>'
+                    values_td += '<td scope="row" ">' + tags[i][t] + '</td>'
                 };
-                $comm += '<tr>' + $td + '<td scope="row" class="table-warning">' + '<button class="btn btn-info">' +
-                    "确认报警" + '</button>' + '</td>' + '</tr>'
-                var $subject_con = $('#sensor');
-                $subject_con.html($comm)
-            }
-        } else {
-            $comm += '<tr>' + '<td scope="row" class="table-danger">' + '当前暂无报警。。。' + '</td>' + '</tr>'
-            var $subject_con = $('#sensor');
-            $subject_con.html($comm)
-        }
+                $keys = `<tr>${keys_td }</tr>`
+                $values +=
+                    `<tr>'${values_td}</tr>`
+                var $subject_keys = $('#keys');
+                var $subject_values = $('#values');
+                $subject_keys.html($keys)
+                $subject_values.html($values)
+            };
+            var lis = ''
+            data.paginate.iter_pages.forEach((item, index) => {
+                if (item) {
+                    var tmp = ''
+                    if (data.paginate.page == item) {
+                        tmp =
+                            `<li class="page-item active "><a class="page-link form-control" href="javascript:model_page(${item}) "> ${item} </a></li>`
+                    } else {
+                        tmp =
+                            `<li class="page-item "><a class="page-link form-control" href="javascript:model_page(${item})"> ${item} </a></li>`
+                    }
+                } else {
+                    tmp =
+                        `<li class="page-item "><a class="page-link form-control" href="javascript:void(0)">...</a></li>`
+                }
 
-        var head = '<li class="page-item "><a class="page-link form-control" onclick="pre()">' + 'Pres' + '</a></li>'
-        var tail = '<li class="page-item "><a class="page-link form-control" onclick="next()">' + 'Next' + '</a></li>'
-        if (data.max_pages > 0) {
-            for (var i = 1; i < data.max_pages + 1; i++) {
-                $lis +=
-                    '<li class="page-item"><a class="page-link form-control btn btn-info mr-2" id="page' + i +
-                    '" onclick="page(this)">' +
-                    i + '</a></li>'
-            }
-            $lis1 = head + $lis + tail
-            var $subject_con = $('#alarm_page');
-            $subject_con.html($lis1)
+                lis += tmp
+            });
+            var tag_page =
+
+                `<ul class="pagination pagination-md justify-content-end">
+                <li class="page-item ">
+                ${ data.paginate.has_prev ?
+                `<a class="page-link form-control" tabindex="-1"
+                        href="javascript:model_page(${data.paginate.prev_num},1)">Previous</a>`: ''}
+                        
+                </li>
+                ${lis}
+                <li class="page-item ">
+                ${ data.paginate.has_next ?
+                    `<a class="page-link form-control" tabindex="-1"
+                    href="javascript:model_page(${data.paginate.next_num},1)">Next</a>` : ''}
+                </li>
+                <li class="page-item"><a class="page-link form-control">共</a></li>
+                <input id='total' name='total' disabled class="form-control" style="width: 60px;"
+                    value=${ data.paginate.total } />
+                <li class="page-item"><a class="page-link form-control">条</a></li>
+                <li class="page-item"><a class="page-link form-control">共</a></li>
+                <input id='max_pages' name='max_pages' disable class="form-control" style="width: 60px;"
+                    value=${ data.paginate.pages } />
+                <li class="page-item"><a class="page-link form-control">页</a></li>`;
+
+            var $tag_page = $('#tag_page');
+            $tag_page.html(tag_page);
         } else {
-            $lis1 +=
-                '<li class="page-item"><a class="page-link form-control btn btn-info" id="page1" onclick="page(this)">' +
-                '对不起，没有' + '</a></li>'
-            var $subject_con = $('#alarm_page');
-            $subject_con.html($lis1)
+            $values += '<tr>' + '<td scope="row" class="table-danger">' + '没有位号信息，请重新上传。。。' + '</td>' + '</tr>';
+            var $subject_con = $('#values');
+            $subject_con.html($values);
         }
     }
-    var int = self.setInterval("page()", 5000);
+
+
+    function model_page(page) {
+        $.ajax({
+            url: "{{url_for('cs.show_sensor')}}",
+            data: {
+                "page": page,
+            },
+            headers: {
+                "X-CSRFToken": csrftoken
+            },
+            type: 'post',
+            dataType: 'json',
+            success: pages_success,
+            error: function (data) {
+                console.log(data);
+            },
+        });
+        return false
+    }
+
+
+
+    var int = self.setInterval("page()", 10000);
     (function () {
         'use strict'
 

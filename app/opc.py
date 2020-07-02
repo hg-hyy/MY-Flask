@@ -28,7 +28,8 @@ from .config import client, server, opc, modbus, URL
 from .model import User
 from .settings import Config
 from threading import Thread
-from .zmq_event import ZClient, event2dict, sensor2dict
+from .zmq_sensor import SensorClient,sensor2dict
+from .zmq_event import EventClient, event2dict
 import psutil
 import signal
 
@@ -1522,30 +1523,61 @@ def paginate(list, page=1, per_page=3, max_per_page=None):
     return Pagination(page, per_page, total, items)
 
 
-z = ZClient()
+ec = EventClient()
+sc = SensorClient()
 
 
 @cs.route("/show_sensor", methods=['GET', 'POST'], endpoint='show_sensor')
 def show_sensor():
-    tags = []
-    page = int(request.args.get('page', 1))
-    pages = int(request.args.get('pages', 3))
-    for data in z.sensor_list:
+    tags=[]
+    if request.method=='POST':
+        page = int(request.form.get('page', 1))
+        pages = int(request.form.get('pages', 3))
+    else:
+        page = int(request.args.get('page', 1))
+        pages = int(request.args.get('pages', 3))
+
+    for data in sc.sensor_list:
         tags.append(sensor2dict(data))
-    if request.method == 'POST':
-        return {'tags': tags}
-    pag = paginate(tags, page, pages)
-    return render_template('opc/show_sensor.html', paginate=pag, show_sensor='bg-warning')
+    pga = paginate(tags, page, pages)
+    pga_dict = {'items': pga.items,
+                        'has_prev': pga.has_prev,
+                        'prev_num': pga.prev_num,
+                        'has_next': pga.has_next,
+                        'next_num': pga.next_num,
+                        'iter_pages': list(pga.iter_pages()),
+                        'pages': pga.pages,
+                        'page': pga.page,
+                        'total': pga.total
+                        }
+    if request.method=='POST':
+        return {'paginate':pga_dict}
+    return render_template('opc/show_sensor.html', paginate=pga, show_sensor='bg-warning')
 
 
 @cs.route("/show_alarm", methods=['GET', 'POST'], endpoint='show_alarm')
 def show_alarm():
-    tags = []
-    page = int(request.args.get('page', 1))
-    pages = int(request.args.get('pages', 3))
-    for data in z.event_list:
+    tags=[]
+    if request.method=='POST':
+        page = int(request.form.get('page', 1))
+        pages = int(request.form.get('pages', 3))
+    else:
+        page = int(request.args.get('page', 1))
+        pages = int(request.args.get('pages', 3))
+
+    for data in ec.event_list:
         tags.append(event2dict(data))
-    if request.method == 'POST':
-        return {'tags': tags}
-    pag = paginate(tags, page, pages)
-    return render_template('opc/show_alarm.html', paginate=pag, show_alarm='bg-warning')
+    pga = paginate(tags, page, pages)
+    pga_dict = {'items': pga.items,
+                        'has_prev': pga.has_prev,
+                        'prev_num': pga.prev_num,
+                        'has_next': pga.has_next,
+                        'next_num': pga.next_num,
+                        'iter_pages': list(pga.iter_pages()),
+                        'pages': pga.pages,
+                        'page': pga.page,
+                        'total': pga.total
+                        }
+    if request.method=='POST':
+        return {'paginate':pga_dict}
+    return render_template('opc/show_alarm.html', paginate=pga, show_alarm='bg-warning')

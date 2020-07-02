@@ -55,7 +55,7 @@
                 <button class="btn btn-outline-danger dropdown-toggle" type="button" id="dropdownMenuButton"
                     data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     {% if g.user %}
-                    Welcome! {{g.user}}
+                    Welcome! {{g.user.username}}
                     {% else %}
                     未登录
                     {% endif %}

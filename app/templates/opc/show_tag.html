@@ -777,15 +777,22 @@
                 $subject_values.html($values)
             };
             var lis = ''
-            data.paginate.iter_pages.forEach((intem, index) => {
-                var tmp = ''
-                if (data.paginate.page == index + 1) {
+            data.paginate.iter_pages.forEach((item, index) => {
+                if(item){
+                                  var tmp = ''
+                if (data.paginate.page == item) {
                     tmp =
-                        `<li class="page-item active "><a class="page-link form-control" href="javascript:model_page(${index+1}) "> ${index+1} </a></li>`
+                        `<li class="page-item active "><a class="page-link form-control" href="javascript:model_page(${item}) "> ${item} </a></li>`
                 } else {
                     tmp =
-                        `<li class="page-item "><a class="page-link form-control" href="javascript:model_page(${index+1})"> ${index+1} </a></li>`
+                        `<li class="page-item "><a class="page-link form-control" href="javascript:model_page(${item})"> ${item} </a></li>`
+                }  
                 }
+                else{
+                    tmp =
+                        `<li class="page-item "><a class="page-link form-control" href="javascript:void(0)">...</a></li>` 
+                }
+
                 lis += tmp
             });
             var tag_page =

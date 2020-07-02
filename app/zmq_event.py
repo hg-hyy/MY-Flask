@@ -8,51 +8,11 @@ import os
 import time
 from .import sensor_list_pb2
 from .import event_list_pb2
-# import sensor_list_pb2
-# import event_list_pb2
 
-# 监听的ip和端口
 tcp_event='tcp://192.168.20.213:40220'
 
 
-# 传感类数据对象
-
-
-class Data:
-    def __init__(self, tag, data_type, quality, timestamp,
-                 value_double=0.0,
-                 value_int64=0,
-                 value_string='',
-                 value_bytes=b''):
-        # 标签点名称
-        self.tag = tag
-        # 值
-        self.value_double = value_double
-        self.value_int64 = value_int64
-        self.value_string = value_string
-        self.value_bytes = value_bytes
-        # 数据类型
-        self.data_type = data_type
-        # 品质
-        self.quality = quality
-        # 时间戳
-        self.timestamp = timestamp
-
-    def get_value(self):
-        if self.data_type not in (0, 1, 2, 3):
-            return None
-        elif self.data_type == 0:
-            return self.value_double
-        elif self.data_type == 1:
-            return self.value_int64
-        elif self.data_type == 2:
-            return self.value_string
-        else:
-            return self.value_bytes
-
 # 事件类数据对象
-
-
 class Event:
     def __init__(self, source, event_type, level, keyword, content, timestamp):
         # 事件源
@@ -74,23 +34,7 @@ def sdt(ts):
     ymd = da.strftime("%Y-%m-%d %H:%M:%S")
     return ymd
 
-# 传感类数据对象转字典
-
-
-def sensor2dict(data):
-    if data:
-        value = data.get_value()
-        return {'tag': data.tag,
-                'value': value,
-                'data_type': data.data_type,
-                'quality': data.quality,
-                'timestamp': data.timestamp}
-    else:
-        return {}
-
 # 事件类数据对象转字典
-
-
 def event2dict(event):
     if event:
         return {'source': event.source,
@@ -102,8 +46,7 @@ def event2dict(event):
     else:
         return {}
 
-
-class ZClient(object):
+class EventClient(object):
 
     def __init__(self,tcp_event=tcp_event):
         """Initialize Worker"""

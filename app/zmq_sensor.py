@@ -66,18 +66,17 @@ def sensor2dict(data):
                 'value': value,
                 'data_type': data.data_type,
                 'quality': data.quality,
-                'timestamp': data.timestamp}
+                'timestamp': sdt(data.timestamp)}
     else:
         return {}
 
 # 事件类数据对象转字典
 
-class ZClient(object):
+class SensorClient(object):
 
-    def __init__(self,tcp_sensor=tcp_sensor, tcp_event=tcp_event):
+    def __init__(self,tcp_sensor=tcp_sensor):
         """Initialize Worker"""
         self.tcp_sensor = tcp_sensor
-        self.tcp_event = tcp_event
         self.sensor_list = []
         self._context = zmq.Context()
         self.sub_sensor = self._context.socket(zmq.SUB)
@@ -116,11 +115,11 @@ class ZClient(object):
         return data_list
 
     def receive_sensor_message(self):
-        list_sensor_temp=[]
+        # list_sensor_temp=[]
         message = self.sub_sensor.recv()
         topic, message = message.split(b'^', 1)
-        list_sensor_temp=[]= self.un_package_sensor_data(message)
-        self.sensor_list.extend(list_sensor_temp)
+        self.sensor_list= self.un_package_sensor_data(message)
+        # self.sensor_list.extend(list_sensor_temp)
         print(self.sensor_list[0].tag, self.sensor_list[0].get_value())
 
 if __name__ == "__main__":
