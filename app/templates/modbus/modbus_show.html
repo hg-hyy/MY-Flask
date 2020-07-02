@@ -1,0 +1,932 @@
+{% extends "base.html" %}
+{% block title %}tags{% endblock %}
+{% block head %}
+<style type="text/css">
+
+</style>
+{% endblock %}
+{% block content %}
+<div class="row">
+    <div class="align-middle col-12  mb-2">
+        <h5 class="h2 d-inline">
+            <span class="text-muted ">参数预览</span>
+        </h5>
+        <hr class="border-bottom border-info" />
+    </div>
+</div>
+<div class="row">
+    <div class="col-12 mt-1">
+        <table class="table table-bordered table-hover">
+            <thead>
+                <tr>
+                    {% for k in basic_config.keys()%}
+                    <th>
+                        {{k}}
+                    </th>
+                    {%endfor%}
+                    <th>
+                        操作
+                    </th>
+                </tr>
+            </thead>
+            <tbody id='opc_da_config'>
+                <tr >
+                    {% for v in basic_config.values()%}
+                    <td class="table-success">
+                        {{v}}
+                    </td>
+                    {%endfor%}
+                    <td class="table-success">
+                        <a href="{{url_for('mt.modbus')}}" class="btn btn-info btn-sm" onclick="edit()">修改</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="row">
+    <div class="align-middle col-12  mb-2">
+        <h5 class="h2 d-inline">
+            <span class="text-muted ">位号预览</span>
+        </h5>
+        <hr class="border-bottom border-danger" />
+    </div>
+
+
+
+    <!-- 分组表 -->
+    <div class="col-12 text-center">
+        <table class="table table-bordered table-hover table-secondary ">
+            <thead>
+                <tr>
+                    <th>#id</th>
+                    <th>slave_id</th>
+                    <th>fun_code</th>
+                    <th>tags_num</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody id='tag_values'>
+
+            </tbody>
+        </table>
+    </div>
+
+</div>
+<!-- 分页 -->
+<div class="row mt-2 ">
+    <div class="col-md-12 col-sm-12 ">
+        <nav>
+            <ul class="pagination pagination-md justify-content-end">
+                <ul class="pagination  justify-content-end" id='page'>
+                    <li class="page-item ">
+                        {% if paginate.has_prev %}
+                        <a class="page-link form-control" tabindex="-1"
+                            href="/show_modbus_page?page={{ paginate.prev_num }}">Previous</a>
+                        {% endif %}
+                    </li>
+                    {%  for i in  paginate.iter_pages %}
+                    {% if i %}
+                    {%if paginate.page == i%}
+                    <li class="page-item active">
+                        <a class="page-link form-control" href="/show_modbus_page?page={{ i }}">{{ i }}</a>
+                    </li>
+                    {%else%}
+                    <li class="page-item ">
+                        <a class="page-link form-control" href="/show_modbus_page?page={{ i }}">{{ i }}</a>
+                    </li>
+                    {% endif %}
+                    {% else %}
+                    <li class="page-item ">
+                        <a class="page-link form-control" href="javascript:void(0)">...</a>
+                    </li>
+                    {% endif %}
+                    {% endfor %}
+                    {% if paginate.has_next %}
+                    <a class="page-link form-control" href="/show_modbus_page?page={{ paginate.next_num }}">Next</a>
+                    {% endif %}
+                    </li>
+                </ul>
+
+                <li class="page-item"><a class="page-link form-control">共</a></li>
+                <input id='total' name='total' class="form-control" style="width: 40px;" value="{{ paginate.total }}"
+                    disabled />
+                <li class="page-item"><a class="page-link form-control">组</a></li>
+                <li class="page-item"><a class="page-link form-control">共</a></li>
+                <input id='max_pages' name='max_pages' class="form-control" style="width: 40px;"
+                    value="{{ paginate.pages }}" disabled />
+                <li class="page-item"><a class="page-link form-control">页</a></li>
+            </ul>
+        </nav>
+    </div>
+</div>
+<!--tag展示-->
+<div class="modal fade" id="page_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog  modal-sm modal-dialog-centered" style="max-width:1000px;">
+        <div class="modal-content">
+            <div class="modal-header">
+
+
+                <div class="form-inline my-1 my-lg-0">
+                    <label for="slave_id">站号:</label>
+                    <input class="form-control mr-sm-1 col-sm-1" name='slave_id' id='slave_id'>
+                    <label for="fun_code">功能码:</label>
+                    <input class="form-control mr-sm-1 col-sm-3" name='fun_code' id='fun_code'>
+                    <button class="btn btn-outline-success my-2 my-sm-0" onclick="show_add_tag_modal()">新建位号</button>
+                </div>
+                <div class="form-inline my-2 my-lg-0">
+                    <input class="form-control mr-sm-1" placeholder="tag name" name="key" id=key>
+                    <button class="btn btn-outline-success my-2 my-sm-0" onclick="tag_search()">查询位号</button>
+                </div>
+            </div>
+            <div class="modal-body">
+
+
+                <table class="table  table-bordered table-sm text-center table-hover table-info">
+                    <thead id='keys'>
+                        <tr>
+                            <th>tag</th>
+                            <th>start</th>
+                            <th>register_number</th>
+                            <th>data_type</th>
+                            <th>data_format</th>
+                            <th>desc</th>
+                            <th>操作</th>
+                        </tr>
+
+                    </thead>
+                    <tbody id='values'>
+
+                    </tbody>
+                </table>
+
+                <div class="row mt-1 ">
+                    <div class="col-md-12 col-sm-12 ">
+                        <nav id='tag_page'>
+
+                        </nav>
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-success" onclick="hide_page_modal()">
+                    关闭
+                </button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>
+
+<!--group新增-->
+<div class="modal fade" id="add_group_modal" tabindex="-1" role="dialog" aria-labelledby="addtag" aria-hidden="true">
+    <div class="modal-dialog  modal-sm modal-dialog-centered" style="max-width:300px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="form-inline my-2 my-lg-0">
+                    <h1 class="h4">新增组</h1>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="form-signin" action="" method="post">
+                    <div class="form-label-group" style="margin-bottom:1rem">
+                        <input class="form-control form-control-md" id="group_name" autofocus="" required="" type="text"
+                            placeholder="group_name" name="group_name">
+                        <label for="pub_name" style="display: none">组名</label>
+                    </div>
+                    <div class="form-label-group" style="margin-bottom:1rem">
+                        <label for="collect_cycle" style="display: none">采集周期</label>
+                        <select class="form-control form-control-md" name='collect_cycle' id="collect_cycle">
+                            <option>5</option>
+                            <option>10</option>
+                            <option selected>10</option>
+                            <option>15</option>
+                            <option>20</option>
+                            <option>30</option>
+                        </select>
+                    </div>
+                    <p class="h6 text-danger" id='add_error'></p>
+                    <input class="btn btn-md btn-primary btn-block" type="button" onclick="add_group()" value="新建">
+                </div>
+
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-success" onclick="hide_add_group_modal()">
+                    关闭
+                </button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>
+<!--group修改-->
+<div class="modal fade" id="alter_group_modal" tabindex="-1" role="dialog" aria-labelledby="addtag" aria-hidden="true">
+    <div class="modal-dialog  modal-sm modal-dialog-centered" style="max-width:300px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="form-inline my-2 my-lg-0">
+                    <h1 class="h4">修改组参数</h1>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="form-signin" action="" method="post">
+                    <div class="form-label-group" style="margin-bottom:1rem">
+                        <input class="form-control form-control-md" id="alter_id" autofocus="" required="" type="text"
+                            placeholder="alter_id" name="alter_id" disabled>
+                        <label for="alter_id" style="display: none">站号</label>
+                    </div>
+                    <div class="form-label-group" style="margin-bottom:1rem">
+                        <input class="form-control form-control-md" id="alter_slave_id" autofocus="" required=""
+                            type="text" placeholder="alter_slave_id" name="alter_slave_id">
+                        <label for="alter_slave_id" style="display: none">站号</label>
+                    </div>
+                    <div class="form-label-group" style="margin-bottom:1rem">
+                        <input class="form-control form-control-md" id="alter_fun_code" autofocus="" required=""
+                            type="text" placeholder="alter_fun_code" name="alter_fun_code">
+                        <label for="alter_fun_code" style="display: none">功能码</label>
+                    </div>
+                    <p class="h6 text-danger" id='add_error'></p>
+                    <input class="btn btn-md btn-primary btn-block" type="button" onclick="confirm_alter_group()"
+                        value="修改">
+                </div>
+
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-success" onclick="hide_alter_group_modal()">
+                    关闭
+                </button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>
+
+<!--tag新增-->
+<div class="modal fade" id="add_tag_modal" tabindex="-1" role="dialog" aria-labelledby="addtag" aria-hidden="true">
+    <div class="modal-dialog  modal-sm modal-dialog-centered" style="max-width:300px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="form-inline my-2 my-lg-0">
+                    <h1 class="h4">新增位号</h1>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="form-signin">
+                    <div class="form-label-group" style="margin-bottom:1rem">
+                        <input class="form-control form-control-md" id="tag" autofocus="" required="" type="text"
+                            placeholder="tag name" name="tag">
+                        <label for="tag" style="display: none">标签名</label>
+                    </div>
+                    <div class="form-label-group" style="margin-bottom:1rem">
+                        <input class="form-control form-control-md" id="start" autofocus="" required="" type="text"
+                            placeholder="40001" name="start">
+                        <label for="start" style="display: none">寄存器起始地址</label>
+                    </div>
+                    <div class="form-label-group" style="margin-bottom:1rem">
+                        <select class="form-control form-control-md" name='register_number' id="register_number">
+                            <option selected>1</option>
+                            <option>2</option>
+                        </select>
+                        <label for="register_number" style="display: none">寄存器数量</label>
+                    </div>
+
+                    <div class="form-label-group" style="margin-bottom:1rem">
+                        <label for="data_type" style="display: none">数据类型</label>
+                        <select class="form-control form-control-md" name='data_type' id="data_type">
+                            <option>INT16</option>
+                            <option selected>UINT16</option>
+                            <option>INT32</option>
+                            <option>UINT32</option>
+                            <option>FLOAT</option>
+                        </select>
+                    </div>
+                    <div class="form-label-group" style="margin-bottom:1rem">
+                        <label for="data_format" style="display: none">数据格式</label>
+                        <select class="form-control form-control-md" name='data_format' id="data_format">
+                            <option selected>12</option>
+                            <option>3412</option>
+                        </select>
+                    </div>
+                    <div class="form-label-group" style="margin-bottom:1rem">
+                        <label for="desc" style="display: none">标签描述</label>
+                        <input class="form-control form-control-md" id="desc" required="" type="sub_name"
+                            placeholder="desc" name="desc">
+                    </div>
+                    <p class="h5 text-danger" id='add_error'></p>
+                    <input class="btn btn-md btn-primary btn-block" type="button" onclick="add_tag()" value="新建">
+                </div>
+
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-success" onclick="hide_add_tag_modal()">
+                    关闭
+                </button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>
+
+<!--tag修改-->
+<div class="modal fade" id="alter_tag_modal" tabindex="-1" role="dialog" aria-labelledby="addtag" aria-hidden="true">
+    <div class="modal-dialog  modal-sm modal-dialog-centered" style="max-width:300px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="form-inline my-2 my-lg-0">
+                    <h1 class="h4">修改位号</h1>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div>
+                    <div class="form-label-group" style="margin-bottom:1rem">
+                        <input class="form-control form-control-md" id="alter_tag" autofocus="" required="" type="text"
+                            placeholder="tag name" name="alter_tag" disabled>
+                        <label for="alter_tag" style="display: none">标签名</label>
+                    </div>
+                    <div class="form-label-group" style="margin-bottom:1rem">
+                        <input class="form-control form-control-md" id="alter_start" autofocus="" required=""
+                            type="text" placeholder="40001" name="alter_start">
+                        <label for="alter_start" style="display: none">寄存器起始地址</label>
+                    </div>
+                    <div class="form-label-group" style="margin-bottom:1rem">
+                        <select class="form-control form-control-md" name='alter_register_number'
+                            id="alter_register_number">
+                            <option selected>1</option>
+                            <option>2</option>
+                        </select>
+                        <label for="alter_register_number" style="display: none">寄存器数量</label>
+                    </div>
+
+                    <div class="form-label-group" style="margin-bottom:1rem">
+                        <label for="alter_data_type" style="display: none">数据类型</label>
+                        <select class="form-control form-control-md" name='alter_data_type' id="alter_data_type">
+                            <option>INT16</option>
+                            <option>UINT16</option>
+                            <option>INT32</option>
+                            <option>UINT32</option>
+                            <option>FLOAT</option>
+                        </select>
+                    </div>
+                    <div class="form-label-group" style="margin-bottom:1rem">
+                        <label for="alter_data_format" style="display: none">数据格式</label>
+                        <select class="form-control form-control-md" name='alter_data_format' id="alter_data_format">
+                            <option>12</option>
+                            <option>3412</option>
+                        </select>
+                    </div>
+                    <div class="form-label-group" style="margin-bottom:1rem">
+                        <label for="alter_desc" style="display: none">标签描述</label>
+                        <input class="form-control form-control-md" id="alter_desc" required placeholder="alter_desc"
+                            name="alter_desc">
+                    </div>
+                    <p class="h5 text-danger" id='add_error'></p>
+                    <input class="btn btn-md btn-primary btn-block" type="button" onclick="alter_tag_confirm()"
+                        value="确认修改">
+                </div>
+
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-success" onclick="hide_alert_tag_modal()">
+                    放弃修改
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--删除组确认-->
+<div class="modal fade" id="delete_group_modal" tabindex="-1" role="dialog" aria-labelledby="addtag" aria-hidden="true">
+    <div class="modal-dialog  modal-sm modal-dialog-top" style="max-width:800px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>确认删除组<span class="badge badge-info" id='gl'></span>吗？</h2>
+            </div>
+            <div class="modal-body">
+                <h1 class="dispaly-4">新建组不容易的，骚年请考虑一下。</h1>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-danger" onclick="confirm_delete_group()">
+                    滚犊子
+                </button>
+                <button type="button" class="btn btn-outline-success" onclick="hide_confirm_delete_group()">
+                    好吧,你赢了
+                </button>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var csrftoken = $("meta[name=csrf-token]").attr("content");
+    //显示分页模态框
+
+    function edit() {
+        $("#config").attr({contentEditable:"true"})
+    }
+
+    function show_page_modal(id, slave_id, fun_code) {
+        $('#page_modal').modal("show");
+        $('#slave_id').val(slave_id);
+        $('#fun_code').val(fun_code);
+        page(id, slave_id, fun_code);
+        // console.log('show_page_modal',id, slave_id, fun_code)
+
+    }
+
+    function show_add_group_modal() {
+        $('#add_group_modal').modal("show");
+    }
+
+    function show_alter_group_modal(id, slave_id, fun_coded) {
+        $('#alter_group_modal').modal("show");
+        alter_group(id, slave_id, fun_coded)
+    }
+
+    function show_alter_tag_modal() {
+        $('#alter_tag_modal').modal("show");
+    }
+
+    function hide_page_modal() {
+        $('#page_modal').modal("hide");
+    }
+
+    function hide_alter_group_modal() {
+        $('#alter_group_modal').modal("hide");
+    }
+
+    function show_add_tag_modal() {
+        $('#add_tag_modal').modal("show");
+    }
+
+    function hide_add_tag_modal() {
+        $('#add_tag_modal').modal("hide");
+    }
+
+    function hide_alert_tag_modal() {
+        $('#alter_tag_modal').modal("hide");
+    }
+
+    function hide_add_group_modal() {
+        $('#add_group_modal').modal("hide");
+    }
+
+    function hide_confirm_delete_group() {
+        $('#delete_group_modal').modal("hide");
+    }
+
+    function tag_search() {
+        var key = $("#key").val();
+        var slave_id = $("#slave_id").val();
+        var fun_code = $("#fun_code").val()
+        console.log(key, slave_id, fun_code)
+        $.ajax({
+            url: "{{url_for('mt.tag_search')}}",
+            data: {
+                "key": key,
+                "slave_id": slave_id,
+                "fun_code": fun_code,
+            },
+            type: 'get',
+            dataType: 'json',
+            success: pages_success,
+            error: function (data) {
+                console.log(data);
+            },
+        });
+        return false;
+    }
+
+    function page(id, slave_id, fun_code) {
+        $.ajax({
+            url: "{{url_for('mt.show_modbus_page')}}",
+            data: {
+                "id": id,
+                "slave_id": slave_id,
+                "fun_code": fun_code,
+            },
+            headers: {
+                "X-CSRFToken": csrftoken
+            },
+            type: 'post',
+            dataType: 'json',
+            success: pages_success,
+            error: function (data) {
+                console.log(data);
+            },
+        });
+        return false
+    }
+
+    function add_tag() {
+        var slave_id = $("#slave_id").val()
+        var fun_code = $("#fun_code").val()
+        var tag = $("#tag").val()
+        var start = $("#start").val()
+        var register_number = $("#register_number").val().trim()
+        var data_type = $("#data_type").val()
+        var data_format = $("#data_format").val().trim()
+        var desc = $("#desc").val().trim()
+
+        $.ajax({
+            url: "{{url_for('mt.add_tag')}}",
+            data: {
+                "slave_id": slave_id,
+                "fun_code": fun_code,
+                "tag": tag,
+                "start": start,
+                "register_number": register_number,
+                "data_type": data_type,
+                "data_format": data_format,
+                "desc": desc,
+            },
+            headers: {
+                "X-CSRFToken": csrftoken
+            },
+            type: 'post',
+            dataType: 'json',
+            success: operate_success,
+            error: function (data) {
+                console.log(data);
+
+            },
+        });
+        return false
+    }
+
+    function alter_tag(tag_name) {
+        var slave_id = $("#slave_id").val()
+        var fun_code = $("#fun_code").val()
+        show_alter_tag_modal()
+        console.log(slave_id, fun_code, tag_name)
+        $.ajax({
+            url: "{{url_for('mt.alter_tag')}}",
+            data: {
+                "slave_id": slave_id,
+                "fun_code": fun_code,
+                "tag_name": tag_name,
+            },
+            type: 'get',
+            dataType: 'json',
+            success: alter_tag_success,
+            error: function (data) {
+                console.log(data);
+
+            },
+        });
+        return false
+    }
+
+    function alter_tag_confirm() {
+        var slave_id = $("#slave_id").val()
+        var fun_code = $("#fun_code").val()
+        var tag = $("#alter_tag").val()
+        var start = $("#alter_start").val()
+        var register_number = $("#alter_register_number").val().trim()
+        var data_type = $("#alter_data_type").val()
+        var data_format = $("#alter_data_format").val().trim()
+        var desc = $("#alter_desc").val().trim()
+        console.log(slave_id, fun_code, tag, start, register_number, data_type, data_format, desc)
+        $.ajax({
+            url: "{{url_for('mt.alter_tag')}}",
+            data: {
+                "slave_id": slave_id,
+                "fun_code": fun_code,
+                "tag": tag,
+                "start": start,
+                "register_number": register_number,
+                "data_type": data_type,
+                "data_format": data_format,
+                "desc": desc,
+            },
+            headers: {
+                "X-CSRFToken": csrftoken
+            },
+            type: 'post',
+            dataType: 'json',
+            success: operate_success,
+            error: function (data) {
+                console.log(data);
+
+            },
+        });
+        return false
+    }
+
+    function model_page(page) {
+        var module_name = $("#module").val()
+        var group_id = $("#group_num").val()
+        $.ajax({
+            url: "{{url_for('mt.show_modbus_page')}}",
+            data: {
+                "module": module_name,
+                "group_id": group_id,
+                "page": page,
+            },
+            headers: {
+                "X-CSRFToken": csrftoken
+            },
+            type: 'post',
+            dataType: 'json',
+            success: pages_success,
+            error: function (data) {
+                console.log(data);
+            },
+        });
+        return false
+    }
+
+    function add_group() {
+        var module_name = $("#module").val()
+        var group_name = $("#group_name").val()
+        var collect_cycle = $("#collect_cycle").val()
+        console.log(module_name, group_name, collect_cycle)
+        $.ajax({
+            url: "{{url_for('mt.add_group')}}",
+            data: {
+                "module": module_name,
+                "group_name": group_name,
+                "collect_cycle": collect_cycle,
+            },
+            headers: {
+                "X-CSRFToken": csrftoken
+            },
+            type: 'post',
+            dataType: 'json',
+            success: operate_success,
+            error: function (data) {
+                console.log(data);
+
+            },
+
+        });
+        return false;
+    }
+
+    function alter_group(id, slave_id, fun_code) {
+        $.ajax({
+            url: "{{url_for('mt.alter_group')}}",
+            data: {
+                "id": id,
+                "slave_id": slave_id,
+                "fun_code": fun_code,
+            },
+            type: 'get',
+            dataType: 'json',
+            success: alter_group_success,
+            error: function (data) {
+                console.log(data);
+
+            },
+
+        });
+        return false;
+    }
+
+    function confirm_alter_group() {
+        var alter_id = $("#alter_id").val()
+        var alter_fun_code = $("#alter_fun_code").val()
+        var alter_slave_id = $("#alter_slave_id").val()
+        $.ajax({
+            url: "{{url_for('mt.alter_group')}}",
+            data: {
+                "id": alter_id,
+                "fun_code": alter_fun_code,
+                "slave_id": alter_slave_id,
+            },
+            headers: {
+                "X-CSRFToken": csrftoken
+            },
+            type: 'post',
+            dataType: 'json',
+            success: operate_success,
+            error: function (data) {
+                console.log(data);
+
+            },
+
+        });
+        return false;
+    }
+
+    function delete_group(id) {
+        $('#delete_group_modal').modal("show");
+        $("#gl").text(id)
+    }
+
+    function confirm_delete_group(id) {
+        var id = $("#gl").text()
+        $.ajax({
+            url: "{{url_for('mt.delete_group')}}",
+            data: {
+                "id": id,
+            },
+            headers: {
+                "X-CSRFToken": csrftoken
+            },
+            type: 'post',
+            dataType: 'json',
+            success: operate_success,
+            error: function (data) {
+                console.log(data);
+
+            },
+
+        });
+
+
+        return false;
+    }
+
+
+    function delete_tag(tag_name) {
+        var slave_id = $("#slave_id").val()
+        var fun_code = $("#fun_code").val()
+        console.log('delete_tag', tag_name, slave_id, fun_code)
+
+        $.ajax({
+            url: "{{url_for('mt.delete_tag')}}",
+            data: {
+                "slave_id": slave_id,
+                "fun_code": fun_code,
+                "tag_name": tag_name,
+            },
+            type: 'get',
+            dataType: 'json',
+            success: operate_success,
+            error: function (data) {
+                console.log(data);
+            },
+        });
+        return false;
+    }
+
+    // 分页
+    function pages_success(data) {
+        var $values = '';
+        var $lis = '';
+        var values_td = ''
+        // console.log(data.paginate)
+        var tags = data.paginate.items
+        if (data.paginate.total > 0) {
+            for (let t of tags) {
+                values_td +=
+                    `<tr>
+                    <td>${t.tag}</td>
+                    <td>${t.start}</td>
+                    <td>${t.register_number}</td>
+                    <td>${t.data_type}</td>
+                    <td>${t.data_format}</td>
+                    <td>${t.desc}</td>
+                    <td>
+                    <a class="btn btn-outline-warning btn-sm p-0" onclick="alter_tag('${t.tag}')" >修改</a> |
+                    <a class="btn btn-outline-danger  btn-sm p-0" onclick="delete_tag('${t.tag}')">删除</a>
+                    </td>
+                    </tr>`
+            };
+            var $subject_values = $('#values');
+            $subject_values.html(values_td)
+            var lis = ''
+            data.paginate.iter_pages.forEach((item, index) => {
+                var tmp = ''
+                if (data.paginate.page == index + 1) {
+                    tmp =
+                        `<li class="page-item active "><a class="page-link form-control" href="javascript:model_page(${index+1}) "> ${index+1} </a></li>`
+                } else {
+                    tmp =
+                        `<li class="page-item "><a class="page-link form-control" href="javascript:model_page(${index+1})"> ${index+1} </a></li>`
+                }
+                lis += tmp
+            });
+            var tag_page =
+
+                `<ul class="pagination pagination-md justify-content-end">
+                <li class="page-item ">
+                ${ data.paginate.has_prev ?
+                `<a class="page-link form-control" tabindex="-1"
+                        href="javascript:model_page(${data.paginate.prev_num},1)">Previous</a>`: ''}
+                        
+                </li>
+                ${lis}
+                <li class="page-item ">
+                ${ data.paginate.has_next ?
+                    `<a class="page-link form-control" tabindex="-1"
+                    href="javascript:model_page(${data.paginate.next_num},1)">Next</a>` : ''}
+                </li>
+                <li class="page-item"><a class="page-link form-control">共</a></li>
+                <input id='total' name='total' disabled class="form-control" style="width: 60px;"
+                    value=${ data.paginate.total } />
+                <li class="page-item"><a class="page-link form-control">条</a></li>
+                <li class="page-item"><a class="page-link form-control">共</a></li>
+                <input id='max_pages' name='max_pages' disable class="form-control" style="width: 60px;"
+                    value=${ data.paginate.pages } />
+                <li class="page-item"><a class="page-link form-control">页</a></li>`;
+
+            var $tag_page = $('#tag_page');
+            $tag_page.html(tag_page);
+        } else {
+            $values += '<tr>' + '<td scope="row" class="table-danger">' + '没有位号信息，请重新上传。。。' + '</td>' + '</tr>';
+            var $subject_con = $('#values');
+            $subject_con.html($values);
+        }
+    }
+
+    // 操作结果
+    function operate_success(data) {
+        console.log(data.success, data.message)
+        if (data.success) {
+            $('#add_tag_modal').modal("hide");
+            $('#add_group_modal').modal("hide");
+            $('#delete_group_modal').modal("hide");
+            $('#alter_group_modal').modal("hide");
+            $('#alter_tag_modal').modal("hide");
+        } else {
+            $("#add_error").text(data.message)
+        }
+    }
+
+    function alter_group_success(data) {
+        console.log('alter_group', data.success, data.message)
+        $("#alter_id").val(data.group_info.id)
+        $("#alter_fun_code").val(data.group_info.fun_code)
+        $("#alter_slave_id").val(data.group_info.slave_id)
+    }
+
+    function alter_tag_success(data) {
+        console.log('alter_tag', data.success, data.message, data.tag)
+        $("#alter_tag").val(data.tag.tag)
+        $("#alter_start").val(data.tag.start)
+        $("#alter_register_number").val(data.tag.register_number)
+        $("#alter_data_type").val(data.tag.data_type)
+        $("#alter_data_format").val(data.tag.data_format)
+        $("#alter_desc").val(data.tag.desc)
+    }
+
+    //  首次访问、定时刷新
+    function first_tag_page() {
+        var module_name = $("#module").val()
+        $.ajax({
+            url: "{{url_for('mt.show_modbus_page')}}",
+            data: {},
+            headers: {
+                "X-CSRFToken": csrftoken
+            },
+            type: 'post',
+            dataType: 'json',
+            success: first_tag_page_success,
+            error: function (data) {
+                console.log(data);
+            },
+        });
+        return false;
+    }
+
+    function first_tag_page_success(data) {
+        var $values = '';
+        // console.log(data)
+        if (data.group_infos.length > 0) {
+            for (let t of data.group_infos) {
+                $values +=
+                    `<tr>
+                       <td scope="row" >${t.id }</td>
+                        <td scope="row" >${t.slave_id}</td>
+                        <td scope="row" >${t.fun_code}</td>
+                        <td scope="row" >${t.tag_num}</td>
+                        <td class="p-0 m-0 align-middle">
+                        <a id="showtagmodel1" href="javascript:void(0)" onclick="show_page_modal(${t.id},${t.slave_id},${t.fun_code})"
+                            class="btn btn-outline-info btn-sm p-1 m-0">
+                            查看位号
+                        </a> |
+                        <a id="showtagmodel1" href="javascript:void(0)" onclick="show_alter_group_modal(${t.id},${t.slave_id},${t.fun_code})"
+                            class="btn btn-outline-info btn-sm p-1 m-0">
+                            修改组
+                        </a> |
+                        <a id="showtagmodel1" href="javascript:void(0)" onclick="delete_group(${t.id},${t.slave_id},${t.fun_code})"
+                            class="btn btn-outline-danger btn-sm p-1 m-0">
+                            删除组
+                        </a>
+                        </td>
+                    </tr>`
+            };
+            var $subject_con = $('#tag_values');
+            $subject_con.html($values)
+
+
+        } else {
+            $values += '<tr>' + '<td scope="row" class="table-danger">' + '没有位号信息，请先配置。。。' + '</td>' + '</tr>'
+            var $subject_con = $('#tag_values');
+            $subject_con.html($values)
+        }
+
+    }
+
+    $(document).ready(function () {
+        first_tag_page()
+    })
+
+    // var int = self.setInterval("tag_page()", 10000);
+</script>
+
+{% endblock %}

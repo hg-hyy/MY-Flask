@@ -82,10 +82,11 @@ def create_app(test_config=None):
     """
     蓝图注册
     """
-    from app import opc, user, auth, issue,charts
+    from app import opc, user, auth, issue,charts,modbus
     app.register_blueprint(auth.auth)
     app.register_blueprint(user.admin)
     app.register_blueprint(opc.cs)
+    app.register_blueprint(modbus.mt)
     app.register_blueprint(issue.faq)
     app.register_blueprint(charts.ct)
 

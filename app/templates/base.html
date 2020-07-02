@@ -150,13 +150,6 @@
                                 Config
                             </a>
                         </li>
-                        <li class="nav-item {{tags_review}}">
-                            <a class="nav-link " href="{{url_for('cs.tags_review')}} "
-                                style="font-size: x-large;font-style: italic;font-family: cursive;">
-                                <span data-feather="cast" style="width: 16px; height: 16px;color:black;"></span>
-                                Tags
-                            </a>
-                        </li>
                         <li class="nav-item {{show_sensor}}">
                             <a class="nav-link " href="{{url_for('cs.show_sensor')}} "
                                 style="font-size: x-large;font-style: italic;font-family: cursive;">
@@ -175,7 +168,14 @@
                             <a class="nav-link " href="{{url_for('cs.show_tag_page')}} "
                                 style="font-size: x-large;font-style: italic;font-family: cursive;">
                                 <span data-feather="cast" style="width: 16px; height: 16px;color:black;"></span>
-                                show_tag_page
+                                show_opc_page
+                            </a>
+                        </li>
+                        <li class="nav-item {{modbus}}">
+                            <a class="nav-link " href="{{url_for('mt.show_modbus_page')}} "
+                                style="font-size: x-large;font-style: italic;font-family: cursive;">
+                                <span data-feather="cast" style="width: 16px; height: 16px;color:black;"></span>
+                                show_modbus_page
                             </a>
                         </li>
 

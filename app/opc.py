@@ -29,7 +29,8 @@ from .model import User
 from .settings import Config
 from threading import Thread
 from .zmq_event import ZClient, event2dict, sensor2dict
-
+import psutil
+import signal
 
 conf_path = Config.conf_path
 log_path = Config.log_path
@@ -66,6 +67,15 @@ def load_logged_in_user():
         g.user = None
     else:
         g.user = User.query.filter_by(id=user_id).first()
+
+
+def kill_python(p_name,p_pid=None):
+    for proc in psutil.process_iter():
+        if proc.name() == "python.exe":
+            print(proc.cmdline())
+            if proc.cmdline()[1]=='p_name':
+                print(proc.cmdline(),proc.pid)
+                os.kill(proc.pid,signal.SIGINT)
 
 
 def check_day_log(start, end, logs, level, key):

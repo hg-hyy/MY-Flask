@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+{% block head %}
+
+<style>
+  .text-center {
+    margin-top: 16px;
+  }
+</style>
+{% endblock %}
+{% block content %}
+
+<div class="row">
+  <div class="col-9">
+    <img src="{{url_for('static',filename='pic/adam.jpg')}}" alt="ycmn" class="img-fluid " style="height: 700px;" />
+  </div>
+  <div class="text-center col-3" id='login'>
+    <form class="form-signin" action="{{url_for('auth.login')}}" method="POST">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+      <img class="mb-4" src="{{ url_for( 'static', filename='pic/bootstrap-solid.svg' ) }}" alt="" width="72"
+        height="72">
+      <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
+
+      <input type="username" id="username" name='username' class="form-control form-control-lg mb-2" placeholder="username" required
+        autofocus>
+
+      <input type="password" id="password" name='password' class="form-control form-control-lg" placeholder="Password" required>
+
+      <div class="custom-control custom-checkbox mb-3">
+        <input type="checkbox" class="custom-control-input" id="remember_me" name='remember_me'>
+        <label class="custom-control-label" for="remember_me">Check this remember</label>
+      </div>
+
+      {% with errors = get_flashed_messages(category_filter=["error"]) %}
+      {% if errors %}
+      {% for msg in errors %}
+      <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>{{ msg }}</strong>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      {% endfor %}
+      {% endif %}
+      {% endwith %}
+
+      <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+      <p class="mt-5 mb-3 text-muted">&copy; 2017-2020</p>
+
+
+
+    </form>
+  </div>
+</div>
+{% endblock %}
