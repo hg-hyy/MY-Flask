@@ -120,7 +120,7 @@ class SensorClient(object):
         topic, message = message.split(b'^', 1)
         self.sensor_list= self.un_package_sensor_data(message)
         # self.sensor_list.extend(list_sensor_temp)
-        print(self.sensor_list[0].tag, self.sensor_list[0].get_value())
+        # print(self.sensor_list[0].tag, self.sensor_list[0].get_value())
 
 if __name__ == "__main__":
     z = ZClient()

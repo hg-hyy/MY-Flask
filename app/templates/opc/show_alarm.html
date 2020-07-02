@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}alarm{% endblock %}
+{% block title %}event{% endblock %}
 {% block head %}
 <style type="text/css">
 
@@ -14,7 +14,7 @@
 
             <a class="navbar-brand">
                 <img src="/static/pic/bootstrap-solid.svg" width="30" height="30" class="d-inline align-middle" alt="">
-                Alarm
+                Event
             </a>
 
             <span class="navbar-text">
@@ -126,7 +126,7 @@
     </div>
 </div>
 <!-- 分页 -->
-<div class="row mt-5">
+<div class="row mt-2">
     <div class="col-md-12 col-sm-12 ">
         <nav id='tag_page'>
 
@@ -162,7 +162,7 @@
         var $values = '';
         var $lis = '';
         var $lis1 = '';
-        console.log(data.paginate)
+        // console.log(data.paginate)
         var tags = data.paginate.items
         if (data.paginate.total > 0) {
             for (i in tags) {

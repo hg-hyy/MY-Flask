@@ -14,16 +14,13 @@
 
             <a class="navbar-brand">
                 <img src="/static/pic/bootstrap-solid.svg" width="30" height="30" class="d-inline align-middle" alt="">
-                Sensor
+                Control
             </a>
-
-            <span class="navbar-text">
-                Navbar text with an inline element
-            </span>
             <div action="{{request.path}}" method="get" class="form-inline my-2 my-lg-0 needs-validation" novalidate>
                 <div class="form-group">
+                    <input type="text" name="key" class="form-control" id='key' />
                 </div>
-                <button class="btn btn-warning  my-2 my-sm-0" type="submit">点击 查询</button>
+                <button class="btn btn-warning  my-2 my-sm-0" onclick="search()">点击 查询</button>
             </div>
         </nav>
         <!-- 功能表单 -->
@@ -68,18 +65,18 @@
                             <li class="page-item ">
                                 {% if paginate.has_prev %}
                                 <a class="page-link form-control" tabindex="-1"
-                                    href="/show_sensor?page={{ paginate.prev_num }}">Previous</a>
+                                    href="/control?page={{ paginate.prev_num }}">Previous</a>
                                 {% endif %}
                             </li>
                             {%  for i in  paginate.iter_pages() %}
                             {% if i %}
                             {%if paginate.page == i%}
                             <li class="page-item active">
-                                <a class="page-link form-control" href="/show_sensor?page={{ i }}">{{ i }}</a>
+                                <a class="page-link form-control" href="/control?page={{ i }}">{{ i }}</a>
                             </li>
                             {%else%}
                             <li class="page-item ">
-                                <a class="page-link form-control" href="/show_sensor?page={{ i }}">{{ i }}</a>
+                                <a class="page-link form-control" href="/control?page={{ i }}">{{ i }}</a>
                             </li>
                             {% endif %}
                             {% else %}
@@ -92,7 +89,7 @@
                             {% endfor %}
 
                             {% if paginate.has_next %}
-                            <a class="page-link form-control" href="/show_sensor?page={{ paginate.next_num }}">Next</a>
+                            <a class="page-link form-control" href="/control?page={{ paginate.next_num }}">Next</a>
                             {% endif %}
 
                             </li>
@@ -134,11 +131,12 @@
 <script>
     var csrftoken = $("meta[name=csrf-token]").attr("content");
 
-    function page() {
+    function search() {
+        var key =$("#key").val()
         $.ajax({
-            url: "{{url_for('cs.show_sensor')}}",
+            url: "{{url_for('cs.control')}}",
             data: {
-                "id": 1,
+                "key": key,
             },
             headers: {
                 "X-CSRFToken": csrftoken
@@ -151,6 +149,7 @@
             },
         });
         return false
+
     }
 
     // 分页
@@ -166,8 +165,15 @@
                 var keys_td = ''
                 var values_td = ''
                 for (t in tags[i]) {
-                    keys_td += '<th scope="row" class="table-info p-1">' + t + '</th>'
-                    values_td += '<td scope="row" ">' + tags[i][t] + '</td>'
+                    keys_td = 
+                    `<th scope="row" class="table-info p-1">process_name</th>
+                    <th scope="row" class="table-info p-1">pid</th>
+                    <th scope="row" class="table-info p-1">操作</th>`
+                    values_td = `<td scope="row" ">${tags[i]['tag'].split(':')[1]}</td>'
+                                <td scope="row" ">${tags[i]['value'] }</td>
+                                <td scope="row" ">
+                                <button class="btn btn-info btn-md" onclick="restart(${tags[i]['value']})">重启</button>
+                                </td>`
                 };
                 $keys = `<tr>${keys_td }</tr>`
                 $values +=
@@ -230,10 +236,13 @@
 
 
     function model_page(page) {
+        var key =$("#key").val()
+        console.log(key)
         $.ajax({
-            url: "{{url_for('cs.show_sensor')}}",
+            url: "{{url_for('cs.control')}}",
             data: {
                 "page": page,
+                "key": key,
             },
             headers: {
                 "X-CSRFToken": csrftoken
@@ -248,31 +257,29 @@
         return false
     }
 
+function restart(pid){
+    console.log(pid)
+        $.ajax({
+            url: "{{url_for('cs.restart')}}",
+            data: {
+                "pid": pid,
+            },
+            headers: {
+                "X-CSRFToken": csrftoken
+            },
+            type: 'post',
+            dataType: 'json',
+            success: function(data){
+                console.log(data)
+            },
+            error: function (data) {
+                console.log(data);
+            },
+        });
+        return false
+}
 
-
-    var int = self.setInterval("page()", 10000);
-    (function () {
-        'use strict'
-
-        window.addEventListener('load',
-            function () {
-                // Fetch all the forms we want to apply custom Bootstrap validation styles to
-                var forms = document.getElementsByClassName('needs-validation')
-
-                // Loop over them and prevent submission
-                Array.prototype.filter.call(
-                    forms,
-                    function (form) {
-                        form.addEventListener('submit',
-                            function (event) {
-                                if (form.checkValidity() === false) {
-                                    event.preventDefault()
-                                    event.stopPropagation()
-                                }
-                                form.classList.add('was-validated')
-                            }, false)
-                    })
-            }, false)
-    }())
+    // var int = self.setInterval("page()", 10000);
+ 
 </script>
 {% endblock %}

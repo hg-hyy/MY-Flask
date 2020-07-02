@@ -28,7 +28,7 @@ from .config import client, server, opc, modbus, URL
 from .model import User
 from .settings import Config
 from threading import Thread
-from .zmq_sensor import SensorClient,sensor2dict
+from .zmq_sensor import SensorClient, sensor2dict
 from .zmq_event import EventClient, event2dict
 import psutil
 import signal
@@ -70,13 +70,23 @@ def load_logged_in_user():
         g.user = User.query.filter_by(id=user_id).first()
 
 
-def kill_python(p_name,p_pid=None):
+def kill_python(p_name, p_pid=None):
     for proc in psutil.process_iter():
         if proc.name() == "python.exe":
             print(proc.cmdline())
-            if proc.cmdline()[1]=='p_name':
-                print(proc.cmdline(),proc.pid)
-                os.kill(proc.pid,signal.SIGINT)
+            if proc.cmdline()[1] == 'p_name':
+                print(proc.cmdline(), proc.pid)
+                os.kill(proc.pid, signal.SIGINT)
+
+def kill_process(pid):
+  try:
+    a = os.kill(pid, signal.SIGINT)
+    if not a:
+        current_app.logger.debug(f'已经结束pid为{pid}的进程')
+        return True
+  except OSError as e:
+    current_app.logger.debug('没有如此进程!!!')
+    return False
 
 
 def check_day_log(start, end, logs, level, key):
@@ -1382,12 +1392,12 @@ def log():
         key = request.form.get('key')
         log_name = log_path+'\\'+'{}.log'.format(log_day)
         if not all((log_day, log_day_start, log_day_end)):
-            return {'paginate': log_list ,'msg': f'请输入查询日期和时间'}
+            return {'paginate': log_list, 'msg': f'请输入查询日期和时间'}
         try:
             with open(log_name, 'r', encoding='utf-8') as lg:
                 logs = lg.read().splitlines()
         except Exception as e:
-            return {'paginate': log_list , 'msg': f'OOOPS..[{log_day}]没有日志,被外星人偷走了？？'}
+            return {'paginate': log_list, 'msg': f'OOOPS..[{log_day}]没有日志,被外星人偷走了？？'}
         text = linecache.getline(log_name, 2)[1:-1]
         logs_list = check_day_log(
             log_day_start, log_day_end, logs, log_level, key)
@@ -1529,8 +1539,8 @@ sc = SensorClient()
 
 @cs.route("/show_sensor", methods=['GET', 'POST'], endpoint='show_sensor')
 def show_sensor():
-    tags=[]
-    if request.method=='POST':
+    tags = []
+    if request.method == 'POST':
         page = int(request.form.get('page', 1))
         pages = int(request.form.get('pages', 3))
     else:
@@ -1541,24 +1551,24 @@ def show_sensor():
         tags.append(sensor2dict(data))
     pga = paginate(tags, page, pages)
     pga_dict = {'items': pga.items,
-                        'has_prev': pga.has_prev,
-                        'prev_num': pga.prev_num,
-                        'has_next': pga.has_next,
-                        'next_num': pga.next_num,
-                        'iter_pages': list(pga.iter_pages()),
-                        'pages': pga.pages,
-                        'page': pga.page,
-                        'total': pga.total
-                        }
-    if request.method=='POST':
-        return {'paginate':pga_dict}
+                'has_prev': pga.has_prev,
+                'prev_num': pga.prev_num,
+                'has_next': pga.has_next,
+                'next_num': pga.next_num,
+                'iter_pages': list(pga.iter_pages()),
+                'pages': pga.pages,
+                'page': pga.page,
+                'total': pga.total
+                }
+    if request.method == 'POST':
+        return {'paginate': pga_dict}
     return render_template('opc/show_sensor.html', paginate=pga, show_sensor='bg-warning')
 
 
 @cs.route("/show_alarm", methods=['GET', 'POST'], endpoint='show_alarm')
 def show_alarm():
-    tags=[]
-    if request.method=='POST':
+    tags = []
+    if request.method == 'POST':
         page = int(request.form.get('page', 1))
         pages = int(request.form.get('pages', 3))
     else:
@@ -1569,15 +1579,70 @@ def show_alarm():
         tags.append(event2dict(data))
     pga = paginate(tags, page, pages)
     pga_dict = {'items': pga.items,
-                        'has_prev': pga.has_prev,
-                        'prev_num': pga.prev_num,
-                        'has_next': pga.has_next,
-                        'next_num': pga.next_num,
-                        'iter_pages': list(pga.iter_pages()),
-                        'pages': pga.pages,
-                        'page': pga.page,
-                        'total': pga.total
-                        }
-    if request.method=='POST':
-        return {'paginate':pga_dict}
+                'has_prev': pga.has_prev,
+                'prev_num': pga.prev_num,
+                'has_next': pga.has_next,
+                'next_num': pga.next_num,
+                'iter_pages': list(pga.iter_pages()),
+                'pages': pga.pages,
+                'page': pga.page,
+                'total': pga.total
+                }
+    if request.method == 'POST':
+        return {'paginate': pga_dict}
     return render_template('opc/show_alarm.html', paginate=pga, show_alarm='bg-warning')
+
+
+
+def search_process(key, source, pc_list):
+    print(key)
+    if '*' in key:
+        for s in source:
+            if key[1:] in s['tag']:
+                pc_list.append(s)
+    else:
+        for s in source:
+            if s['tag'] == key:
+                pc_list.append(s)
+
+    return pc_list
+
+
+@cs.route("/control", methods=['GET', 'POST'], endpoint='control')
+def control():
+    tags = []
+    if request.method == 'POST':
+        page = int(request.form.get('page', 1))
+        pages = int(request.form.get('pages', 10))
+        key = request.form.get('key')
+
+    else:
+        page = int(request.args.get('page', 1))
+        pages = int(request.args.get('pages', 5))
+        key = request.args.get('key', '*pid')
+
+    for data in sc.sensor_list:
+        tags.append(sensor2dict(data))
+    
+    pc_list = search_process(key, tags, [])
+    pga = paginate(pc_list, page, pages)
+    pga_dict = {'items': pga.items,
+                'has_prev': pga.has_prev,
+                'prev_num': pga.prev_num,
+                'has_next': pga.has_next,
+                'next_num': pga.next_num,
+                'iter_pages': list(pga.iter_pages()),
+                'pages': pga.pages,
+                'page': pga.page,
+                'total': pga.total
+                }
+    if request.method == 'POST':
+        return {'paginate': pga_dict}
+    return render_template('opc/control.html', paginate=pga, control='bg-danger')
+
+
+@cs.route("/restart", methods=['GET', 'POST'], endpoint='restart')
+def restart():
+    pid = request.form.get('pid')
+    kill_process(11800)
+    return {'success':True,'msg':'重启成功'}
