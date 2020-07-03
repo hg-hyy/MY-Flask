@@ -7,20 +7,9 @@
 @desc:
 
 """
-from math import ceil
-import datetime
-import os
-import time
-import xlrd
-import json
-import re
-import functools
-import linecache
-import requests
 import random
-from pathlib import Path
-from flask import request, render_template, Blueprint, session, url_for
-from flask import Markup, make_response, jsonify, flash, current_app, redirect, g
+from flask import render_template, Blueprint
+from flask import jsonify
 from pyecharts import options as opts
 from pyecharts.charts import Bar
 from pyecharts.charts import Line

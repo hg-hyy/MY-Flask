@@ -1,6 +1,6 @@
-from flask import Blueprint, render_template, session, redirect, url_for, request, flash, make_response, abort, current_app
-from .model import User, Issue, db, Category
-from .forms import LoginForm, CategoryForm, ContactForm, IssueForm
+from flask import Blueprint, render_template, session, redirect, url_for, request, flash, abort, current_app
+from .model import Issue, db, Category
+from .forms import CategoryForm, ContactForm, IssueForm
 from flask import g
 from flask_mail import Message, Mail
 from app.opc import login_required
@@ -21,11 +21,6 @@ def show_category(form=None):
     # 从数据库查询数据
     paginates = Category.query.order_by('id').paginate(
         page, pages, error_out=False)
-    categorys = paginates.items
-
-    # totalpage为总页面数
-    max_pages = math.ceil(paginates.total/pages)
-
     return render_template('issue/show_category.html', paginate=paginates)
 
 
@@ -94,7 +89,7 @@ def show_issue():
     # 从数据库查询数据
     paginates = Issue.query.order_by('id').paginate(
         page, pages, error_out=False)
-    issues = paginates.items
+
     categorys = Category.query.all()
     return render_template('issue/show_issue.html', paginate=paginates, faq='bg-success', categorys=categorys)
 

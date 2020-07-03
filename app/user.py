@@ -1,8 +1,8 @@
-from flask import Blueprint, render_template, request, flash, session, url_for,abort,redirect
-from .forms import RegisterForm, LoginForm
+from flask import Blueprint, render_template, request, flash, url_for,abort,redirect
+from .forms import RegisterForm
 from .model import User, db
 from app.opc import login_required
-from werkzeug.security import generate_password_hash,check_password_hash
+
 
 
 
@@ -18,7 +18,6 @@ def add(admin_create=False):
     if request.method == 'POST':
         try:
             if form.validate_on_submit():
-                user_list = User.query.all()
                 return redirect(url_for('admin.admin'))
         except Exception as e:
             print(str(e))

@@ -1,9 +1,7 @@
 from flask import Flask, render_template, session, url_for, redirect, flash
-from flask_sqlalchemy import SQLAlchemy
 from flask_wtf.csrf import CSRFProtect
 import logging
 from logging.config import dictConfig
-from logging.handlers import RotatingFileHandler
 from flask import g
 from flask_mail import Mail
 import os
@@ -95,15 +93,11 @@ def create_app(test_config=None):
         return csrf_token
 
     def login_required(view):
-        """View decorator that redirects anonymous users to the login page."""
-
         @functools.wraps(view)
         def wrapped_view(**kwargs):
             if g.user is None:
                 return redirect(url_for("auth.login"))
-
             return view(**kwargs)
-
         return wrapped_view
 
     @app.route('/', methods=['GET'], endpoint='index')

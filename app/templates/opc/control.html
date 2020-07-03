@@ -28,7 +28,7 @@
         <hr class="border-bottom border-danger" />
         <!-- issue卡片 -->
         <div class="card-deck">
-            {% for sensor in paginate.items %}
+            {% for sensor in paginate['items'] %}
 
             <div class="card border-success mb-3" style="max-width: 30rem;">
                 <div class="card-header bg-transparent border-success">
@@ -44,14 +44,14 @@
                         {{ sensor['quality'] }}
                     </h5>
                     <blockquote class="blockquote mb-0">
-                        <p class="card-text text-danger">{{ sensor['value'] }}</p>
+                        <p class="card-text text-danger">{{ sensor['tag'] }}:{{ sensor['value']}}</p>
                         <footer class="blockquote-footer">
-                            <cite title="Source Title">{{ sensor['tag'] }}:{{ sensor['value']}}</cite>
+                            <cite title="Source Title">On:{{ sensor['timestamp']}}</cite>
                         </footer>
                     </blockquote>
                 </div>
                 <div class="card-footer bg-transparent border-success d-flex flex-row-reverse">
-                    <cite title="Source Title">On:{{ sensor['timestamp']}}</cite>
+                    <button class="btn btn-outline-danger btn-md">结束进程</button>
                 </div>
             </div>
             {% endfor %}
@@ -68,7 +68,7 @@
                                     href="/control?page={{ paginate.prev_num }}">Previous</a>
                                 {% endif %}
                             </li>
-                            {%  for i in  paginate.iter_pages() %}
+                            {%  for i in  paginate.iter_pages %}
                             {% if i %}
                             {%if paginate.page == i%}
                             <li class="page-item active">
@@ -132,7 +132,7 @@
     var csrftoken = $("meta[name=csrf-token]").attr("content");
 
     function search() {
-        var key =$("#key").val()
+        var key = $("#key").val()
         $.ajax({
             url: "{{url_for('cs.control')}}",
             data: {
@@ -165,8 +165,8 @@
                 var keys_td = ''
                 var values_td = ''
                 for (t in tags[i]) {
-                    keys_td = 
-                    `<th scope="row" class="table-info p-1">process_name</th>
+                    keys_td =
+                        `<th scope="row" class="table-info p-1">process_name</th>
                     <th scope="row" class="table-info p-1">pid</th>
                     <th scope="row" class="table-info p-1">操作</th>`
                     values_td = `<td scope="row" ">${tags[i]['tag'].split(':')[1]}</td>'
@@ -236,7 +236,7 @@
 
 
     function model_page(page) {
-        var key =$("#key").val()
+        var key = $("#key").val()
         console.log(key)
         $.ajax({
             url: "{{url_for('cs.control')}}",
@@ -257,8 +257,8 @@
         return false
     }
 
-function restart(pid){
-    console.log(pid)
+    function restart(pid) {
+        console.log(pid)
         $.ajax({
             url: "{{url_for('cs.restart')}}",
             data: {
@@ -269,7 +269,7 @@ function restart(pid){
             },
             type: 'post',
             dataType: 'json',
-            success: function(data){
+            success: function (data) {
                 console.log(data)
             },
             error: function (data) {
@@ -277,9 +277,8 @@ function restart(pid){
             },
         });
         return false
-}
+    }
 
     // var int = self.setInterval("page()", 10000);
- 
 </script>
 {% endblock %}

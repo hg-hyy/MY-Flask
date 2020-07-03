@@ -95,10 +95,7 @@
                             href="/show_tag_page?page={{ paginate.prev_num }}">Previous</a>
                         {% endif %}
                     </li>
-
-
                     {%  for i in  paginate.iter_pages %}
-
                     {% if i %}
                     {%if paginate.page == i%}
                     <li class="page-item active">
@@ -128,7 +125,7 @@
                 <li class="page-item"><a class="page-link form-control">共</a></li>
                 <input id='total' name='total' disabled class="form-control" style="width: 60px;"
                     value="{{ paginate.total }}" />
-                <li class="page-item"><a class="page-link form-control">条</a></li>
+                <li class="page-item"><a class="page-link form-control">组</a></li>
                 <li class="page-item"><a class="page-link form-control">共</a></li>
                 <input id='max_pages' name='max_pages' disable class="form-control" style="width: 60px;"
                     value="{{ paginate.pages }}" />
@@ -885,8 +882,6 @@
         var $values = '';
         var count = data.group_infos.length
         console.log(data)
-        $("#max_pages").val(data.paginate.pages)
-        $("#total").val(data.paginate.total)
         var $keys = ''
         if (data.module == 'modbus1') {
             $keys =

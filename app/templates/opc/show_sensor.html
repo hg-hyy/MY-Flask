@@ -31,7 +31,7 @@
         <hr class="border-bottom border-danger" />
         <!-- issue卡片 -->
         <div class="card-deck">
-            {% for sensor in paginate.items %}
+            {% for sensor in paginate['items'] %}
 
             <div class="card border-success mb-3" style="max-width: 30rem;">
                 <div class="card-header bg-transparent border-success">
@@ -71,7 +71,7 @@
                                     href="/show_sensor?page={{ paginate.prev_num }}">Previous</a>
                                 {% endif %}
                             </li>
-                            {%  for i in  paginate.iter_pages() %}
+                            {%  for i in  paginate.iter_pages %}
                             {% if i %}
                             {%if paginate.page == i%}
                             <li class="page-item active">

@@ -1,0 +1,29 @@
+{
+    "module": "local",
+    "data": {
+        "s_opcae_client1.main_server_ip": "192.168.31.17",
+        "s_opcae_client1.main_server_prgid": "Kepware.KEPServerEX_AE.V6",
+        "s_opcae_client1.main_server_clsid": "E6C32641-F1CF-11D0-B0E4-080009CCD384",
+        "s_opcae_client1.main_server_domain": "OPC",
+        "s_opcae_client1.main_server_user": "adminstrator",
+        "s_opcae_client1.main_server_password": "12!@Qwqw",
+        "s_opcae_client1.bak_server_ip": "192.168.31.18",
+        "s_opcae_client1.bak_server_prgid": "Kepware.KEPServerEX.V6",
+        "s_opcae_client1.bak_server_clsid": "6031BF75-9CF2-11D1-A97B-00C04FC01389",
+        "s_opcae_client1.bak_server_domain": "ifix5.5",
+        "s_opcae_client1.bak_server_user": "administrator",
+        "s_opcae_client1.bak_server_password": "12!@QWqw",
+        "s_opcae_client1.subscriptions": [
+            {
+                "subscription_id": 1,
+                "subscription_name": "sub1",
+                "enable": true,
+                "update_rate": 1000,
+                "max_size": 0,
+                "event_type": "SIMPLE,TRACKING,CONDITION",
+                "high_serverrity": 1000,
+                "low_serverrity": 1
+            }
+        ]
+    }
+}

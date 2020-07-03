@@ -1,18 +1,16 @@
-from flask import Blueprint, render_template, request, redirect, url_for, current_app, session, flash, g
+from flask import  current_app, session, flash, g
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileRequired, FileAllowed
 from flask_wtf.recaptcha import RecaptchaField
-from wtforms import widgets, Form
+from wtforms import widgets
 from wtforms import StringField
-from wtforms.validators import DataRequired, Regexp, Length, IPAddress, ValidationError, InputRequired, Email
-from wtforms import PasswordField, SubmitField, RadioField
-from wtforms import BooleanField, IntegerField
-from wtforms.fields import core
+from wtforms.validators import DataRequired, Regexp, Length, ValidationError, InputRequired, Email
+from wtforms import PasswordField, SubmitField
+from wtforms import BooleanField
 from wtforms import TextAreaField, SelectField
 from wtforms.fields.html5 import EmailField
 from .model import User, db, Category, Issue, Contact
 from wtforms.validators import EqualTo
-from werkzeug.security import generate_password_hash, check_password_hash
 import datetime
 
 
@@ -74,8 +72,8 @@ class LoginForm(FlaskForm):
         remember_me = self.remember_me.data
         user = User.query.filter_by(username=self.username.data).first_or_404(
             description='THE {} is not found'.format(self.username.data))
-
-        if user.username == self.username.data and user.check_password:
+        if user.username == self.username.data and user.check_password(self.password.data):
+            session.clear()
             if remember_me == True:
                 session.permanent = True
                 current_app.permanent_session_lifetime = datetime.timedelta(
@@ -89,6 +87,7 @@ class LoginForm(FlaskForm):
             return True
         else:
             self.username.errors.append('Invalid username or password.')
+            flash('密码错误', 'error')
             return False
 
 

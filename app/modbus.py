@@ -6,11 +6,10 @@ import re
 from flask import redirect, url_for
 from flask import request, render_template, Blueprint, current_app, session
 from werkzeug.utils import secure_filename
-import functools
 from .settings import Config
 from flask import g
 from math import ceil
-
+from app.opc import login_required
 
 conf_path = Config.conf_path
 log_path = Config.log_path
@@ -18,31 +17,6 @@ p = Config.p
 
 
 mt = Blueprint('mt', __name__)
-
-
-def login_required(view):
-    """View decorator that redirects anonymous users to the login page."""
-
-    @functools.wraps(view)
-    def wrapped_view(**kwargs):
-        if g.user is None:
-            return redirect(url_for('auth.login'))
-        return view(**kwargs)
-
-    return wrapped_view
-
-
-@mt.before_app_request
-def load_logged_in_user():
-    """If a user id is stored in the session, load the user object from
-    the database into ``g.user``."""
-    user_id = session.get("user_id")
-
-    if user_id is None:
-        g.user = None
-    else:
-        g.user = {'username': 'admin', 'password': '111111'}
-
 
 def allowed_file(filename):
     return '.' in filename and \

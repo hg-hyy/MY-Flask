@@ -55,13 +55,13 @@
                 <button class="btn btn-outline-danger dropdown-toggle" type="button" id="dropdownMenuButton"
                     data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     {% if g.user %}
-                    Welcome! {{g.user.username}}
+                    Welcome! {{g.user}}
                     {% else %}
                     未登录
                     {% endif %}
                 </button>
                 <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                    {% if session['user_id'] %}
+                    {% if g.user %}
                     <a href="{{url_for('admin.profile')}}" class="dropdown-item">Profile</a>
                     <a href="{{url_for('auth.logout')}}" class="dropdown-item">Logout</a>
                     {% else %}

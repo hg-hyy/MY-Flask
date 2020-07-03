@@ -1,16 +1,9 @@
-from flask import Blueprint, render_template, session, redirect, url_for, request, flash,make_response
-from .model import User
-from .forms import LoginForm, CategoryForm, ContactForm
-from flask import g
-from flask_mail import Message,Mail
-from werkzeug.security import generate_password_hash,check_password_hash
-from threading import Thread
-from flask import current_app
-
-
+from flask import Blueprint, render_template, session, redirect, url_for, request, flash, make_response
+from .forms import LoginForm
 
 
 auth = Blueprint('auth', __name__)
+
 
 @auth.route('/login', methods=['GET', 'POST'], endpoint='login')
 def login():
@@ -22,13 +15,12 @@ def login():
         except Exception as e:
             flash(f'用户名或密码错误{str(e)}', 'error')
             return render_template('auth/login.html', form=form)
-    return render_template('auth/login.html', form=form,login='bg-info')
+    return render_template('auth/login.html', form=form, login='bg-info')
 
 
-@auth.route('/logout',methods=['GET', 'POST'] ,endpoint='logout')
+@auth.route('/logout', methods=['GET', 'POST'], endpoint='logout')
 def logout():
     # remove the username from the session if it's there
-    session.pop('user_id', None)
     session.clear()
     flash('You have been logged out', 'success')
     return redirect(url_for('auth.login'))
@@ -47,4 +39,3 @@ def set_cookie():
     resp = make_response(render_template(...))
     resp.set_cookie('username', 'the username')
     return resp
-

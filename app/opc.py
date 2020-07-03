@@ -17,17 +17,13 @@ import re
 import functools
 import linecache
 import requests
-from pathlib import Path
 from flask import request, render_template, Blueprint, session, url_for
-from flask import Markup, make_response, jsonify, flash, current_app, redirect, g
+from flask import current_app, redirect, g, jsonify
 from werkzeug.utils import secure_filename
-from flask_wtf.csrf import generate_csrf
-from uuid import uuid4
-from .forms import OpcForm, LoginForm, OpcdaForm
-from .config import client, server, opc, modbus, URL
+from .forms import OpcForm, OpcdaForm
+from .config import client, opc, modbus, URL
 from .model import User
 from .settings import Config
-from threading import Thread
 from .zmq_sensor import SensorClient, sensor2dict
 from .zmq_event import EventClient, event2dict
 import psutil
@@ -51,7 +47,6 @@ def login_required(view):
     @functools.wraps(view)
     def wrapped_view(**kwargs):
         if g.user is None:
-            form = LoginForm()
             return redirect(url_for('auth.login'))
         return view(**kwargs)
 
@@ -78,15 +73,16 @@ def kill_python(p_name, p_pid=None):
                 print(proc.cmdline(), proc.pid)
                 os.kill(proc.pid, signal.SIGINT)
 
+
 def kill_process(pid):
-  try:
-    a = os.kill(pid, signal.SIGINT)
-    if not a:
-        current_app.logger.debug(f'已经结束pid为{pid}的进程')
-        return True
-  except OSError as e:
-    current_app.logger.debug('没有如此进程!!!')
-    return False
+    try:
+        a = os.kill(pid, signal.SIGINT)
+        if not a:
+            current_app.logger.debug(f'已经结束pid为{pid}的进程')
+            return True
+    except OSError as e:
+        current_app.logger.debug('没有如此进程!!!')
+        return False
 
 
 def check_day_log(start, end, logs, level, key):
@@ -352,13 +348,13 @@ def decode_config(cfg_msg, module):
 
 
 def call_s_config(ref_url, json_data):
+    stu = False
+    res = {}
     try:
         data = json.dumps(json_data)
         headers = {'content-type': 'application/json'}
         response = requests.post(
             url=ref_url, data=data, headers=headers, timeout=5)
-        stu = False
-        res = {}
         if response.status_code == 200 and response.json()["code"] == 1000:
             stu = True
             res = response.json()['data']
@@ -368,6 +364,7 @@ def call_s_config(ref_url, json_data):
             return res, stu
     except Exception as error:
         current_app.logger.error(f'配置异常!原因:{error}')
+        return res, stu
 
 
 @cs.route('/page', methods=['GET', 'POST'], endpoint='page')
@@ -434,17 +431,17 @@ def show_tag_page():
             tags, basic_config, group_infos = read_opc_config(cfg_msg, module)
         if group_infos:
             pga = paginate(group_infos[group_id]['tags'], page, pages)
-            pga_dict = {'items': pga.items,
-                        'has_prev': pga.has_prev,
-                        'prev_num': pga.prev_num,
-                        'has_next': pga.has_next,
-                        'next_num': pga.next_num,
-                        'iter_pages': list(pga.iter_pages()),
-                        'pages': pga.pages,
-                        'page': pga.page,
-                        'total': pga.total
-                        }
-            return {"paginate": pga_dict, 'group_infos': group_infos, 'module': module}
+            # pga_dict = {'items': pga.items,
+            #             'has_prev': pga.has_prev,
+            #             'prev_num': pga.prev_num,
+            #             'has_next': pga.has_next,
+            #             'next_num': pga.next_num,
+            #             'iter_pages': list(pga.iter_pages()),
+            #             'pages': pga.pages,
+            #             'page': pga.page,
+            #             'total': pga.total
+            #             }
+            return {"paginate": pga, 'group_infos': group_infos, 'module': module}
         return {"paginate": [], 'group_infos': [], 'module': module}
 
     module = str(request.args.get('module', 's_opcda_client1'))
@@ -458,16 +455,16 @@ def show_tag_page():
     else:
         tags, basic_config, group_infos = read_opc_config(cfg_msg, module)
     pga = paginate(group_infos, page, pages)
-    pga_dict = {'items': pga.items,
-                'has_prev': pga.has_prev,
-                'prev_num': pga.prev_num,
-                'has_next': pga.has_next,
-                'next_num': pga.next_num,
-                'iter_pages': pga.iter_pages(),
-                'pages': pga.pages,
-                'total': pga.total
-                }
-    return render_template('opc/show_tag.html', paginate=pga_dict, group_infos=group_infos, group='bg-info')
+    # pga_dict = {'items': pga.items,
+    #             'has_prev': pga.has_prev,
+    #             'prev_num': pga.prev_num,
+    #             'has_next': pga.has_next,
+    #             'next_num': pga.next_num,
+    #             'iter_pages': pga.iter_pages(),
+    #             'pages': pga.pages,
+    #             'total': pga.total
+    #             }
+    return render_template('opc/show_tag.html', paginate=pga, group_infos=group_infos, group='bg-info')
 
 
 @cs.route('/search', methods=['GET', 'POST'], endpoint='search')
@@ -520,7 +517,7 @@ def show_tag_search():
     print(pga.total, pga.pages, pga.has_prev, pga.has_next,
           pga.prev_num, pga.next_num, pga_dict['iter_pages'])
     current_app.logger.debug(f'查询{module}位号:%s' % (tagname))
-    return {"paginate": pga_dict, 'group_infos': group_infos}
+    return {"paginate": pga, 'group_infos': group_infos}
 
 
 @cs.route('/add_group', methods=['GET', 'POST'], endpoint='add_group')
@@ -581,7 +578,7 @@ def alter_group():
                 cfg_msg, module)
         else:
             tags, basic_config, group_infos = read_opc_config(cfg_msg, module)
-
+        new_gis = {}
         for gis in group_infos:
             if gis['group_id'] == group_id:
                 new_gis = {
@@ -771,16 +768,14 @@ def alter_tag():
     if not data:
         current_app.logger.debug(f'修改标签{publish_tag_name}失败，标签不存在！')
         return {'success': False, 'message': '标签名不存在'}
-        tag = {}
     for gis in group_infos:
         if gis['group_id'] == group_id:
             for index, t in enumerate(gis['tags']):
                 if t['publish_tag_name'] == publish_tag_name:
-                    print(t)
                     tag = t
                     break
     current_app.logger.debug(f'请求修改标签{publish_tag_name}成功')
-    return {'success': True, 'message': '请求修改标签点成功', 'tag': tag}
+    return {'success': True, 'message': '请求修改标签点成功', 'tag': publish_tag_name}
 
 
 @cs.route('/delete_tag', methods=['GET', 'POST'], endpoint='delete_tag')
@@ -844,7 +839,7 @@ def load_opc_sev():
         module = request.form['module']
         enAutoTag = int(request.form['enAutoTag'])
         isDataConvert = int(request.form['isDataConvert'])
-        tags = []
+        tag_list = []
         if enAutoTag == 0:
             f = request.files['file']
 
@@ -859,7 +854,7 @@ def load_opc_sev():
             for T in xl:
                 wb = xlrd.open_workbook(T)
                 names = wb.sheet_names()
-                tag = []
+
                 for name in names:
                     st = wb.sheet_by_name(name)
                     nrows = st.nrows
@@ -868,11 +863,11 @@ def load_opc_sev():
                         publish_tag_name = tags_list[m]
                         tag_value = [publish_tag_name, write_able, data_type]
                         X = dict(zip(tag_key, tag_value))
-                        tag.append(X)
-            tags = tag
+                        tag_list.append(X)
+
         basic_config = {module+'.enAutoTag': enAutoTag,
                         module+'.isDataConvert': isDataConvert}
-        tags = {module+'.tags': tags}
+        tags = {module+'.tags': tag_list}
 
         data = {**basic_config, **tags}
 
@@ -967,7 +962,7 @@ def load_opc_da():
                 Y = dict(zip(group_key, group_value))
                 groups.append(Y)
 
-        dict2 = {module+'.groups': groups}
+            dict2 = {module+'.groups': groups}
         data = {**dict1, **dict2}
 
         res = {
@@ -1074,7 +1069,7 @@ def load_modbus():
         f = request.files['file']
         if f and allowed_file(f.filename):
             f.save(conf_path+secure_filename(f.filename))
-
+            names = []
             xl = list(p.rglob('modbus.xlsx'))
             for T in xl:
                 wb = xlrd.open_workbook(T)
@@ -1082,6 +1077,7 @@ def load_modbus():
             data_list = []      # 站 号
             data_dict = {"slave_id": 0, "block": []}
             block_dict = {'fun_code': 0, 'tags': []}
+            wb = None
             for name in names:
                 st = wb.sheet_by_name(name)
                 nrows = st.nrows
@@ -1091,6 +1087,8 @@ def load_modbus():
 
                 tags = []
                 block_list = []   # 功能码
+                slave_id = []
+                fun_code = []
                 for i in range(1, nrows):
                     tags_list = st.row_values(i, start_colx=0, end_colx=None)
                     tag = {
@@ -1116,7 +1114,7 @@ def load_modbus():
                             fun_code[0]), 'tags': tags}
                         dt['block'].append(block_dict)
 
-        dict2 = {module+'.data': data_list}
+            dict2 = {module+'.data': data_list}
         data = {**dict1, **dict2}
         res = {
             "module": "local",
@@ -1370,18 +1368,8 @@ def set_config(cfg_msg, module):
 @ cs.route('/log', methods=['GET', 'POST'], endpoint='log')
 @login_required
 def log():
-    log_list = {'items': [],
-                'has_prev': False,
-                'prev_num': 0,
-                'has_next': False,
-                'next_num': 0,
-                'iter_pages': [],
-                'pages': 0,
-                'page': 0,
-                'total': 0
-                }
+    logs_list = []
     if request.method == 'POST':
-        logs_list = []
         log_level = request.form.get('log_level', 'ALL')
         log_day = request.form.get('log_day', time.strftime('%Y-%m-%d'))
         log_day_start = log_day+' ' + \
@@ -1392,52 +1380,30 @@ def log():
         key = request.form.get('key')
         log_name = log_path+'\\'+'{}.log'.format(log_day)
         if not all((log_day, log_day_start, log_day_end)):
-            return {'paginate': log_list, 'msg': f'请输入查询日期和时间'}
+            return {'paginate': {}, 'msg': f'请输入查询日期和时间'}
         try:
             with open(log_name, 'r', encoding='utf-8') as lg:
                 logs = lg.read().splitlines()
         except Exception as e:
-            return {'paginate': log_list, 'msg': f'OOOPS..[{log_day}]没有日志,被外星人偷走了？？'}
+            return {'paginate': {}, 'msg': f'OOOPS..[{log_day}]没有日志,被外星人偷走了？？'}
         text = linecache.getline(log_name, 2)[1:-1]
         logs_list = check_day_log(
             log_day_start, log_day_end, logs, log_level, key)
         if logs_list:
             pga = paginate(logs_list, page, pages)
-            log_list = {'items': pga.items,
-                        'has_prev': pga.has_prev,
-                        'prev_num': pga.prev_num,
-                        'has_next': pga.has_next,
-                        'next_num': pga.next_num,
-                        'iter_pages': list(pga.iter_pages()),
-                        'pages': pga.pages,
-                        'page': pga.page,
-                        'total': pga.total
-                        }
-            return {"paginate": log_list, 'msg': f'查询到{pga.total}条日志'}
+            return {"paginate": pga, 'msg': f'查询到条日志'}
         else:
-            return {'paginate': log_list, 'msg': f'查询到0条日志'}
+            return {'paginate': {}, 'msg': f'查询到0条日志'}
 
     else:
         pages = int(request.args.get('pages', 5))
         page = int(request.args.get('page', 1))
-        logs_list = []
         with open(log_path+'\\'+'{}.log'.format(time.strftime('%Y-%m-%d')), 'r', encoding='utf-8') as lg:
             logs = lg.read().splitlines()
         for l in logs:
             logs_list.append(l.rsplit('  '))
-            pga = paginate(logs_list, page, pages)
-            log_list = {
-                'items': pga.items,
-                'has_prev': pga.has_prev,
-                'prev_num': pga.prev_num,
-                'has_next': pga.has_next,
-                'next_num': pga.next_num,
-                'iter_pages': list(pga.iter_pages()),
-                'pages': pga.pages,
-                'page': pga.page,
-                'total': pga.total
-            }
-        return render_template('log/log.html', paginate=log_list, log='bg-info')
+        pga = paginate(logs_list, page, pages)
+        return render_template('log/log.html', paginate=pga, log='bg-info')
 
 
 def check_log():
@@ -1445,6 +1411,7 @@ def check_log():
         log_level = request.args.get("log_level")
         log_day = request.args.get("log_day")
         log_list = []
+        loglist = []
         for root, dirs, files in os.walk(log_path):
             loglist = files
         for lv in loglist:
@@ -1522,6 +1489,19 @@ class Pagination(object):
                 yield num
                 last = num
 
+    @property
+    def to_json(self):
+        return {'items': self.items,
+                'has_prev': self.has_prev,
+                'prev_num': self.prev_num,
+                'has_next': self.has_next,
+                'next_num': self.next_num,
+                'iter_pages': list(self.iter_pages()),
+                'pages': self.pages,
+                'page': self.page,
+                'total': self.total
+                }
+
 
 def paginate(list, page=1, per_page=3, max_per_page=None):
     if max_per_page is not None:
@@ -1530,7 +1510,7 @@ def paginate(list, page=1, per_page=3, max_per_page=None):
     end = page*per_page
     items = list[start:end]
     total = len(list)
-    return Pagination(page, per_page, total, items)
+    return Pagination(page, per_page, total, items).to_json
 
 
 ec = EventClient()
@@ -1550,18 +1530,18 @@ def show_sensor():
     for data in sc.sensor_list:
         tags.append(sensor2dict(data))
     pga = paginate(tags, page, pages)
-    pga_dict = {'items': pga.items,
-                'has_prev': pga.has_prev,
-                'prev_num': pga.prev_num,
-                'has_next': pga.has_next,
-                'next_num': pga.next_num,
-                'iter_pages': list(pga.iter_pages()),
-                'pages': pga.pages,
-                'page': pga.page,
-                'total': pga.total
-                }
+    # pga_dict = {'items': pga.items,
+    #             'has_prev': pga.has_prev,
+    #             'prev_num': pga.prev_num,
+    #             'has_next': pga.has_next,
+    #             'next_num': pga.next_num,
+    #             'iter_pages': list(pga.iter_pages()),
+    #             'pages': pga.pages,
+    #             'page': pga.page,
+    #             'total': pga.total
+    #             }
     if request.method == 'POST':
-        return {'paginate': pga_dict}
+        return {'paginate': pga}
     return render_template('opc/show_sensor.html', paginate=pga, show_sensor='bg-warning')
 
 
@@ -1578,24 +1558,22 @@ def show_alarm():
     for data in ec.event_list:
         tags.append(event2dict(data))
     pga = paginate(tags, page, pages)
-    pga_dict = {'items': pga.items,
-                'has_prev': pga.has_prev,
-                'prev_num': pga.prev_num,
-                'has_next': pga.has_next,
-                'next_num': pga.next_num,
-                'iter_pages': list(pga.iter_pages()),
-                'pages': pga.pages,
-                'page': pga.page,
-                'total': pga.total
-                }
+    # pga_dict = {'items': pga.items,
+    #             'has_prev': pga.has_prev,
+    #             'prev_num': pga.prev_num,
+    #             'has_next': pga.has_next,
+    #             'next_num': pga.next_num,
+    #             'iter_pages': list(pga.iter_pages()),
+    #             'pages': pga.pages,
+    #             'page': pga.page,
+    #             'total': pga.total
+    #             }
     if request.method == 'POST':
-        return {'paginate': pga_dict}
+        return {'paginate': pga}
     return render_template('opc/show_alarm.html', paginate=pga, show_alarm='bg-warning')
 
 
-
 def search_process(key, source, pc_list):
-    print(key)
     if '*' in key:
         for s in source:
             if key[1:] in s['tag']:
@@ -1623,21 +1601,21 @@ def control():
 
     for data in sc.sensor_list:
         tags.append(sensor2dict(data))
-    
+
     pc_list = search_process(key, tags, [])
     pga = paginate(pc_list, page, pages)
-    pga_dict = {'items': pga.items,
-                'has_prev': pga.has_prev,
-                'prev_num': pga.prev_num,
-                'has_next': pga.has_next,
-                'next_num': pga.next_num,
-                'iter_pages': list(pga.iter_pages()),
-                'pages': pga.pages,
-                'page': pga.page,
-                'total': pga.total
-                }
+    # pga_dict = {'items': pga.items,
+    #             'has_prev': pga.has_prev,
+    #             'prev_num': pga.prev_num,
+    #             'has_next': pga.has_next,
+    #             'next_num': pga.next_num,
+    #             'iter_pages': list(pga.iter_pages()),
+    #             'pages': pga.pages,
+    #             'page': pga.page,
+    #             'total': pga.total
+    #             }
     if request.method == 'POST':
-        return {'paginate': pga_dict}
+        return {'paginate': pga}
     return render_template('opc/control.html', paginate=pga, control='bg-danger')
 
 
@@ -1645,4 +1623,4 @@ def control():
 def restart():
     pid = request.form.get('pid')
     kill_process(11800)
-    return {'success':True,'msg':'重启成功'}
+    return {'success': True, 'msg': '重启成功'}

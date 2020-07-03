@@ -13,10 +13,8 @@
         <hr class="border-bottom border-danger" />
     </div>
 
+    <!-- 工具栏 -->
     <div class="col-md-12 text-center">
-        <!-- 工具栏 -->
-
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
         <div class=" justify-content-between flex-wrap flex-md-nowrap align-items-center mb-3">
             <div class="form-group form-inline mb-0">
                 <label class="form-input-label mr-1" for="log_level">日志级别:</label>
@@ -35,20 +33,14 @@
                 <label class="form-input-label mr-1" for="log_day_end">结束时间:</label>
                 <input class="form-control col-1" type="text" name="log_day_end" id="log_day_end" value="">
 
-
                 <button type="button" class="btn btn-outline-info ml-1 " onclick="select_log()">
                     <span data-feather="upload"></span>
                     开始查询
                 </button>
-                <button type="button" class="btn btn-outline-success ml-1 ">
-                    <span data-feather="calendar"></span>
-                    导出配置
-                </button>
                 <label class="form-input-label mr-1" for="key"></label>
                 <input class="form-control col-2" type="text" name="key" id="key"" value="">
                         
-
-                    <button type=" button" class="btn btn-outline-success ml-1 " onclick="search()">
+                <button type=" button" class="btn btn-outline-success ml-1 " onclick="search()">
                 <span data-feather="calendar"></span>搜索日志
                 </button>
 
@@ -122,9 +114,6 @@
                 </ul>
 
                 <li class="page-item"><a class="page-link form-control">共</a></li>
-                <input id='nums' name='nums' class="form-control" style="width: 60px;" />
-                <li class="page-item"><a class="page-link form-control">条</a></li>
-                <li class="page-item"><a class="page-link form-control">共</a></li>
                 <input id='total' name='total' disabled class="form-control" style="width: 60px;"
                     value="{{ paginate.total }}" />
                 <li class="page-item"><a class="page-link form-control">条</a></li>
@@ -187,8 +176,8 @@
         var log_day_start = $("#log_day_start").val();
         var log_day_end = $("#log_day_end").val();
         var pages = $("#pages").val();
-        var $subject_con = $('#logs');
-        $subject_con.html('')
+        // var $subject_con = $('#logs');
+        // $subject_con.html('')
         $.ajax({
             url: "{{url_for('cs.log')}}",
             // data: $('#log_form').serialize(),
@@ -278,7 +267,7 @@
         var $trs = '';
         var $lis = '';
         console.log(data)
-        if (data.paginate.items.length>0) {
+        if (data.paginate.items.length > 0) {
             // for (let i of data.paginate.items) {
             //     $values += `<tr><td> ${i[0]}</td><td> ${i[1]}</td><td>${i[2]}</td></tr>`
             // }
@@ -297,14 +286,20 @@
 
             var lis = ''
             data.paginate.iter_pages.forEach((item, index) => {
-                var tmp = ''
-                if (data.paginate.page == index + 1) {
-                    tmp =
-                        `<li class="page-item active "><a class="page-link form-control" href="javascript:click_page(${index+1}) "> ${index+1} </a></li>`
+                if (item) {
+                    var tmp = ''
+                    if (data.paginate.page == item) {
+                        tmp =
+                            `<li class="page-item active "><a class="page-link form-control" href="javascript:click_page(${item}) "> ${item} </a></li>`
+                    } else {
+                        tmp =
+                            `<li class="page-item "><a class="page-link form-control" href="javascript:click_page(${item})"> ${item} </a></li>`
+                    }
                 } else {
                     tmp =
-                        `<li class="page-item "><a class="page-link form-control" href="javascript:click_page(${index+1})"> ${index+1} </a></li>`
+                        `<li class="page-item "><a class="page-link form-control" href="javascript:void(0)">...</a></li>`
                 }
+
                 lis += tmp
             });
             var log_page =
@@ -334,7 +329,7 @@
             var $log_page = $('#log_page');
             $log_page.html(log_page);
         } else {
-            $trs += '<tr>' + '<td scope="row" class="table-danger">' + '没有日志信息，请稍后重试' + '</td>' + '</tr>';
+            $trs = '<tr>' + '<td scope="row" class="table-danger">' + '没有日志信息，请稍后重试' + '</td>' + '</tr>';
             var $logs = $('#logs');
             $logs.html($trs);
         }

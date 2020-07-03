@@ -31,7 +31,7 @@
         <hr class="border-bottom border-danger" />
         <!-- issue卡片 -->
         <div class="card-deck">
-            {% for alarm in paginate.items %}
+            {% for alarm in paginate['items'] %}
 
             <div class="card border-success mb-3" style="max-width: 30rem;">
                 <div class="card-header bg-transparent border-success">
@@ -73,7 +73,7 @@
                             </li>
 
 
-                            {%  for i in  paginate.iter_pages() %}
+                            {%  for i in  paginate.iter_pages %}
 
                             {% if i %}
                             {%if paginate.page == i%}

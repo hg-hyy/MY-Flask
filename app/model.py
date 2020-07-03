@@ -20,10 +20,6 @@ class User(db.Model):
     _password = db.Column(db.String(128), unique=True, nullable=False)
     # issue = db.relationship('Issue', backref='User', lazy=True)
 
-    # @property
-    # def password(self):
-    #     return self._password
-
     @property
     def password(self):
         raise AttributeError('password is not a readable attribute')

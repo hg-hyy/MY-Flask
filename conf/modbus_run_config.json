@@ -1,14 +1,14 @@
 {
     "dev_id": "201",
-    "Coll_Type": "TCP",
+    "Coll_Type": "RTU",
     "TCP": {
         "host": "172.16.2.100",
         "port": "502"
     },
     "RTU": {
         "serial": "com1",
-        "baud": "4800",
-        "data_bit": "7",
+        "baud": "9600",
+        "data_bit": "8",
         "stop_bit": "1",
         "parity": "none"
     },
