@@ -1,4 +1,7 @@
 body {
+  background: #EBEBEB;
+  font: 16px/24px "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+  color: #333;
   font-size: .875rem;
 }
 
@@ -60,3 +63,33 @@ body {
   text-transform: uppercase;
 }
 
+
+.step {
+  width: 940px;
+  margin: 0 auto 24px auto;
+  text-align: center;
+}
+
+
+a:focus,
+a:active,
+button:active,
+button:focus,
+button:hover,
+button::-moz-focus-inner, 
+button:focus {
+  outline: 0!important;
+}
+
+
+*:focus {
+  outline: 0;
+}
+
+input[type="reset"]::-moz-focus-inner,
+input[type="button"]::-moz-focus-inner,
+input[type="submit"]::-moz-focus-inner,
+select::-moz-focus-inner,
+input[type="file"] > input[type="button"]::-moz-focus-inner {
+  outline: 0 !important;
+}

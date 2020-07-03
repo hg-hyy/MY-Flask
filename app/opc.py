@@ -366,7 +366,7 @@ def call_s_config(ref_url, json_data):
         current_app.logger.error(f'配置异常!原因:{error}')
         return res, stu
 
-
+# 废弃
 @cs.route('/page', methods=['GET', 'POST'], endpoint='page')
 def page():
     """
@@ -431,16 +431,6 @@ def show_tag_page():
             tags, basic_config, group_infos = read_opc_config(cfg_msg, module)
         if group_infos:
             pga = paginate(group_infos[group_id]['tags'], page, pages)
-            # pga_dict = {'items': pga.items,
-            #             'has_prev': pga.has_prev,
-            #             'prev_num': pga.prev_num,
-            #             'has_next': pga.has_next,
-            #             'next_num': pga.next_num,
-            #             'iter_pages': list(pga.iter_pages()),
-            #             'pages': pga.pages,
-            #             'page': pga.page,
-            #             'total': pga.total
-            #             }
             return {"paginate": pga, 'group_infos': group_infos, 'module': module}
         return {"paginate": [], 'group_infos': [], 'module': module}
 
@@ -455,18 +445,10 @@ def show_tag_page():
     else:
         tags, basic_config, group_infos = read_opc_config(cfg_msg, module)
     pga = paginate(group_infos, page, pages)
-    # pga_dict = {'items': pga.items,
-    #             'has_prev': pga.has_prev,
-    #             'prev_num': pga.prev_num,
-    #             'has_next': pga.has_next,
-    #             'next_num': pga.next_num,
-    #             'iter_pages': pga.iter_pages(),
-    #             'pages': pga.pages,
-    #             'total': pga.total
-    #             }
+
     return render_template('opc/show_tag.html', paginate=pga, group_infos=group_infos, group='bg-info')
 
-
+# 废弃
 @cs.route('/search', methods=['GET', 'POST'], endpoint='search')
 def search():
     """
@@ -494,28 +476,17 @@ def show_tag_search():
     pages = int(request.form.get('pages', 10))
     page = int(request.form.get('page', 1))
     module = request.args.get('module')
-    tagname = request.args.get('tagname')  # 标签名
+    tagname = request.args.get('tagname')
     cfg_msg = read_json(module)
     if module in modbus:
-        tags, basic_config, group_infos = read_modbus_config(cfg_msg, module)
+        tags, _, group_infos = read_modbus_config(cfg_msg, module)
         data = search_modbus_tag(tagname, tags, [])
     else:
-        tags, basic_config, group_infos = read_opc_config(cfg_msg, module)
+        tags, _, group_infos = read_opc_config(cfg_msg, module)
         data = search_opc_tag(tagname, tags, [])
 
     pga = paginate(data, page, pages)
-    pga_dict = {'items': pga.items,
-                'has_prev': pga.has_prev,
-                'prev_num': pga.prev_num,
-                'has_next': pga.has_next,
-                'next_num': pga.next_num,
-                'iter_pages': list(pga.iter_pages()),
-                'pages': pga.pages,
-                'page': pga.page,
-                'total': pga.total
-                }
-    print(pga.total, pga.pages, pga.has_prev, pga.has_next,
-          pga.prev_num, pga.next_num, pga_dict['iter_pages'])
+
     current_app.logger.debug(f'查询{module}位号:%s' % (tagname))
     return {"paginate": pga, 'group_infos': group_infos}
 
@@ -1329,7 +1300,6 @@ def tags_review():
 
 
 @ cs.route('/get_config', methods=['GET', 'POST'], endpoint='get_config')
-@login_required
 def get_config():
     if request.method == 'POST':
         res_msg = {}
@@ -1404,22 +1374,6 @@ def log():
             logs_list.append(l.rsplit('  '))
         pga = paginate(logs_list, page, pages)
         return render_template('log/log.html', paginate=pga, log='bg-info')
-
-
-def check_log():
-    if request.method == "GET":
-        log_level = request.args.get("log_level")
-        log_day = request.args.get("log_day")
-        log_list = []
-        loglist = []
-        for root, dirs, files in os.walk(log_path):
-            loglist = files
-        for lv in loglist:
-            if lv.split('-')[0] == log_level and lv == log_level+'-'+log_day+'.log':
-                log_list.append(lv)
-            elif lv.split('-')[0] == log_level and log_day == '':
-                log_list.append(lv)
-        return {'log_level': log_level, 'log_list': log_list}
 
 
 class Pagination(object):
@@ -1530,16 +1484,6 @@ def show_sensor():
     for data in sc.sensor_list:
         tags.append(sensor2dict(data))
     pga = paginate(tags, page, pages)
-    # pga_dict = {'items': pga.items,
-    #             'has_prev': pga.has_prev,
-    #             'prev_num': pga.prev_num,
-    #             'has_next': pga.has_next,
-    #             'next_num': pga.next_num,
-    #             'iter_pages': list(pga.iter_pages()),
-    #             'pages': pga.pages,
-    #             'page': pga.page,
-    #             'total': pga.total
-    #             }
     if request.method == 'POST':
         return {'paginate': pga}
     return render_template('opc/show_sensor.html', paginate=pga, show_sensor='bg-warning')
@@ -1558,16 +1502,6 @@ def show_alarm():
     for data in ec.event_list:
         tags.append(event2dict(data))
     pga = paginate(tags, page, pages)
-    # pga_dict = {'items': pga.items,
-    #             'has_prev': pga.has_prev,
-    #             'prev_num': pga.prev_num,
-    #             'has_next': pga.has_next,
-    #             'next_num': pga.next_num,
-    #             'iter_pages': list(pga.iter_pages()),
-    #             'pages': pga.pages,
-    #             'page': pga.page,
-    #             'total': pga.total
-    #             }
     if request.method == 'POST':
         return {'paginate': pga}
     return render_template('opc/show_alarm.html', paginate=pga, show_alarm='bg-warning')
@@ -1604,16 +1538,6 @@ def control():
 
     pc_list = search_process(key, tags, [])
     pga = paginate(pc_list, page, pages)
-    # pga_dict = {'items': pga.items,
-    #             'has_prev': pga.has_prev,
-    #             'prev_num': pga.prev_num,
-    #             'has_next': pga.has_next,
-    #             'next_num': pga.next_num,
-    #             'iter_pages': list(pga.iter_pages()),
-    #             'pages': pga.pages,
-    #             'page': pga.page,
-    #             'total': pga.total
-    #             }
     if request.method == 'POST':
         return {'paginate': pga}
     return render_template('opc/control.html', paginate=pga, control='bg-danger')
@@ -1622,5 +1546,5 @@ def control():
 @cs.route("/restart", methods=['GET', 'POST'], endpoint='restart')
 def restart():
     pid = request.form.get('pid')
-    kill_process(11800)
+    kill_process(pid)
     return {'success': True, 'msg': '重启成功'}

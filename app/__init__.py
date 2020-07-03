@@ -1,4 +1,4 @@
-from flask import Flask, render_template, session, url_for, redirect, flash
+from flask import Flask, render_template, request, url_for, redirect, flash
 from flask_wtf.csrf import CSRFProtect
 import logging
 from logging.config import dictConfig
@@ -117,6 +117,35 @@ def create_app(test_config=None):
     @app.before_first_request
     def before_first():
         app.logger.debug("config_studio 重新启动")
+
+    # @csrf_exempt
+    @app.route('/signin',methods=['POST','GET'],endpoint='signin')
+    def signin():
+        response = {}
+        try:
+            username = request.args.get("Username")
+            password = request.args.get("Password")
+            # user = authenticate(request, username=username, password=password)
+            
+            if username=='admin' and password=='111111' :
+                app.logger.debug('登录成功')
+                response['login'] = True
+                response['msg'] = 'success'
+                response['code'] = 200
+                token = (str(encode_auth_token(username), encoding='utf-8'))
+                response['token'] = token
+                return response
+            response['login'] = False
+            response['msg'] = '登录失败'
+            response['code'] = 500
+            return response
+        except Exception as e:
+            print(e)
+            return str(e)
+
+
+
+
 
 
     def encode_auth_token(email):

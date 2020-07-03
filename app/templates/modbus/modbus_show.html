@@ -483,7 +483,7 @@
         var fun_code = $("#fun_code").val()
         console.log(key, slave_id, fun_code)
         $.ajax({
-            url: "{{url_for('mt.tag_search')}}",
+            url: "{{url_for('mt.m_tag_search')}}",
             data: {
                 "key": key,
                 "slave_id": slave_id,
@@ -531,7 +531,7 @@
         var desc = $("#desc").val().trim()
 
         $.ajax({
-            url: "{{url_for('mt.add_tag')}}",
+            url: "{{url_for('mt.m_add_tag')}}",
             data: {
                 "slave_id": slave_id,
                 "fun_code": fun_code,
@@ -562,7 +562,7 @@
         show_alter_tag_modal()
         console.log(slave_id, fun_code, tag_name)
         $.ajax({
-            url: "{{url_for('mt.alter_tag')}}",
+            url: "{{url_for('mt.m_alter_tag')}}",
             data: {
                 "slave_id": slave_id,
                 "fun_code": fun_code,
@@ -590,7 +590,7 @@
         var desc = $("#alter_desc").val().trim()
         console.log(slave_id, fun_code, tag, start, register_number, data_type, data_format, desc)
         $.ajax({
-            url: "{{url_for('mt.alter_tag')}}",
+            url: "{{url_for('mt.m_alter_tag')}}",
             data: {
                 "slave_id": slave_id,
                 "fun_code": fun_code,
@@ -644,7 +644,7 @@
         var collect_cycle = $("#collect_cycle").val()
         console.log(module_name, group_name, collect_cycle)
         $.ajax({
-            url: "{{url_for('mt.add_group')}}",
+            url: "{{url_for('mt.m_add_group')}}",
             data: {
                 "module": module_name,
                 "group_name": group_name,
@@ -667,7 +667,7 @@
 
     function alter_group(id, slave_id, fun_code) {
         $.ajax({
-            url: "{{url_for('mt.alter_group')}}",
+            url: "{{url_for('mt.m_alter_group')}}",
             data: {
                 "id": id,
                 "slave_id": slave_id,
@@ -690,7 +690,7 @@
         var alter_fun_code = $("#alter_fun_code").val()
         var alter_slave_id = $("#alter_slave_id").val()
         $.ajax({
-            url: "{{url_for('mt.alter_group')}}",
+            url: "{{url_for('mt.m_alter_group')}}",
             data: {
                 "id": alter_id,
                 "fun_code": alter_fun_code,
@@ -719,7 +719,7 @@
     function confirm_delete_group(id) {
         var id = $("#gl").text()
         $.ajax({
-            url: "{{url_for('mt.delete_group')}}",
+            url: "{{url_for('mt.m_delete_group')}}",
             data: {
                 "id": id,
             },
@@ -747,7 +747,7 @@
         console.log('delete_tag', tag_name, slave_id, fun_code)
 
         $.ajax({
-            url: "{{url_for('mt.delete_tag')}}",
+            url: "{{url_for('mt.m_delete_tag')}}",
             data: {
                 "slave_id": slave_id,
                 "fun_code": fun_code,

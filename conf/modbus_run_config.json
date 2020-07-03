@@ -20,14 +20,6 @@
                     "fun_code": 3,
                     "tags": [
                         {
-                            "tag": "modbus_1",
-                            "start": 40001,
-                            "register_number": 1,
-                            "data_type": "UINT16",
-                            "data_format": 12,
-                            "desc": "有功点度量"
-                        },
-                        {
                             "tag": "modbus_2",
                             "start": 40002,
                             "register_number": 1,
@@ -98,6 +90,14 @@
                             "data_type": "UINT16",
                             "data_format": 12,
                             "desc": "有功点度量"
+                        },
+                        {
+                            "tag": "modbus_1",
+                            "start": "40001",
+                            "register_number": "1",
+                            "data_type": "UINT16",
+                            "data_format": "12",
+                            "desc": "hello"
                         }
                     ]
                 },
