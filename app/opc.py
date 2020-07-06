@@ -1366,7 +1366,7 @@ def log():
             return {'paginate': {}, 'msg': f'查询到0条日志'}
 
     else:
-        pages = int(request.args.get('pages', 5))
+        pages = int(request.args.get('pages', 14))
         page = int(request.args.get('page', 1))
         with open(log_path+'\\'+'{}.log'.format(time.strftime('%Y-%m-%d')), 'r', encoding='utf-8') as lg:
             logs = lg.read().splitlines()

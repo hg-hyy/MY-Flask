@@ -53,7 +53,7 @@ class LoginForm(FlaskForm):
                              render_kw={'class': 'form-control form-control-md my-3',
                                         'placeholder': 'password', 'required': 'required'}
                              )
-    # recaptcha = RecaptchaField('验证码')
+    recaptcha = RecaptchaField('验证码')
 
     remember_me = BooleanField(label='remember me')
 

@@ -32,16 +32,23 @@
 
 <body style="overflow: hidden;">
     <!-- 顶部标题栏 -->
-    <nav class="navbar navbar-expand-md  sticky-top navbar-dark  bg-dark ">
-        <span data-feather="home" style="width: 16px; height: 16px;color: aliceblue;"></span>
+    <nav id='appbar' class="appbar navbar navbar-expand-md  sticky-top navbar-dark  bg-dark ">
+        <a class="navbar-brand col-md-1 col-lg-1 mr-0 px-1" href="{{url_for('index')}}">
+            安全隔离网关
+        </a>
+        <!-- <span data-feather="home" style="width: 24px; height: 24px;color: aliceblue;"></span> -->
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse"
             aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav mr-auto">
+
                 <li class="nav-item active">
-                    <a class="nav-link" href="{{url_for('index')}}">Home <span class="sr-only">(current)</span></a>
+                    <a class="nav-link" href="javascript:void(0)" onclick="plus()">
+                        <span data-feather="menu" style="width: 20px; height: 20px;color:white;"></span>
+
+                    </a>
                 </li>
             </ul>
             <button class="btn btn-outline-info " type="button" data-toggle="modal" data-target="#FAQ">
@@ -82,141 +89,233 @@
         <div class="row">
 
             <!-- 左边导航栏 -->
-            <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
-                <div class="sidebar-sticky pt-3 " style="background:rgba(129, 104, 104, 0.438);">
-                    <ul class="nav flex-column">
-                        <h2
-                            class="sidebar-heading d-flex justify-content-between align-items-center p-3 mt-5 mb-1 text-muted  ">
-                            <span>Home</span>
-                        </h2>
-                        <li class="nav-item {{home}}" active>
-                            <a class="nav-link  " href="{{url_for('index')}}"
-                                style="font-size: x-large;font-style: italic;font-family: cursive;">
-                                <span data-feather="home" style="width: 16px; height: 16px;color:black;"></span>
-                                HOME
-                            </a>
-                        </li>
-                        <h2
-                            class="sidebar-heading d-flex justify-content-between align-items-center p-3 mt-1 mb-1 text-muted  ">
-                            <span>opc config setting</span>
-                        </h2>
+            <nav id="sidebar" class="d-md-block bg-light sidebar collapse p-0 ">
 
-                        <li class="nav-item {{opc}}">
-                            <a class="nav-link  " href="{{url_for('cs.opc')}}"
-                                style="font-size: x-large;font-style: italic;font-family: cursive;">
-                                <span data-feather="edit" style="width: 16px; height: 16px;color:black;"></span>
-                                Opc
-                            </a>
-                        </li>
-                        <li class="nav-item {{opc_da_server}}">
-                            <a class="nav-link  " href="{{url_for('cs.load_opc_se')}}"
-                                style="font-size: x-large;font-style: italic;font-family: cursive;">
-                                <span data-feather="edit" style="width: 16px; height: 16px;color:black;"></span>
-                                Opc_da_server
-                            </a>
-                        </li>
-                        <li class="nav-item {{opc_da_client}}" onclick="bg(this)">
-                            <a class="nav-link  " href="{{url_for('cs.load_opc_da')}}"
-                                style="font-size: x-large;font-style: italic;font-family: cursive;">
-                                <span data-feather="star" style="width: 16px; height: 16px;color:black;"></span>
-                                Opc_da_client
-                            </a>
-                        </li>
-                        <li class="nav-item {{opc_ae_client}}">
-                            <a class="nav-link  " href="{{url_for('cs.load_opc_ae')}}"
-                                style="font-size: x-large;font-style: italic;font-family: cursive;">
-                                <span data-feather="anchor" style="width: 16px; height: 16px;color:black;"></span>
-                                Opc_ae_client
-                            </a>
-                        </li>
-                        <li class="nav-item {{modbus_slave}}">
-                            <a class="nav-link  " href="{{url_for('cs.load_modbus')}}"
-                                style="font-size: x-large;font-style: italic;font-family: cursive;">
-                                <span data-feather="octagon" style="width: 16px; height: 16px;color:black;"></span>
-                                Modbus_slave
-                            </a>
-                        </li>
+                <div class="d-flex justify-content-start bg-dark">
+                    <img src="{{url_for('static',filename='pic/logo.png')}}" class="img-fluid p-0 m-0"
+                        alt="Responsive image" style="height: 56px;" />
+                </div>
 
-                        <h2
-                            class="sidebar-heading d-flex justify-content-between align-items-center p-3 mt-1 mb-1 text-muted  ">
+                <div class="sidebar-sticky " style="background:rgba(129, 104, 104, 0.438);">
+                    <ul id='open' class="nav flex-column ">
+
+                        <h6
+                            class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                            <span> config setting</span>
+                            <a class="d-flex align-items-center text-muted" href="#" aria-label="Add a new report">
+
+                            </a>
+                        </h6>
+
+                        <a class="nav-link  {{opc}}" href="{{url_for('cs.opc')}}">
+                            <span data-feather="circle" style="width: 24px; height: 24px;color:black;"></span>
+                            Opc
+                        </a>
+
+
+                        <a class="nav-link {{opc_da_server}} " href="{{url_for('cs.load_opc_se')}}">
+                            <span data-feather="edit" style="width: 24px; height: 24px;color:black;"></span>
+                            server
+                        </a>
+
+
+                        <a class="nav-link {{opc_da_client}} " href="{{url_for('cs.load_opc_da')}}">
+                            <span data-feather="star" style="width: 24px; height: 24px;color:black;"></span>
+                            da
+                        </a>
+
+
+                        <a class="nav-link {{opc_ae_client}}  " href="{{url_for('cs.load_opc_ae')}}">
+                            <span data-feather="anchor" style="width: 24px; height: 24px;color:black;"></span>
+                            ae
+                        </a>
+
+
+                        <a class="nav-link {{modbus_slave}} " href="{{url_for('cs.load_modbus')}}">
+                            <span data-feather="octagon" style="width: 24px; height: 24px;color:black;"></span>
+                            Modbus
+                        </a>
+
+
+                        <h6
+                            class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
                             <span>config & tag review</span>
-                        </h2>
+                            <a class="d-flex align-items-center text-muted" href="#" aria-label="Add a new report">
+                                <span data-feather="settings"></span>
+                            </a>
+                        </h6>
 
-                        <li class="nav-item {{config_review}}">
-                            <a class="nav-link " href="{{url_for('cs.config_review')}} "
-                                style="font-size: x-large;font-style: italic;font-family: cursive;">
-                                <span data-feather="cpu" style="width: 16px; height: 16px;color:black;"></span>
-                                Config
-                            </a>
-                        </li>
-                        <li class="nav-item {{show_sensor}}">
-                            <a class="nav-link " href="{{url_for('cs.show_sensor')}} "
-                                style="font-size: x-large;font-style: italic;font-family: cursive;">
-                                <span data-feather="cast" style="width: 16px; height: 16px;color:black;"></span>
-                                Sensor
-                            </a>
-                        </li>
-                        <li class="nav-item {{control}}">
-                            <a class="nav-link " href="{{url_for('cs.control')}} "
-                                style="font-size: x-large;font-style: italic;font-family: cursive;">
-                                <span data-feather="cast" style="width: 16px; height: 16px;color:black;"></span>
-                                control
-                            </a>
-                        </li>
-                        <li class="nav-item {{show_alarm}}">
-                            <a class="nav-link " href="{{url_for('cs.show_alarm')}} "
-                                style="font-size: x-large;font-style: italic;font-family: cursive;">
-                                <span data-feather="cast" style="width: 16px; height: 16px;color:black;"></span>
-                                Event
-                            </a>
-                        </li>
-                        <li class="nav-item {{group}}">
-                            <a class="nav-link " href="{{url_for('cs.show_tag_page')}} "
-                                style="font-size: x-large;font-style: italic;font-family: cursive;">
-                                <span data-feather="cast" style="width: 16px; height: 16px;color:black;"></span>
-                                opc_tag
-                            </a>
-                        </li>
-                        <li class="nav-item {{modbus}}">
-                            <a class="nav-link " href="{{url_for('mt.show_modbus_page')}} "
-                                style="font-size: x-large;font-style: italic;font-family: cursive;">
-                                <span data-feather="cast" style="width: 16px; height: 16px;color:black;"></span>
-                                modbus_tag
-                            </a>
-                        </li>
+                        <a class="nav-link {{config_review}} " href="{{url_for('cs.config_review')}} ">
+                            <span data-feather="cpu" style="width: 24px; height: 24px;color:black;"></span>
+                            Config
+                        </a>
 
-                        <h2
-                            class="sidebar-heading d-flex justify-content-between align-items-center p-3 mt-1 mb-1 text-muted  ">
+
+                        <a class="nav-link {{show_sensor}}" href="{{url_for('cs.show_sensor')}} ">
+                            <span data-feather="file-text" style="width: 24px; height: 24px;color:black;"></span>
+                            Sensor
+                        </a>
+
+
+                        <a class="nav-link {{control}}" href="{{url_for('cs.control')}} ">
+                            <span data-feather="layers" style="width: 24px; height: 24px;color:black;"></span>
+                            control
+                        </a>
+
+
+                        <a class="nav-link {{show_alarm}}" href="{{url_for('cs.show_alarm')}} ">
+                            <span data-feather="bell" style="width: 24px; height: 24px;color:black;"></span>
+                            Event
+                        </a>
+
+
+                        <a class="nav-link {{group}}" href="{{url_for('cs.show_tag_page')}} ">
+                            <span data-feather="tag" style="width: 24px; height: 24px;color:black;"></span>
+                            tag
+                        </a>
+
+
+                        <a class="nav-link {{modbus}}" href="{{url_for('mt.show_modbus_page')}} ">
+                            <span data-feather="cast" style="width: 24px; height: 24px;color:black;"></span>
+                            modbus
+                        </a>
+
+
+                        <h6
+                            class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
                             <span>log & faq</span>
-                        </h2>
-                        <li class="nav-item {{log}}">
-                            <a class="nav-link " href="{{url_for('cs.log')}} "
-                                style="font-size: x-large;font-style: italic;font-family: cursive;">
-                                <span data-feather="hard-drive" style="width: 16px; height: 16px;color:black;"></span>
-                                Log
-                            </a>
-                        </li>
+                            <a class="d-flex align-items-center text-muted" href="#" aria-label="Add a new report">
 
-                        <li class="nav-item {{faq}}">
-                            <a class="nav-link " href="{{url_for('faq.show_issue')}} "
-                                style="font-size: x-large;font-style: italic;font-family: cursive;">
-                                <span data-feather="info" style="width: 16px; height: 16px;color:black;"></span>
-                                Faq
                             </a>
-                        </li>
+                        </h6>
+
+                        <a class="nav-link {{log}}" href="{{url_for('cs.log')}} ">
+                            <span data-feather="hard-drive" style="width: 24px; height: 24px;color:black;"></span>
+                            Log
+                        </a>
+
+
+
+                        <a class="nav-link {{faq}}" href="{{url_for('faq.show_issue')}} ">
+                            <span data-feather="info" style="width: 24px; height: 24px;color:black;"></span>
+                            Faq
+                        </a>
+
+                    </ul>
+
+                    <ul id='close' class="nav flex-column d-none ">
+
+                        <h6
+                            class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                            <span>setting</span>
+                            <a class="d-flex align-items-center text-muted" href="#" aria-label="Add a new report" >
+
+                            </a>
+                        </h6>
+
+                        <a class="nav-link  {{opc}}" href="{{url_for('cs.opc')}}"  data-toggle="tooltip" data-placement="right" title="OPC SETTING">
+                            <span data-feather="circle" style="width: 24px; height: 24px;color:black;"></span>
+                            
+                        </a>
+
+
+                        <a class="nav-link {{opc_da_server}} " href="{{url_for('cs.load_opc_se')}}" data-toggle="tooltip" data-placement="right" title="load_opc_se">
+                            <span data-feather="edit" style="width: 24px; height: 24px;color:black;"></span>
+                            
+                        </a>
+
+
+                        <a class="nav-link {{opc_da_client}} " href="{{url_for('cs.load_opc_da')}}" data-toggle="tooltip" data-placement="right" title="load_opc_da">
+                            <span data-feather="star" style="width: 24px; height: 24px;color:black;"></span>
+                            
+                        </a>
+
+
+                        <a class="nav-link {{opc_ae_client}}  " href="{{url_for('cs.load_opc_ae')}}" data-toggle="tooltip" data-placement="right" title="load_opc_ae">
+                            <span data-feather="anchor" style="width: 24px; height: 24px;color:black;"></span>
+                            
+                        </a>
+
+
+                        <a class="nav-link {{modbus_slave}} " href="{{url_for('cs.load_modbus')}}" data-toggle="tooltip" data-placement="right" title="load_modbus">
+                            <span data-feather="octagon" style="width: 24px; height: 24px;color:black;"></span>
+                           
+                        </a>
+
+
+                        <h6
+                            class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                            <span>config</span>
+                            <a class="d-flex align-items-center text-muted" href="#" aria-label="Add a new report">
+                            </a>
+                        </h6>
+
+                        <a class="nav-link {{config_review}} " href="{{url_for('cs.config_review')}} " data-toggle="tooltip" data-placement="right" title="config_review">
+                            <span data-feather="cpu" style="width: 24px; height: 24px;color:black;"></span>
+                            
+                        </a>
+
+
+                        <a class="nav-link {{show_sensor}}" href="{{url_for('cs.show_sensor')}} " data-toggle="tooltip" data-placement="right" title="show_sensor">
+                            <span data-feather="file-text" style="width: 24px; height: 24px;color:black;"></span>
+                           
+                        </a>
+
+
+                        <a class="nav-link {{control}}" href="{{url_for('cs.control')}} " data-toggle="tooltip" data-placement="right" title="control">
+                            <span data-feather="layers" style="width: 24px; height: 24px;color:black;"></span>
+                            
+                        </a>
+
+
+                        <a class="nav-link {{show_alarm}}" href="{{url_for('cs.show_alarm')}} " data-toggle="tooltip" data-placement="right" title="show_alarm">
+                            <span data-feather="bell" style="width: 24px; height: 24px;color:black;"></span>
+                            
+                        </a>
+
+
+                        <a class="nav-link {{group}}" href="{{url_for('cs.show_tag_page')}} " data-toggle="tooltip" data-placement="right" title="show_tag_page">
+                            <span data-feather="tag" style="width: 24px; height: 24px;color:black;"></span>
+                            
+                        </a>
+
+
+                        <a class="nav-link {{modbus}}" href="{{url_for('mt.show_modbus_page')}} " data-toggle="tooltip" data-placement="right" title="show_modbus_page">
+                            <span data-feather="cast" style="width: 24px; height: 24px;color:black;"></span>
+                          
+                        </a>
+
+
+                        <h6
+                            class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                            <span>log</span>
+                            <a class="d-flex align-items-center text-muted" href="#" aria-label="Add a new report">
+
+                            </a>
+                        </h6>
+
+                        <a class="nav-link {{log}}" href="{{url_for('cs.log')}} " data-toggle="tooltip" data-placement="right" title="log">
+                            <span data-feather="hard-drive" style="width: 24px; height: 24px;color:black;"></span>
+                            
+                        </a>
+
+
+
+                        <a class="nav-link {{faq}}" href="{{url_for('faq.show_issue')}} " data-toggle="tooltip" data-placement="right" title="show_issue">
+                            <span data-feather="info" style="width: 24px; height: 24px;color:black;"></span>
+                           
+                        </a>
+
                     </ul>
                 </div>
             </nav>
 
             <!-- 正文-->
-            <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-md-4" id='main'>
-                <div class="jumbotron p-0 m-0 ">
-                    <div class="row">
-                        <div class="col-12" style="position: relative; overflow-y: auto; height: 716px;">
-                            {% block heads %}{% endblock %}
-                            {% block content %}{% endblock %}
-                        </div>
-                    </div>
+            <main id="main" class='main'>
+
+                <div class="col-12" style="position: relative; overflow-y: auto; height: 724px;">
+                    {% block heads %}{% endblock %}
+                    {% block content %}{% endblock %}
                 </div>
 
                 <!-- 全局提示框 -->
@@ -268,6 +367,10 @@
         </div>
     </div>
 
+
+
+
+
     <div class="modal fade in " id="FAQ" tabindex="-1" role="dialog" aria-labelledby="FAQ">
         <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
             <div class="modal-content">
@@ -300,8 +403,8 @@
                 </div>
                 <div class="modal-body">
 
-                    <form class="form-signin" action="" method="post">
-
+                    <form class="form-signin" action="{{url_for('auth.login')}}" method="post">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                         <div class="text-center mb-4">
                             <img width="72" height="72" class="mb-4" alt=""
                                 src="{{url_for('static',filename='pic/bootstrap-solid.svg')}}">
@@ -386,6 +489,51 @@
 
         function auto_close() {
             $(".alert").alert('close');
+        }
+        var flag = 1
+
+        function plus() {
+
+
+            if (flag) {
+                $("#sidebar").css({
+                    "width": '73px',
+                    "transition": "width 0.2s"
+                });
+                $(".main").css({
+                    "width": '1847px',
+                    "left": "73px",
+                    "transition": "width 0.1s"
+                });
+                $(".appbar").css({
+                    "width": '1920px',
+                    "left": "0px",
+                    "transition": "width 0.1s"
+                });
+                flag = 0
+                $("#open").addClass('d-none')
+                $("#close").removeClass('d-none')
+            } else {
+                $("#sidebar").css({
+                    "width": '240px',
+                    "transition": "width 0.2s"
+                });
+                $(".main").css({
+                    "width": '1680px',
+                    "left": "240px",
+                    "transition": "width 0.1s"
+                });
+                $(".appbar").css({
+                    "width": '1680px',
+                    "left": "240px",
+                    "transition": "width 0.1s"
+                });
+                $("#close").addClass('d-none')
+                $("#open").removeClass('d-none')
+                flag = 1
+            }
+
+
         }
     </script>
 </body>
