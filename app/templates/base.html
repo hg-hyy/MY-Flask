@@ -8,6 +8,7 @@
     <meta name="author" content="HYY, and Bootstrap contributors">
     <meta name="generator" content="Config-Studio V1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='pic/favicon.ico') }}">
     <title>{% block title %}{% endblock %}</title>
     <script src="{{ url_for('static', filename='js/jquery-3.5.1.js') }}"></script>
     <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
@@ -109,7 +110,7 @@
 
                         <a class="nav-link  {{opc}}" href="{{url_for('cs.opc')}}">
                             <span data-feather="circle" style="width: 24px; height: 24px;color:black;"></span>
-                            Opc
+                            opc
                         </a>
 
 
@@ -203,19 +204,18 @@
 
                     </ul>
 
-                    <ul id='close' class="nav flex-column d-none ">
+                    <ul id='close' class="nav flex-column d-none text-center">
 
                         <h6
-                            class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                            class="sidebar-heading mt-2 text-muted">
                             <span>setting</span>
                             <a class="d-flex align-items-center text-muted" href="#" aria-label="Add a new report" >
 
                             </a>
                         </h6>
 
-                        <a class="nav-link  {{opc}}" href="{{url_for('cs.opc')}}"  data-toggle="tooltip" data-placement="right" title="OPC SETTING">
+                        <a class="nav-link   {{opc}}" href="{{url_for('cs.opc')}}"  data-toggle="tooltip" data-placement="right" title="OPC SETTING">
                             <span data-feather="circle" style="width: 24px; height: 24px;color:black;"></span>
-                            
                         </a>
 
 
@@ -244,7 +244,7 @@
 
 
                         <h6
-                            class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                            class="sidebar-heading mt-2 text-muted">
                             <span>config</span>
                             <a class="d-flex align-items-center text-muted" href="#" aria-label="Add a new report">
                             </a>
@@ -287,7 +287,7 @@
 
 
                         <h6
-                            class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                            class="sidebar-heading mt-2 text-muted">
                             <span>log</span>
                             <a class="d-flex align-items-center text-muted" href="#" aria-label="Add a new report">
 

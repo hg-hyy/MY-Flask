@@ -40,4 +40,7 @@ def set_cookie():
     resp.set_cookie('username', 'the username')
     return resp
 
+@auth.route('/signin', methods=['GET', 'POST'], endpoint='signin')
+def signin():
+    return render_template('auth/signin.html')
 

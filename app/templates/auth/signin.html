@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="cn">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="FLASK_DEMON">
+    <meta name="author" content="HYY, and Bootstrap contributors">
+    <meta name="generator" content="Config-Studio V1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='pic/favicon.ico') }}">
+    <title>sign in</title>
+    <script src="{{ url_for('static', filename='js/jquery-3.5.1.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/vue.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/axios.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/feather.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/alerts.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/impress.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/jquery.datetimepicker.full.min.js') }}"></script>
+    <script src='//recaptcha.net/recaptcha/api.js'></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/jquery.datetimepicker.min.css') }}">
+    <style type="text/css">
+        a:hover {
+            text-decoration: none;
+            background-color: cadetblue;
+            transform: translateY(-6px);
+            transition: all 0.2s ease-in-out;
+            font-family: 'Terminal Dosis', Arial, sans-serif;
+        }
+    </style>
+</head>
+
+<body style="background-image: url('/static/pic/bg.png');">
+    <div>
+        <img src="{{ url_for( 'static', filename='pic/sm.png' ) }}" alt="SIEMENS" style="position: relative;top:50px;left:50px">
+    </div>
+    <div  style="top: 310px;position: relative">
+        <div class="col-4 offset-4">
+            <div class="list-group">
+                <a href="{{ url_for('auth.login') }}" class="list-group-item  flex-column align-items-start mb-2 py-3" style="color: black;">
+                    <div class="d-flex align-items-center">
+                        <div class="d-flex">
+                            <div class="p-3 mr-3">
+                                <img src="{{ url_for( 'static', filename='pic/user.svg' ) }}" alt="" width="24"
+                                height="24">
+                            </div>
+                        </div>
+                        <div class="d-flex flex-column">
+                            <div class="p-0">
+                                <h2 class="mb-1">User management</h2>
+                            </div>
+                            <div class="p-0">
+                                <h6 class="mb-1">Manage your users</h6>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+                <a href="#" class="list-group-item  flex-column align-items-start mb-2 py-3" style="color: black;">
+                    <div class="d-flex align-items-center">
+                        <div class="d-flex">
+                            <div class="p-3 mr-3">
+                                <img src="{{ url_for( 'static', filename='pic/play-circle.svg' ) }}" alt="" width="24"
+                                height="24">
+                            </div>
+                        </div>
+                        <div class="d-flex flex-column">
+                            <div class="p-0">
+                                <h2 class="mb-1">WinCC Unified RT</h2>
+                            </div>
+                            <div class="p-0">
+                                <h6 class="mb-1">Start your project</h6>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+                <a href="#" class="list-group-item  flex-column align-items-start mb-2 py-3" style="color: black;">
+                    <div class="d-flex align-items-center">
+                        <div class="d-flex">
+                            <div class="p-3 mr-3">
+                                <img src="{{ url_for( 'static', filename='pic/alert-circle.svg' ) }}" alt="" width="24"
+                                height="24">
+                            </div>
+                        </div>
+                        <div class="d-flex flex-column">
+                            <div class="p-0">
+                                <h2 class="mb-1">WinCC Unified Help</h2>
+                            </div>
+                            <div class="p-0">
+                                <h6 class="mb-1">Shows help for WinCC Unified</h6>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

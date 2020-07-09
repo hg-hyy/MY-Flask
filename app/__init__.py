@@ -103,7 +103,7 @@ def create_app(test_config=None):
     @app.route('/', methods=['GET'], endpoint='index')
     @login_required
     def index():
-        flash('爱上一个地方，就应该背上包去旅行，走得更远。大家都在等你，还不快过来。。。玩耍！！！','success')
+        flash('爱上一个地方，就应该背上包去旅行，走得更远。大家都在等你，还不快过来玩耍！','success')
         return render_template('index.html', home='bg-primary')
 
     @app.route('/impress', methods=['GET'], endpoint='impress')
