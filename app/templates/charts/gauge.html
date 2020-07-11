@@ -1,0 +1,246 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+{% block head %}
+<style type="text/css"></style>
+{% endblock %}
+{% block content %}
+<div class="row">
+<div id="cpu" class="col-auto" style="width:500px; height:500px;"></div>
+<div id="memory" class="col-auto" style="width:500px; height:500px;"></div>
+</div>
+
+<script>
+    var gauge_cpu = echarts.init(document.getElementById('cpu'), 'white', {
+        renderer: 'canvas'
+    });
+    var option_cpu = {
+        "animation": true,
+        "animationThreshold": 2000,
+        "animationDuration": 1000,
+        "animationEasing": "cubicOut",
+        "animationDelay": 0,
+        "animationDurationUpdate": 300,
+        "animationEasingUpdate": "cubicOut",
+        "animationDelayUpdate": 0,
+        "color": [
+            "#c23531",
+            "#2f4554",
+            "#61a0a8",
+            "#d48265",
+            "#749f83",
+            "#ca8622",
+            "#bda29a",
+            "#6e7074",
+            "#546570",
+            "#c4ccd3",
+            "#f05b72",
+            "#ef5b9c",
+            "#f47920",
+            "#905a3d",
+            "#fab27b",
+            "#2a5caa",
+            "#444693",
+            "#726930",
+            "#b2d235",
+            "#6d8346",
+            "#ac6767",
+            "#1d953f",
+            "#6950a1",
+            "#918597"
+        ],
+        "series": [{
+            "type": "gauge",
+            "title": {
+                "show": true,
+                "position": "top",
+                "margin": 8
+            },
+            "detail": {
+                "show": true,
+                "position": "top",
+                "margin": 8,
+                "formatter": "{value}%"
+            },
+            "name": "CPU",
+            "min": 0,
+            "max": 100,
+            "splitNumber": 10,
+            "radius": "75%",
+            "startAngle": 225,
+            "endAngle": -45,
+            "data": [{
+                "name": "CPU",
+                "value": 0
+            }]
+        }],
+        "legend": [{
+            "data": [
+                "CPU使用率"
+            ],
+            "selected": {
+                "CPU使用率": true
+            },
+            "show": false,
+            "padding": 5,
+            "itemGap": 10,
+            "itemWidth": 25,
+            "itemHeight": 14
+        }],
+        "tooltip": {
+            "show": true,
+            "trigger": "item",
+            "triggerOn": "mousemove|click",
+            "axisPointer": {
+                "type": "line"
+            },
+            "formatter": "{a} <br/>{b} : {c}%",
+            "textStyle": {
+                "fontSize": 14
+            },
+            "borderWidth": 0
+        },
+        "title": [{
+            "padding": 5,
+            "itemGap": 10
+        }]
+    };
+
+    $(
+        function () {
+            gauge_cpu.setOption(option_cpu);
+            setInterval(update_gauge_data, 5000);
+        }
+    );
+
+    function update_gauge_data() {
+        $.ajax({
+            type: "GET",
+            url: "{{url_for('ct.update_gauge_data')}}",
+            dataType: "json",
+            success: function (result) {
+                option_cpu['series'][0]['data'][0] = result
+                gauge_cpu.setOption(
+                    option_cpu
+                );
+            }
+        });
+    }
+</script>
+<script>
+    var gauge_memory = echarts.init(document.getElementById('memory'), 'white', {
+        renderer: 'canvas'
+    });
+    var option_memory = {
+        "animation": true,
+        "animationThreshold": 2000,
+        "animationDuration": 1000,
+        "animationEasing": "cubicOut",
+        "animationDelay": 0,
+        "animationDurationUpdate": 300,
+        "animationEasingUpdate": "cubicOut",
+        "animationDelayUpdate": 0,
+        "color": [
+            "#c23531",
+            "#2f4554",
+            "#61a0a8",
+            "#d48265",
+            "#749f83",
+            "#ca8622",
+            "#bda29a",
+            "#6e7074",
+            "#546570",
+            "#c4ccd3",
+            "#f05b72",
+            "#ef5b9c",
+            "#f47920",
+            "#905a3d",
+            "#fab27b",
+            "#2a5caa",
+            "#444693",
+            "#726930",
+            "#b2d235",
+            "#6d8346",
+            "#ac6767",
+            "#1d953f",
+            "#6950a1",
+            "#918597"
+        ],
+        "series": [{
+            "type": "gauge",
+            "title": {
+                "show": true,
+                "position": "top",
+                "margin": 8
+            },
+            "detail": {
+                "show": true,
+                "position": "top",
+                "margin": 8,
+                "formatter": "{value}%"
+            },
+            "name": "MEMORY",
+            "min": 0,
+            "max": 100,
+            "splitNumber": 10,
+            "radius": "75%",
+            "startAngle": 225,
+            "endAngle": -45,
+            "data": [{
+                "name": "MEMORY",
+                "value": 0
+            }]
+        }],
+        "legend": [{
+            "data": [
+                "MEMORY使用率"
+            ],
+            "selected": {
+                "MEMORY使用率": true
+            },
+            "show": false,
+            "padding": 5,
+            "itemGap": 10,
+            "itemWidth": 25,
+            "itemHeight": 14
+        }],
+        "tooltip": {
+            "show": true,
+            "trigger": "item",
+            "triggerOn": "mousemove|click",
+            "axisPointer": {
+                "type": "line"
+            },
+            "formatter": "{a} <br/>{b} : {c}%",
+            "textStyle": {
+                "fontSize": 14
+            },
+            "borderWidth": 0
+        },
+        "title": [{
+            "padding": 5,
+            "itemGap": 10
+        }]
+    };
+
+    $(
+        function () {
+            gauge_memory.setOption(option_memory);
+            setInterval(update_gauge_data1, 5000);
+        }
+    );
+
+    function update_gauge_data1() {
+        $.ajax({
+            type: "GET",
+            url: "{{url_for('ct.update_gauge_data1')}}",
+            dataType: "json",
+            success: function (result) {
+                option_memory['series'][0]['data'][0] = result
+                gauge_memory.setOption(
+                    option_memory
+                );
+            }
+        });
+    }
+</script>
+{% endblock %}

@@ -14,7 +14,7 @@ from pyecharts import options as opts
 from pyecharts.charts import Bar
 from pyecharts.charts import Line
 from pyecharts.charts import Pie
-
+from pyecharts.charts import Gauge
 
 ct = Blueprint("ct", __name__)
 
@@ -38,8 +38,7 @@ def line_base() -> Line:
     return line
 
 
-
-@ct.route("/line",methods=['GET'], endpoint='line')
+@ct.route("/line", methods=['GET'], endpoint='line')
 def line():
     return render_template("charts/line_chart.html")
 
@@ -51,12 +50,13 @@ def get_line_chart():
 
 
 idx = 9
+
+
 @ct.route("/update_line_data", methods=['GET'], endpoint='update_line_data')
 def update_line_data():
     global idx
     idx = idx + 1
     return jsonify({"name": idx, "value": random.randrange(50, 80)})
-
 
 
 def pie_base() -> Pie:
@@ -68,3 +68,18 @@ def pie_base() -> Pie:
         .set_global_opts(title_opts=opts.TitleOpts(title="", subtitle=""))
     )
     return c
+
+
+
+@ct.route("/gauge", methods=['GET'], endpoint='gauge')
+def gauge():
+    return render_template("charts/gauge.html")
+
+
+@ct.route("/update_gauge_data", methods=['GET'], endpoint='update_gauge_data')
+def update_gauge_data():
+    return jsonify({"name": 'CPU', "value": random.randrange(1, 100)})
+
+@ct.route("/update_gauge_data1", methods=['GET'], endpoint='update_gauge_data1')
+def update_gauge_data1():
+    return jsonify({"name": 'MEMORY', "value": random.randrange(1, 100)})
