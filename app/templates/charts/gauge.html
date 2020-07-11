@@ -5,8 +5,9 @@
 {% endblock %}
 {% block content %}
 <div class="row">
-<div id="cpu" class="col-auto" style="width:500px; height:500px;"></div>
-<div id="memory" class="col-auto" style="width:500px; height:500px;"></div>
+    <div id="cpu" class="col-auto p-0" style="width:500px; height:500px;"></div>
+    <div id="memory" class="col-auto" style="width:500px; height:500px;"></div>
+    <div id="pie" class="col-auto" style="width:900px; height:500px;"></div>
 </div>
 
 <script>
@@ -65,7 +66,7 @@
             "min": 0,
             "max": 100,
             "splitNumber": 10,
-            "radius": "75%",
+            "radius": "50%",
             "startAngle": 225,
             "endAngle": -45,
             "data": [{
@@ -105,28 +106,6 @@
         }]
     };
 
-    $(
-        function () {
-            gauge_cpu.setOption(option_cpu);
-            setInterval(update_gauge_data, 5000);
-        }
-    );
-
-    function update_gauge_data() {
-        $.ajax({
-            type: "GET",
-            url: "{{url_for('ct.update_gauge_data')}}",
-            dataType: "json",
-            success: function (result) {
-                option_cpu['series'][0]['data'][0] = result
-                gauge_cpu.setOption(
-                    option_cpu
-                );
-            }
-        });
-    }
-</script>
-<script>
     var gauge_memory = echarts.init(document.getElementById('memory'), 'white', {
         renderer: 'canvas'
     });
@@ -182,7 +161,7 @@
             "min": 0,
             "max": 100,
             "splitNumber": 10,
-            "radius": "75%",
+            "radius": "50%",
             "startAngle": 225,
             "endAngle": -45,
             "data": [{
@@ -222,17 +201,165 @@
         }]
     };
 
+    var chart_pie = echarts.init(document.getElementById('pie'), 'white', {
+        renderer: 'canvas'
+    });
+    var option_pie = {
+        "animation": true,
+        "animationThreshold": 2000,
+        "animationDuration": 1000,
+        "animationEasing": "cubicOut",
+        "animationDelay": 0,
+        "animationDurationUpdate": 300,
+        "animationEasingUpdate": "cubicOut",
+        "animationDelayUpdate": 0,
+        "color": [
+            "#c23531",
+            "#2f4554",
+            "#61a0a8",
+            "#d48265",
+            "#749f83",
+            "#ca8622",
+            "#bda29a",
+            "#6e7074",
+            "#546570",
+            "#c4ccd3",
+            "#f05b72",
+            "#ef5b9c",
+            "#f47920",
+            "#905a3d",
+            "#fab27b",
+            "#2a5caa",
+            "#444693",
+            "#726930",
+            "#b2d235",
+            "#6d8346",
+            "#ac6767",
+            "#1d953f",
+            "#6950a1",
+            "#918597"
+        ],
+        "series": [{
+            "type": "pie",
+            "clockwise": true,
+            "data": [{
+                    "name": "JAVA",
+                    "value": 143
+                },
+                {
+                    "name": "C",
+                    "value": 42
+                },
+                {
+                    "name": "C++",
+                    "value": 69
+                },
+                {
+                    "name": "PYTHON",
+                    "value": 30
+                },
+                {
+                    "name": "JAVASCRIPT",
+                    "value": 53
+                },
+                {
+                    "name": "PHP",
+                    "value": 57
+                },
+                {
+                    "name": "C#",
+                    "value": 43
+                }
+            ],
+            "radius": [
+                "40%",
+                "60%"
+            ],
+            "center": [
+                "50%",
+                "50%"
+            ],
+            "label": {
+                "show": true,
+                "position": "top",
+                "margin": 8,
+                "formatter": "{b}: {c}"
+            },
+            "rippleEffect": {
+                "show": true,
+                "brushType": "stroke",
+                "scale": 2.5,
+                "period": 4
+            }
+        }],
+        "legend": [{
+            "data": [
+                "JAVA",
+                "C",
+                "C++",
+                "PYTHON",
+                "JAVASCRIPT",
+                "PHP",
+                "C#"
+            ],
+            "selected": {},
+            "show": true,
+            "left": "2%",
+            "top": "15%",
+            "orient": "vertical",
+            "padding": 5,
+            "itemGap": 10,
+            "itemWidth": 25,
+            "itemHeight": 14
+        }],
+        "tooltip": {
+            "show": true,
+            "trigger": "item",
+            "triggerOn": "mousemove|click",
+            "axisPointer": {
+                "type": "line"
+            },
+            "textStyle": {
+                "fontSize": 14
+            },
+            "borderWidth": 0
+        },
+        "title": [{
+            "text": "Pie-Radius",
+            "padding": 5,
+            "itemGap": 10
+        }]
+    };
+
+
     $(
         function () {
+            gauge_cpu.setOption(option_cpu);
             gauge_memory.setOption(option_memory);
-            setInterval(update_gauge_data1, 5000);
+            chart_pie.setOption(option_pie);
+            setInterval(update_gauge_memory, 5000);
+            setInterval(update_gauge_cpu, 5000);
         }
     );
 
-    function update_gauge_data1() {
+    function update_gauge_cpu() {
         $.ajax({
             type: "GET",
-            url: "{{url_for('ct.update_gauge_data1')}}",
+            url: "{{url_for('ct.update_gauge_cpu')}}",
+            dataType: "json",
+            success: function (result) {
+                option_cpu['series'][0]['data'][0] = result
+                gauge_cpu.setOption(
+                    option_cpu
+                );
+            }
+        });
+    }
+
+    function update_gauge_memory() {
+        $.ajax({
+            type: "GET",
+            url: "{{url_for('ct.update_gauge_memory')}}",
             dataType: "json",
             success: function (result) {
                 option_memory['series'][0]['data'][0] = result
