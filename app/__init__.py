@@ -1,3 +1,13 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+"""
+@author: hyy
+@file: opc_modbus_tool
+@time: 2020/06/8
+@desc:
+
+"""
+from flask import has_request_context, request
 from flask import Flask, render_template, request, url_for, redirect, flash
 from flask_wtf.csrf import CSRFProtect
 import logging
@@ -14,9 +24,45 @@ import datetime
 from .model import db
 from .settings import Config
 from .utils import log_class
+from logging.handlers import SMTPHandler
+from flask.logging import default_handler
 
 
-def create_log(log_path,log_level):
+mail_handler = SMTPHandler(
+    (os.getenv('MAIL_SERVER'), 25),
+    '1021509854@qq.com',
+    ['littleshenyun@outlook.com'],
+    'Application Error',
+    (os.getenv('MAIL_USERNAME'), os.getenv('MAIL_PASSWORD'))
+)
+mail_handler.setLevel(logging.ERROR)
+
+
+class RequestFormatter(logging.Formatter):
+    def format(self, record):
+        if has_request_context():
+            record.url = request.url
+            record.remote_addr = request.remote_addr
+        else:
+            record.url = None
+            record.remote_addr = None
+
+        return super().format(record)
+
+
+formatter = RequestFormatter(
+    '[%(asctime)s]  [%(remote_addr)s]  [requested %(url)s]  [%(levelname)s]  [%(module)s: %(message)s]'
+)
+
+default_handler.setFormatter(formatter)
+mail_handler.setFormatter(formatter)
+
+# root = logging.getLogger()
+# root.addHandler(default_handler)
+# root.addHandler(mail_handler)
+
+
+def create_log(log_path, log_level):
 
     if not os.path.exists(log_path):
         os.mkdir(log_path)
@@ -46,7 +92,7 @@ def create_log(log_path,log_level):
         },
         'loggers': {
             'root': {
-                'level': 'INFO',
+                'level': 'WARNING',
                 'handlers': ['wsgi']
             },
             'app': {
@@ -74,13 +120,16 @@ def create_app(test_config=None):
     mail.init_app(app)
     CSRFProtect(app)
     CORS(app)
-    create_log(Config.log_path,Config.log_level)
+    create_log(Config.log_path, Config.log_level)
     app.add_template_filter(log_class, "log_class")
+    if app.debug:
+        app.logger.addHandler(mail_handler)
+    app.logger.removeHandler(default_handler)
 
     """
     蓝图注册
     """
-    from app import opc, user, auth, issue,charts,modbus
+    from app import opc, user, auth, issue, charts, modbus
     app.register_blueprint(auth.auth)
     app.register_blueprint(user.admin)
     app.register_blueprint(opc.cs)
@@ -103,7 +152,7 @@ def create_app(test_config=None):
     @app.route('/', methods=['GET'], endpoint='index')
     @login_required
     def index():
-        flash('爱上一个地方，就应该背上包去旅行，走得更远。大家都在等你，还不快过来玩耍！','success')
+        flash('爱上一个地方，就应该背上包去旅行，走得更远。大家都在等你，还不快过来玩耍！', 'success')
         return render_template('index.html', home='bg-primary')
 
     @app.route('/impress', methods=['GET'], endpoint='impress')
@@ -119,15 +168,15 @@ def create_app(test_config=None):
         app.logger.debug("config_studio 重新启动")
 
     # @csrf_exempt
-    @app.route('/signin',methods=['POST','GET'],endpoint='signin')
+    @app.route('/signin', methods=['POST', 'GET'], endpoint='signin')
     def signin():
         response = {}
         try:
             username = request.args.get("Username")
             password = request.args.get("Password")
             # user = authenticate(request, username=username, password=password)
-            
-            if username=='admin' and password=='111111' :
+
+            if username == 'admin' and password == '111111':
                 app.logger.debug('登录成功')
                 response['login'] = True
                 response['msg'] = 'success'
@@ -142,11 +191,6 @@ def create_app(test_config=None):
         except Exception as e:
             print(e)
             return str(e)
-
-
-
-
-
 
     def encode_auth_token(email):
         # 申请Token,参数为自定义,user_id不必须,此处为以后认证作准备,程序员可以根据情况自定义不同参数

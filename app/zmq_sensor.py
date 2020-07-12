@@ -94,9 +94,7 @@ class SensorClient(object):
         self._thread.start()
 
     def _run_server(self):
-        print('开始初始化。。。。')
         self._do_init()
-        print('初始化完成。。。')
         while True:
             self.receive_sensor_message()
             time.sleep(5)

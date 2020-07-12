@@ -27,11 +27,11 @@ class DevelopmentConfig(Config):
     RECAPTCHA_PUBLIC_KEY = '6LfGgaQZAAAAAKDGl49W3MUM4EuMRVn4DW17mAdx'
     RECAPTCHA_PRIVATE_KEY = '6LfGgaQZAAAAALFg29Ktye6qiinyqwIhj-xqmYO5'
 
-    MAIL_SERVER = os.getenv('MAIL_SERVER'),
+    MAIL_SERVER = os.getenv('MAIL_SERVER')
     MAIL_PORT = 465
     MAIL_USE_SSL = True
-    MAIL_USERNAME = os.getenv('MAIL_USERNAME'),
-    MAIL_PASSWORD = os.getenv('MAIL_PASSWORD'),
+    MAIL_USERNAME = os.getenv('MAIL_USERNAME')
+    MAIL_PASSWORD = os.getenv('MAIL_PASSWORD')
     MAIL_DEFAULT_SENDER = '1021509854@qq.com'
 
 
