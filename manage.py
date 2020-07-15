@@ -28,4 +28,4 @@ if __name__ == "__main__":
     Development
 
     """
-    app.run(threaded=True)
+    app.run(threaded=True,host='192.168.20.166',port='8080')

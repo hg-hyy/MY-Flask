@@ -17,7 +17,7 @@ body {
   left: 0;
   z-index: 100;
   /* Behind the navbar */
-  padding: 56px 0 0;
+  padding: 72px 0 0;
   /* Height of navbar */
   /* Height of navbar */
   box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
@@ -29,13 +29,12 @@ body {
   left: 240px;
   top: 0px;
   width: calc(100vw - 240px);
-
 }
 
 .appbar {
   left: 240px;
   top: 0px;
-  height: 56px;
+  height: 72px;
   width: calc(100vw - 240px);
 
 }
@@ -79,7 +78,7 @@ ul>a {
 .sidebar-sticky {
   position: relative;
   top: 0;
-  height: calc(100vh - 56px);
+  height: calc(100vh - 72px);
   padding-top: .5rem;
   overflow-x: hidden;
   overflow-y: auto;

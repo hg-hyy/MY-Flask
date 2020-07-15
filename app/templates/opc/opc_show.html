@@ -8,9 +8,9 @@
 
 <div class="row">
     <div class="align-middle col-12  mb-2">
-        <h5 class="h2 d-inline">
+        <h4 class="h2 d-inline">
             <span class="text-muted ">参数配置预览</span>
-        </h5>
+        </h4>
         <hr class="border-bottom border-danger" />
     </div>
     <label for="module" class="col-sm1 col-form-label col-form-label-md ml-3 ">
@@ -37,10 +37,11 @@
         onclick="opc_show()">show me </button>
     <button type="button" class="col-sm-1 form-control form-control-md btn btn-outline-primary"
         onclick="get_config()">s_config </button>
+        <a href="{{url_for('cs.load_opc_da')}}" class="col-sm-1 form-control form-control-md btn btn-outline-primary">修改配置</a>
 </div>
 
 <div class="row">
-    <div class="col-5 mt-1">
+    <div class="col-5 m-0 p-0">
         <table class="table table-bordered table-hover">
             <thead>
                 <tr>
@@ -65,7 +66,7 @@
         </table>
     </div>
     <!-- 配置说明 -->
-    <div class="col-2 p-0">
+    <div class="col-2 p-0 m-0">
         <table class="table table-bordered table-hover">
             <th>配置说明</th>
             <tr>
@@ -106,10 +107,6 @@
             </tr>
 
         </table>
-    </div>
-
-    <div class="col-2 offset-6">
-        <a href="{{url_for('cs.load_opc_da')}}" class="btn btn-info">修改配置</a>
     </div>
 </div>
 
