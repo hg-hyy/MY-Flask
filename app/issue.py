@@ -1,13 +1,16 @@
-from flask import Blueprint, render_template, session, redirect, url_for, request, flash, abort, current_app
+from flask import Blueprint, render_template, redirect, url_for, request, flash, abort, current_app
 from .model import Issue, db, Category
 from .forms import CategoryForm, ContactForm, IssueForm
 from flask import g
 from flask_mail import Message, Mail
 from app.opc import login_required
-import math
 import markdown2 as Markdown
 import bleach
+import time
 from threading import Thread
+from sqlalchemy import and_,or_   
+
+
 faq = Blueprint('faq', __name__)
 mail = Mail()
 
@@ -79,17 +82,82 @@ def get_issue(id, check_user=True):
     return issue
 
 
+@faq.route("/search_issue_datetime", methods=['GET', 'POST'], endpoint='search_issue_datetime')
+def search_issue_datetime():
+    if request.method == 'POST':
+        ca = request.form.get('ca')
+        created_day = request.form.get(
+            'created_day', time.strftime('%Y-%m-%d'))
+        created_day_start = created_day+' ' + \
+            request.form.get('created_day_start', '00:00:00')
+        created_day_end = created_day+' ' + \
+            request.form.get("created_day_end", "23:59:59")
+        page = int(request.form.get('page', 1))
+        pages = int(request.form.get('pages', 3))
+        category = Category.query.filter_by(name=ca).first_or_404()
+        paginates = Issue.query.filter(and_(Issue.created > created_day_start, Issue.created <
+                                            created_day_end, Issue.category_id == category.id)).paginate(page, pages, error_out=False)
+        pga = {'items': [issue.to_json() for issue in paginates.items],
+               'has_prev': paginates.has_prev,
+               'prev_num': paginates.prev_num,
+               'has_next': paginates.has_next,
+               'next_num': paginates.next_num,
+               'iter_pages': list(paginates.iter_pages()),
+               'pages': paginates.pages,
+               'page': paginates.page,
+               'total': paginates.total
+               }
+        return {'category': category.to_json(), 'paginate': pga}
+
+
+@faq.route("/search_issue_key", methods=['GET', 'POST'], endpoint='search_issue_key')
+def search_issue_key():
+    if request.method == 'POST':
+        page = int(request.form.get('page', 1))
+        pages = int(request.form.get('pages', 6))
+        key = request.form.get('key')
+        category = Category.query.first_or_404()
+        paginates = Issue.query.filter(or_(Issue.title.like('%{0}%'.format(
+            key)), Issue.body.like('%{0}%'.format(key)))).paginate(page, pages, error_out=False)
+        pga = {'items': [issue.to_json() for issue in paginates.items],
+               'has_prev': paginates.has_prev,
+               'prev_num': paginates.prev_num,
+               'has_next': paginates.has_next,
+               'next_num': paginates.next_num,
+               'iter_pages': list(paginates.iter_pages()),
+               'pages': paginates.pages,
+               'page': paginates.page,
+               'total': paginates.total
+               }
+        return {'category': category.to_json(), 'paginate': pga}
+
+
 @faq.route("/show_issue", methods=['GET', 'POST'], endpoint='show_issue')
 @login_required
 def show_issue():
-    """Show all the posts, most recent first."""
+    if request.method == 'POST':
+        ca = request.form.get('ca')
+        page = int(request.form.get('page', 1))
+        pages = int(request.form.get('pages', 3))
+        category = Category.query.filter_by(name=ca).first_or_404()
+        paginates = Issue.query.filter_by(category_id=category.id).paginate(
+            page, pages, error_out=False)
+        pga = {'items': [issue.to_json() for issue in paginates.items],
+               'has_prev': paginates.has_prev,
+               'prev_num': paginates.prev_num,
+               'has_next': paginates.has_next,
+               'next_num': paginates.next_num,
+               'iter_pages': list(paginates.iter_pages()),
+               'pages': paginates.pages,
+               'page': paginates.page,
+               'total': paginates.total
+               }
+        return {'category': category.to_json(), 'paginate': pga}
+
     page = int(request.args.get('page', 1))
-    # 获取每页显示数据条数默认为2
     pages = int(request.args.get('pages', 3))
-    # 从数据库查询数据
     paginates = Issue.query.order_by('id').paginate(
         page, pages, error_out=False)
-
     categorys = Category.query.all()
     return render_template('issue/show_issue.html', paginate=paginates, faq='bg-success', categorys=categorys)
 
@@ -200,4 +268,3 @@ def get_clean_html_content(html_content):
 #     content_html = get_clean_html_content(self.content_html)
 
 #     gavatar_id = hashlib.md5(self.email.lower().encode('utf-8')).hexdigest()
-

@@ -7,7 +7,6 @@ from flask import redirect, url_for
 from flask import request, render_template, Blueprint, current_app, session
 from werkzeug.utils import secure_filename
 from .settings import Config
-from flask import g
 from app.utils import paginate
 from app.opc import login_required
 

@@ -7,7 +7,6 @@
 @desc:
 
 """
-from math import ceil
 import datetime
 import os
 import time
@@ -18,7 +17,7 @@ import functools
 import linecache
 import requests
 from flask import request, render_template, Blueprint, session, url_for
-from flask import current_app, redirect, g, jsonify
+from flask import current_app, redirect, g
 from werkzeug.utils import secure_filename
 from .forms import OpcForm, OpcdaForm
 from .config import client, opc, modbus, URL
@@ -28,13 +27,15 @@ from .zmq_sensor import SensorClient, sensor2dict
 from .zmq_event import EventClient, event2dict
 import psutil
 import signal
+from app.utils import paginate
+
+
+cs = Blueprint("cs", __name__)
 
 conf_path = Config.conf_path
 log_path = Config.log_path
 p = Config.p
 
-
-cs = Blueprint("cs", __name__)
 
 """
 ##################################### 公用方法 #########################################
@@ -282,7 +283,7 @@ def read_opc_config(cfg_msg, module):
                     group_infos.append(group_info)
             return tag_list, opc_config, group_infos
         except Exception as e:
-            print(str(e), '--------error  in red opc config----------')
+            print(str(e), '--------error  in read opc config----------')
             return tag_list, opc_config, group_infos
     else:
         return tag_list, opc_config, group_infos
@@ -1376,100 +1377,8 @@ def log():
         return render_template('log/log.html', paginate=pga, log='bg-info')
 
 
-class Pagination(object):
-
-    def __init__(self, page, per_page, total, items):
-        #: the unlimited query object that was used to create this
-        #: pagination object.
-        #: the current page number (1 indexed)
-        self.page = page
-        #: the number of items to be displayed on a page.
-        self.per_page = per_page
-        #: the total number of items matching the query
-        self.total = total
-        #: the items for the current page
-        self.items = items
-
-    @property
-    def pages(self):
-        """The total number of pages"""
-        if self.per_page == 0:
-            pages = 0
-        else:
-            pages = int(ceil(self.total / float(self.per_page)))
-        return pages
-
-    def prev(self, error_out=False):
-        """Returns a :class:`Pagination` object for the previous page."""
-        return paginate(self.page - 1, self.per_page, error_out)
-
-    @property
-    def prev_num(self):
-        """Number of the previous page."""
-        if not self.has_prev:
-            return None
-        return self.page - 1
-
-    @property
-    def has_prev(self):
-        """True if a previous page exists"""
-        return self.page > 1
-
-    def next(self, error_out=False):
-        return paginate(self.page + 1, self.per_page, error_out)
-
-    @property
-    def has_next(self):
-        """True if a next page exists."""
-        return self.page < self.pages
-
-    @property
-    def next_num(self):
-        """Number of the next page"""
-        if not self.has_next:
-            return None
-        return self.page + 1
-
-    def iter_pages(self, left_edge=2, left_current=2, right_current=5, right_edge=2):
-
-        last = 0
-        for num in range(1, self.pages + 1):
-            if num <= left_edge or \
-               (num > self.page - left_current - 1 and
-                num < self.page + right_current) or \
-               num > self.pages - right_edge:
-                if last + 1 != num:
-                    yield None
-                yield num
-                last = num
-
-    @property
-    def to_json(self):
-        return {'items': self.items,
-                'has_prev': self.has_prev,
-                'prev_num': self.prev_num,
-                'has_next': self.has_next,
-                'next_num': self.next_num,
-                'iter_pages': list(self.iter_pages()),
-                'pages': self.pages,
-                'page': self.page,
-                'total': self.total
-                }
-
-
-def paginate(list, page=1, per_page=3, max_per_page=None):
-    if max_per_page is not None:
-        per_page = min(per_page, max_per_page)
-    start = (page-1) * per_page
-    end = page*per_page
-    items = list[start:end]
-    total = len(list)
-    return Pagination(page, per_page, total, items).to_json
-
-
 ec = EventClient()
 sc = SensorClient()
-
 
 @cs.route("/show_sensor", methods=['GET', 'POST'], endpoint='show_sensor')
 def show_sensor():

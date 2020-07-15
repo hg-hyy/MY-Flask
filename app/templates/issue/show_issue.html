@@ -20,52 +20,56 @@
     <!-- issue -->
     <div class="col-9">
         <!-- 功能表单 -->
-        <form id='issue'>
+        <div id='issue'>
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
             <div class=" justify-content-between flex-wrap flex-md-nowrap align-items-center mb-3">
                 <div class="form-group form-inline mb-0">
 
                     <label class="form-input-label mr-1" for="title">主题分类:</label>
-                    <select class="form-control mr-1 col-1" id="log_level" name='log_level'>
-                        {%for issue in issues%}
-                        <option>{{issue.category}}</option>
+                    <select class="form-control mr-1 col-auto" id="category" name='category'
+                        onchange="get_category(this)">
+                        {%for category in categorys%}
+                        <option>{{category}}</option>
                         {%endfor%}
                     </select>
 
-                    <label class="form-input-label mr-1" for="log_day">发布日期:</label>
-                    <input class="form-control col-1" type="text" name="log_day" id="log_day" value="">
+                    <label class="form-input-label mr-1" for="created_day">发布日期:</label>
+                    <input class="form-control col-2" type="text" name="created_day" id="created_day" value="">
 
-                    <label class="form-input-label mr-1" for="log_day_start">开始时间:</label>
-                    <input class="form-control col-1" type="text" name="log_day_start" id="log_day_start" value="">
+                    <label class="form-input-label mr-1" for="created_day_start">开始时间:</label>
+                    <input class="form-control col-1" type="text" name="created_day_start" id="created_day_start"
+                        value="">
 
-                    <label class="form-input-label mr-1" for="log_day_end">结束时间:</label>
-                    <input class="form-control col-1" type="text" name="log_day_end" id="log_day_end" value="">
+                    <label class="form-input-label mr-1" for="created_day_end">结束时间:</label>
+                    <input class="form-control col-1" type="text" name="created_day_end" id="created_day_end" value="">
 
 
-                    <button type="button" class="btn btn-outline-info ml-1 " onclick="select_log()">
+                    <button type="button" class="btn btn-outline-info ml-1 " onclick="serach_issue_datetime()">
                         <span data-feather="upload"></span>
                         查询
                     </button>
 
                     <label class="form-input-label mr-1" for="key"></label>
-                    <input class="form-control col-2" type="text" name="key" id="key"" value="">
-                
-
-                <button type=" button" class="btn btn-outline-success ml-1 " onclick="search()">
-                    <span data-feather="calendar"></span>搜索
+                    <input class="form-control col-1" type="text" name="key" id="key"" value="">
+                    <button type=" button" class="btn btn-outline-success ml-1 " onclick="search_issue_key()">
+                    <span data-feather="calendar"></span>
+                    搜索
                     </button>
-
-
+                    <div class="custom-control custom-switch">
+                        <input type="checkbox" class="custom-control-input" id="style" checked
+                            onchange="issue_style(this.checked)">
+                        <label class="custom-control-label" for="style">table_or_card</label>
+                    </div>
                 </div>
             </div>
-        </form>
+        </div>
 
         <!-- issue卡片 -->
-        <div class="card-deck">
+        <div class="card-columns" id='style_card'>
 
             {% for issue in paginate.items %}
 
-            <div class="card border-success mb-3" style="max-width: 30rem;">
+            <div class="card border-success  mb-3" style="max-width: 30rem;">
                 <div class="card-header bg-transparent border-success">
                     <h3>
                         <span class="text-muted">当前分类</span>
@@ -102,11 +106,39 @@
             </div>
             {% endfor %}
         </div>
-       
+
+        <div class="col-12 d-none" id='style_table'>
+            <table class="table table-bordered">
+                <thead id='keys'>
+                    <tr>
+                        <th>#ID</th>
+                        <th>标题</th>
+                        <th>正文</th>
+                        <th>类别</th>
+                        <th>创建用户</th>
+                        <th>创建时间</th>
+                    </tr>
+                </thead>
+                <tbody id='values'>
+                    {% for issue in paginate.items %}
+                    <tr>
+                        <td> {{loop.index}}</td>
+                        <td> {{ issue['title'] }}</td>
+                        <td> {{ issue['body'] }}</td>
+                        <td> {{issue.category}}</td>
+                        <td> {{g.user}}</td>
+                        <td> {{ issue['created'].strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+
         <!-- 分页 -->
         <div class="row mt-4 ">
             <div class="col-md-12 col-sm-12 ">
-                <nav>
+                <nav id='tag_page'>
                     <ul class="pagination pagination-md justify-content-end">
                         <select class="form-control " name='pages' id="pages" onchange="pages(this)"
                             style="width: fit-content;">
@@ -187,5 +219,271 @@
     </div>
 
 </div>
+<script>
+    var csrftoken = $("meta[name=csrf-token]").attr("content");
 
+    jQuery(function () {
+        jQuery('#created_day').datetimepicker({
+            format: 'Y-m-d',
+            timepicker: false,
+            validateOnBlur: true,
+            closeOnDateSelect: true,
+        });
+        jQuery('#created_day_start').datetimepicker({
+            format: 'H:i:s',
+            datepicker: false,
+            timepicker: true,
+            validateOnBlur: true,
+            closeOnDateSelect: true,
+            onShow: function (ct) {
+                this.setOptions({
+                    // maxDate: jQuery('#created_day_end').val() ? jQuery(
+                    //     '#created_day_end').val() : false,
+                    maxTime: jQuery('#created_day_end').val() ? jQuery(
+                        '#created_day_end').val() : false
+                })
+            },
+        });
+        jQuery('#created_day_end').datetimepicker({
+            format: 'H:i:s',
+            datepicker: false,
+            timepicker: true,
+            validateOnBlur: true,
+            closeOnDateSelect: true,
+            onShow: function (ct) {
+                this.setOptions({
+                    // minDate: jQuery('#created_day_start').val() ? jQuery(
+                    //     '#created_day_start').val() : false,
+                    minTime: jQuery('#created_day_start').val() ? jQuery(
+                        '#created_day_start').val() : false
+                })
+            },
+        });
+        $.datetimepicker.setLocale('zh');
+    });
+
+    function get_category(obj) {
+        console.log(obj.value)
+        $.ajax({
+            url: "{{url_for('faq.show_issue')}}",
+            data: {
+                "ca": obj.value,
+                "pages": 3,
+                "page": 1,
+            },
+            headers: {
+                "X-CSRFToken": csrftoken
+            },
+            type: 'post',
+            dataType: 'json',
+            success: success,
+            error: function (data) {
+                console.log(data);
+            },
+        });
+        return false;
+    }
+
+    function click_to_page(page) {
+        var category = $("#category").val()
+        $.ajax({
+            url: "{{url_for('faq.show_issue')}}",
+            data: {
+                "ca": category,
+                "page": page,
+                "pages": 3,
+            },
+            headers: {
+                "X-CSRFToken": csrftoken
+            },
+            type: 'post',
+            dataType: 'json',
+            success: success,
+            error: function (data) {
+                console.log(data);
+            },
+        });
+        return false
+    }
+
+    function serach_issue_datetime() {
+        var category = $("#category").val()
+        var created_day = $("#created_day").val();
+        var created_day_start = $("#created_day_start").val();
+        var created_day_end = $("#created_day_end").val();
+        $.ajax({
+            url: "{{url_for('faq.search_issue_datetime')}}",
+            data: {
+                "ca": category,
+                "created_day": created_day,
+                "created_day_start": created_day_start,
+                "created_day_end": created_day_end,
+                "pages": 3,
+                "page": 1,
+            },
+            type: 'post',
+            dataType: 'json',
+            headers: {
+                "X-CSRFToken": csrftoken
+            },
+            success: success,
+            error: function (data) {
+                console.log(data);
+            },
+        });
+        return false;
+    }
+
+    function search_issue_key() {
+        var category = $("#category").val()
+        var created_day = $("#created_day").val();
+        var created_day_start = $("#created_day_start").val();
+        var created_day_end = $("#created_day_end").val();
+        var key = $("#key").val();
+        $.ajax({
+            url: "{{url_for('faq.search_issue_key')}}",
+            data: {
+                "key": key,
+                "ca": category,
+                "created_day": created_day,
+                "created_day_start": created_day_start,
+                "created_day_end": created_day_end,
+                "pages": 6,
+                "page": 1,
+            },
+            type: 'post',
+            headers: {
+                "X-CSRFToken": csrftoken
+            },
+            dataType: 'json',
+            success: success,
+            error: function (data) {
+                console.log(data);
+            },
+        });
+        return false;
+    }
+
+    function issue_style(style) {
+        console.log(style)
+        if (style) {
+            $("#style_table").addClass('d-none')
+            $("#style_card").removeClass('d-none')
+        } else {
+            $("#style_card").addClass('d-none')
+            $("#style_table").removeClass('d-none')
+        }
+    }
+
+    $(document).ready(function () {
+        issue_style(true)
+
+    })
+
+
+
+    function success(data) {
+        console.log(data)
+        var card = ''
+        var $keys = '';
+        var $values = '';
+        var tags = data.paginate.items
+        if (data.paginate.total >= 0) {
+            for (let issue of tags) {
+                card +=
+                    `<div class="card border-success mb-3" style="max-width: 30rem;">
+                    <div class="card-header bg-transparent border-success">
+                        <h3>
+                            <span class="text-muted">当前分类</span>
+                            <span class="badge badge-info badge-pill">
+                                ${data.category.name}
+                            </span>
+                        </h3>
+                    </div>
+                    <div class="card-body text-success">
+                        <h5 class="card-title">${issue['title']}</h5>
+                        <blockquote class="blockquote mb-0">
+                            <p class="card-text">${issue['body']}</p>
+                            <footer class="blockquote-footer">
+                                by ${issue['user']}  on
+                                <cite title="Source Title">${issue['created']}</cite>
+                            </footer>
+                        </blockquote>
+                    </div>
+                    <div class="card-footer bg-transparent border-success d-flex flex-row-reverse">
+
+                        <form action="${issue['id']}/delete_issue" method="post">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                            <input class="btn btn-outline-danger btn-md " type="submit" value="删除"
+                                onclick="return confirm('确认删除?');">
+                        </form>
+                        <form action="/${issue['id']}/update_issue" method="get" class="d-inline mr-3">
+                            <input class="btn btn-outline-info btn-md " type="submit" value="编辑">
+                        </form>
+                    </div>
+                </div>`
+                $("#card").html(card)
+            }
+            for (i in tags) {
+                var keys_td = ''
+                var values_td = ''
+                for (t in tags[i]) {
+                    keys_td += '<th scope="row" class="table-info p-1">' + t + '</th>'
+                    values_td += '<td scope="row" ">' + tags[i][t] + '</td>'
+                };
+                $keys = `<tr>${keys_td }</tr>`
+                $values += `<tr>'${values_td}</tr>`
+                $('#keys').html($keys);
+                $('#values').html($values);
+
+            };
+
+
+            var lis = ''
+            data.paginate.iter_pages.forEach((item, index) => {
+                if (item) {
+                    var tmp = ''
+                    if (data.paginate.page == item) {
+                        tmp =
+                            `<li class="page-item active "><a class="page-link form-control" href="javascript:click_to_page(${item}) "> ${item} </a></li>`
+                    } else {
+                        tmp =
+                            `<li class="page-item "><a class="page-link form-control" href="javascript:click_to_page(${item})"> ${item} </a></li>`
+                    }
+                } else {
+                    tmp =
+                        `<li class="page-item "><a class="page-link form-control" href="javascript:void(0)">...</a></li>`
+                }
+
+                lis += tmp
+            });
+            var tag_page =
+
+                `<ul class="pagination pagination-md justify-content-end">
+                <li class="page-item ">
+                ${ data.paginate.has_prev ?
+                `<a class="page-link form-control" tabindex="-1"
+                        href="javascript:click_to_page(${data.paginate.prev_num},1)">Previous</a>`: ''}
+                        
+                </li>
+                ${lis}
+                <li class="page-item ">
+                ${ data.paginate.has_next ?
+                    `<a class="page-link form-control" tabindex="-1"
+                    href="javascript:click_to_page(${data.paginate.next_num},1)">Next</a>` : ''}
+                </li>
+                <li class="page-item"><a class="page-link form-control">共</a></li>
+                <input id='total' name='total' disabled class="form-control" style="width: 60px;"
+                    value=${ data.paginate.total } />
+                <li class="page-item"><a class="page-link form-control">条</a></li>
+                <li class="page-item"><a class="page-link form-control">共</a></li>
+                <input id='max_pages' name='max_pages' disable class="form-control" style="width: 60px;"
+                    value=${ data.paginate.pages } />
+                <li class="page-item"><a class="page-link form-control">页</a></li>`;
+
+            var $tag_page = $('#tag_page');
+            $tag_page.html(tag_page);
+        }
+    }
+</script>
 {% endblock %}

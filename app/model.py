@@ -84,6 +84,16 @@ class User(db.Model):
     def __str__(self):
         return self.username
 
+    def to_json(self):
+        return{
+            'id':self.id,
+            'username':self.username,
+            'email':self.email,
+            'create_time':self.create_time,
+            'last_login_time':self.last_login_time,
+            'is_superuser':self.is_superuser,
+            '_password':self._password,
+        }
 class Opc(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
@@ -139,10 +149,21 @@ class Category(db.Model):
     ), onupdate=datetime.datetime.now())
     issue = db.relationship('Issue', backref=db.backref('Category', lazy=True))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    User = db.relationship('User', backref='Category', lazy=True)
+    user = db.relationship('User', backref='Category', lazy=True)
 
     def __str__(self):
         return self.name
+    
+    def to_json(self):
+        return{
+            'id':self.id,
+            'name':self.name,
+            'created':self.created,
+            'issue':[issue.to_json() for issue in self.issue ],
+            'user_id':self.user_id,
+            'user':self.user.username,
+        }
+
 
 
 class Issue(db.Model):
@@ -157,7 +178,7 @@ class Issue(db.Model):
         'category.id'), nullable=False)
     category = db.relationship(
         'Category', backref=db.backref('Issue', lazy=True))
-    User = db.relationship('User', backref='Issue', lazy=True)
+    user = db.relationship('User', backref='Issue', lazy=True)
 
     def __repr__(self):
         return '<Issue %r>' % self.title
@@ -170,6 +191,17 @@ class Issue(db.Model):
     meta = {
         'ordering': ['-created']
     }
+    def to_json(self):
+        return{
+            'id':self.id,
+            'created':self.created,
+            'title':self.title,
+            'body':self.body,
+            'user_id':self.user_id,
+            'category_id':self.category_id,
+            'category':self.category.name,
+            'user':self.user.username,
+        }
 
 class Contact(db.Model):
     id = db.Column(db.Integer, primary_key=True)
