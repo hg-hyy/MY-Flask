@@ -28,14 +28,17 @@
     {% block head %}{% endblock %}
     <style>
         #main {
-            margin-top: 16px;
+            margin-top: 8px;
         }
     </style>
 </head>
 
-<body style="overflow: hidden;">
+<body>
     <!-- 顶部标题栏 -->
     <nav id='appbar' class="appbar navbar navbar-expand-md  sticky-top navbar-dark  bg-dark ">
+        <a class="navbar-brand" href="javascript:void(0)" onclick="plus()">
+            <span data-feather="menu" style="width: 20px; height: 20px;color:black;"></span>
+        </a>
         <a class="navbar-brand col-md-1 col-lg-1 mr-0 px-1" href="{{url_for('index')}}">
             安全隔离网关
         </a>
@@ -46,25 +49,21 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav mr-auto">
-
                 <li class="nav-item active">
-                    <a class="nav-link" href="javascript:void(0)" onclick="plus()">
-                        <span data-feather="menu" style="width: 20px; height: 20px;color:white;"></span>
 
-                    </a>
                 </li>
             </ul>
-            <button class="btn btn-outline-info " type="button" data-toggle="modal" data-target="#FAQ">
+            <button class="btn btn-outline-info mr-1" type="button" data-toggle="modal" data-target="#FAQ">
                 FAQ
             </button>
-            <button class="btn btn-outline-warning " type="button" data-toggle="modal" data-target="#loginModal">
+            <button class="btn btn-outline-warning mr-1" type="button" data-toggle="modal" data-target="#loginModal">
                 SIGN IN
             </button>
             <div class="dropdown mr-2">
                 <button class="btn btn-outline-danger dropdown-toggle" type="button" id="dropdownMenuButton"
                     data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     {% if g.user %}
-                    Welcome! {{g.user}}
+                    {{g.user}}
                     {% else %}
                     未登录
                     {% endif %}
@@ -82,8 +81,6 @@
                 <input class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search">
                 <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
             </form>
-
-
         </div>
     </nav>
 
@@ -208,104 +205,114 @@
 
                     <ul id='close' class="nav flex-column d-none text-center">
 
-                        <h6
-                            class="sidebar-heading mt-2 text-muted">
+                        <h6 class="sidebar-heading mt-2 text-muted">
                             <span>setting</span>
-                            <a class="d-flex align-items-center text-muted" href="#" aria-label="Add a new report" >
+                            <a class="d-flex align-items-center text-muted" href="#" aria-label="Add a new report">
 
                             </a>
                         </h6>
 
-                        <a class="nav-link   {{opc}}" href="{{url_for('cs.opc')}}"  data-toggle="tooltip" data-placement="right" title="OPC SETTING">
+                        <a class="nav-link   {{opc}}" href="{{url_for('cs.opc')}}" data-toggle="tooltip"
+                            data-placement="right" title="OPC SETTING">
                             <span data-feather="circle" style="width: 24px; height: 24px;color:black;"></span>
                         </a>
 
 
-                        <a class="nav-link {{opc_da_server}} " href="{{url_for('cs.load_opc_se')}}" data-toggle="tooltip" data-placement="right" title="load_opc_se">
+                        <a class="nav-link {{opc_da_server}} " href="{{url_for('cs.load_opc_se')}}"
+                            data-toggle="tooltip" data-placement="right" title="load_opc_se">
                             <span data-feather="edit" style="width: 24px; height: 24px;color:black;"></span>
-                            
+
                         </a>
 
 
-                        <a class="nav-link {{opc_da_client}} " href="{{url_for('cs.load_opc_da')}}" data-toggle="tooltip" data-placement="right" title="load_opc_da">
+                        <a class="nav-link {{opc_da_client}} " href="{{url_for('cs.load_opc_da')}}"
+                            data-toggle="tooltip" data-placement="right" title="load_opc_da">
                             <span data-feather="star" style="width: 24px; height: 24px;color:black;"></span>
-                            
+
                         </a>
 
 
-                        <a class="nav-link {{opc_ae_client}}  " href="{{url_for('cs.load_opc_ae')}}" data-toggle="tooltip" data-placement="right" title="load_opc_ae">
+                        <a class="nav-link {{opc_ae_client}}  " href="{{url_for('cs.load_opc_ae')}}"
+                            data-toggle="tooltip" data-placement="right" title="load_opc_ae">
                             <span data-feather="anchor" style="width: 24px; height: 24px;color:black;"></span>
-                            
+
                         </a>
 
 
-                        <a class="nav-link {{modbus_slave}} " href="{{url_for('cs.load_modbus')}}" data-toggle="tooltip" data-placement="right" title="load_modbus">
+                        <a class="nav-link {{modbus_slave}} " href="{{url_for('cs.load_modbus')}}" data-toggle="tooltip"
+                            data-placement="right" title="load_modbus">
                             <span data-feather="octagon" style="width: 24px; height: 24px;color:black;"></span>
-                           
+
                         </a>
 
 
-                        <h6
-                            class="sidebar-heading mt-2 text-muted">
+                        <h6 class="sidebar-heading mt-2 text-muted">
                             <span>config</span>
                             <a class="d-flex align-items-center text-muted" href="#" aria-label="Add a new report">
                             </a>
                         </h6>
 
-                        <a class="nav-link {{config_review}} " href="{{url_for('cs.config_review')}} " data-toggle="tooltip" data-placement="right" title="config_review">
+                        <a class="nav-link {{config_review}} " href="{{url_for('cs.config_review')}} "
+                            data-toggle="tooltip" data-placement="right" title="config_review">
                             <span data-feather="cpu" style="width: 24px; height: 24px;color:black;"></span>
-                            
+
                         </a>
 
 
-                        <a class="nav-link {{show_sensor}}" href="{{url_for('cs.show_sensor')}} " data-toggle="tooltip" data-placement="right" title="show_sensor">
+                        <a class="nav-link {{show_sensor}}" href="{{url_for('cs.show_sensor')}} " data-toggle="tooltip"
+                            data-placement="right" title="show_sensor">
                             <span data-feather="file-text" style="width: 24px; height: 24px;color:black;"></span>
-                           
+
                         </a>
 
 
-                        <a class="nav-link {{control}}" href="{{url_for('cs.control')}} " data-toggle="tooltip" data-placement="right" title="control">
+                        <a class="nav-link {{control}}" href="{{url_for('cs.control')}} " data-toggle="tooltip"
+                            data-placement="right" title="control">
                             <span data-feather="layers" style="width: 24px; height: 24px;color:black;"></span>
-                            
+
                         </a>
 
 
-                        <a class="nav-link {{show_alarm}}" href="{{url_for('cs.show_alarm')}} " data-toggle="tooltip" data-placement="right" title="show_alarm">
+                        <a class="nav-link {{show_alarm}}" href="{{url_for('cs.show_alarm')}} " data-toggle="tooltip"
+                            data-placement="right" title="show_alarm">
                             <span data-feather="bell" style="width: 24px; height: 24px;color:black;"></span>
-                            
+
                         </a>
 
 
-                        <a class="nav-link {{group}}" href="{{url_for('cs.show_tag_page')}} " data-toggle="tooltip" data-placement="right" title="show_tag_page">
+                        <a class="nav-link {{group}}" href="{{url_for('cs.show_tag_page')}} " data-toggle="tooltip"
+                            data-placement="right" title="show_tag_page">
                             <span data-feather="tag" style="width: 24px; height: 24px;color:black;"></span>
-                            
+
                         </a>
 
 
-                        <a class="nav-link {{modbus}}" href="{{url_for('mt.show_modbus_page')}} " data-toggle="tooltip" data-placement="right" title="show_modbus_page">
+                        <a class="nav-link {{modbus}}" href="{{url_for('mt.show_modbus_page')}} " data-toggle="tooltip"
+                            data-placement="right" title="show_modbus_page">
                             <span data-feather="cast" style="width: 24px; height: 24px;color:black;"></span>
-                          
+
                         </a>
 
 
-                        <h6
-                            class="sidebar-heading mt-2 text-muted">
+                        <h6 class="sidebar-heading mt-2 text-muted">
                             <span>log</span>
                             <a class="d-flex align-items-center text-muted" href="#" aria-label="Add a new report">
 
                             </a>
                         </h6>
 
-                        <a class="nav-link {{log}}" href="{{url_for('cs.log')}} " data-toggle="tooltip" data-placement="right" title="log">
+                        <a class="nav-link {{log}}" href="{{url_for('cs.log')}} " data-toggle="tooltip"
+                            data-placement="right" title="log">
                             <span data-feather="hard-drive" style="width: 24px; height: 24px;color:black;"></span>
-                            
+
                         </a>
 
 
 
-                        <a class="nav-link {{faq}}" href="{{url_for('faq.show_issue')}} " data-toggle="tooltip" data-placement="right" title="show_issue">
+                        <a class="nav-link {{faq}}" href="{{url_for('faq.show_issue')}} " data-toggle="tooltip"
+                            data-placement="right" title="show_issue">
                             <span data-feather="info" style="width: 24px; height: 24px;color:black;"></span>
-                           
+
                         </a>
 
                     </ul>
@@ -315,7 +322,7 @@
             <!-- 正文-->
             <main id="main" class='main'>
 
-                <div class="col-12" style="position: relative; overflow-y: auto; height: 724px;">
+                <div class="col-12" id='content' style="position: relative; overflow-y: auto; height: 724px;">
                     {% block heads %}{% endblock %}
                     {% block content %}{% endblock %}
                 </div>
@@ -324,9 +331,9 @@
                 <div style="position: fixed;top: 60px;right: 30px;" id='alarm'></div>
 
                 <!--页脚-->
-                <div class="container-fluid p-0 m-0 ">
+                <div id='footer' class="footer">
                     <hr class="border-top border-info" />
-                    <div class="row justify-content-start text-center">
+                    <div class="row justify-content-start text-center p-0 m-0">
                         <div class="col-3 col-md">
                             <img class="mb-2" src="{{url_for('static',filename='pic/CL1.jpg')}}" alt="" width="100"
                                 height="100">
@@ -355,23 +362,17 @@
                             </ul>
                         </div>
                     </div>
-
-                    <div class="row py-2 px-1 " style="background:linear-gradient(to right,#BFF098, #6FD6FF);">
+                    <div class="d-flex py-2" style="background:linear-gradient(to right,#BFF098, #6FD6FF);">
                         <div class="mx-auto w-auto">
                             <span>Copyright © <a href="http://www.youzhan.org">天の使精选</a></span> |
                             <span><a href="http://www.miibeian.gov.cn/" target="_blank">ICP备11008151号</a></span>
                         </div>
                     </div>
-
                 </div>
             </main>
 
         </div>
     </div>
-
-
-
-
 
     <div class="modal fade in " id="FAQ" tabindex="-1" role="dialog" aria-labelledby="FAQ">
         <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
