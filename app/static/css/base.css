@@ -69,12 +69,6 @@ ul>a {
   }
 } */
 
-
-
-
-
-
-
 .sidebar-sticky {
   position: relative;
   top: 0;
@@ -119,3 +113,18 @@ ul > a:hover{
   background-color: darkgrey;
 }
 
+.heading {
+	background: url("../pic/heading.png") repeat-x center center;
+	width: 80%;
+	margin: 0 0 70px 240px;
+}
+.heading span {
+	background: #f7f7f7;
+	padding: 0 30px 0 0;
+	font-size:25px;
+	color: #333;
+	text-transform: uppercase;
+}
+.heading em {
+	font-weight: bold;
+}

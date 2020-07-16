@@ -40,8 +40,9 @@
             <nav id='appbar' class="appbar navbar navbar-expand-md   sticky-top   " style="background-color: #7952b3;">
                 <a class="navbar-brand" href="javascript:void(0)" onclick="plus()">
                     <span data-feather="menu" style="width: 20px; height: 20px;color:black;"></span>
-                </a> 
-                <a class="navbar-brand col-md-1 col-lg-1 mr-0 px-1 navbar-text" href="{{url_for('index')}}" style="color: white;">
+                </a>
+                <a class="navbar-brand col-md-1 col-lg-1 mr-0 px-1 navbar-text" href="{{url_for('index')}}"
+                    style="color: white;">
                     安全隔离网关
                 </a>
                 <!-- <span data-feather="home" style="width: 24px; height: 24px;color: aliceblue;"></span> -->
@@ -90,8 +91,10 @@
             <nav id="sidebar" class="d-md-block bg-light sidebar collapse p-0 ">
 
                 <div class="d-flex justify-content-start bg-dark">
-                    <img src="{{url_for('static',filename='pic/logo.png')}}" class="img-fluid p-0 m-0"
-                        alt="Responsive image" style="height: 72px;width: 240px;" />
+                    <a href="{{ url_for('auth.signin') }}">
+                        <img src="{{url_for('static',filename='pic/logo.png')}}" class="img-fluid p-0 m-0"
+                            alt="Responsive image" style="height: 72px;width: 240px;" />
+                    </a>
                 </div>
 
                 <div class="sidebar-sticky " style="background:rgba(129, 104, 104, 0.438);">
@@ -319,15 +322,16 @@
             <!-- 正文-->
             <main id="main" class='main'>
                 <!--路由区-->
-                <div class="col-12" id='content' style="position: relative; overflow-y: auto; height: 700px;">
-                    {% block heads %}{% endblock %}
-                    {% block content %}{% endblock %}
+                <div class="container-fluid">
+                    <div class="col-12" id='content' style="position: relative; overflow-y: auto; height: 700px;">
+                        {% block heads %}{% endblock %}
+                        {% block content %}{% endblock %}
+                    </div>
                 </div>
-
                 <!-- 全局提示框 -->
                 <div style="position: fixed;top: 60px;right: 30px;" id='alarm'></div>
                 <hr class="border-top border-info" />
-                
+
                 <!--页脚-->
                 <div id='footer' class="row p-0 m-0 ">
                     <div class="col-12">
@@ -392,7 +396,8 @@
     </div>
 
     <!--model-登录框-->
-    <div class="modal fade in " id="loginModal" tabindex="-1" role="dialog" aria-labelledby="loginModal" data-backdrop="static">
+    <div class="modal fade in " id="loginModal" tabindex="-1" role="dialog" aria-labelledby="loginModal"
+        data-backdrop="static">
         <div class="modal-dialog modal-dialog-centered " role="document">
             <div class="modal-content">
                 <div class="modal-header">

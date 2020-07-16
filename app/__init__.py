@@ -145,7 +145,7 @@ def create_app(test_config=None):
         @functools.wraps(view)
         def wrapped_view(**kwargs):
             if g.user is None:
-                return redirect(url_for("auth.login"))
+                return redirect(url_for("auth.signin"))
             return view(**kwargs)
         return wrapped_view
 
