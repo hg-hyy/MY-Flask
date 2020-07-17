@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for, request, flash, abort, current_app
+from flask import Blueprint, render_template, redirect, url_for, request, flash, abort, current_app,jsonify
 from .model import Issue, db, Category
 from .forms import CategoryForm, ContactForm, IssueForm
 from flask import g
@@ -6,7 +6,7 @@ from flask_mail import Message, Mail
 from app.opc import login_required
 import markdown2 as Markdown
 import bleach
-import time
+import time,json
 from threading import Thread
 from sqlalchemy import and_,or_   
 
@@ -221,7 +221,7 @@ def send_async_email(app, msg):
 def send_email(to, subject, template_txt, template_html=None, **kwargs):
     app = current_app._get_current_object()
     msg = Message(subject)
-    msg.sender = current_app._get_current_object().config['MAIL_USERNAME']
+    msg.sender = app.config['MAIL_USERNAME']
     msg.recipients = [to]
 
     if not template_html:
@@ -268,3 +268,15 @@ def get_clean_html_content(html_content):
 #     content_html = get_clean_html_content(self.content_html)
 
 #     gavatar_id = hashlib.md5(self.email.lower().encode('utf-8')).hexdigest()
+
+
+
+# 坐标操作图片处理的按钮路由
+@faq.route('/img_operate', methods=['POST'],endpoint='img_operate')
+def img_operate():
+    data = json.loads(request.form.get('data'))
+    x = data['x']
+    y = data['y']
+    print(x,y)
+    img = 'http://localhost:5000/static/pic/1.jpg'
+    return jsonify({"success": 200, "img": img, "x": x, "y": y})
