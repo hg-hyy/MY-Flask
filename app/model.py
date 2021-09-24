@@ -30,6 +30,7 @@ class User(db.Model):
 
     def check_password(self, rw_pwd):
         return check_password_hash(self._password, rw_pwd)
+        # return True
 
     def generate_confirmation_token(self, expiration=3600):
         s = Serializer(current_app.config['SECRET_KEY'], expiration)
@@ -147,7 +148,7 @@ class Category(db.Model):
     name = db.Column(db.String(80), unique=True, nullable=False)
     created = db.Column(db.DateTime, index=True, default=datetime.datetime.now(
     ), onupdate=datetime.datetime.now())
-    issue = db.relationship('Issue', backref=db.backref('Category', lazy=True))
+    issue = db.relationship('Issue', backref=db.backref('Category', lazy=True),overlaps="Category,issue")
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     user = db.relationship('User', backref='Category', lazy=True)
 
@@ -177,7 +178,7 @@ class Issue(db.Model):
     category_id = db.Column(db.Integer, db.ForeignKey(
         'category.id'), nullable=False)
     category = db.relationship(
-        'Category', backref=db.backref('Issue', lazy=True))
+        'Category', backref=db.backref('Issue', lazy=True),overlaps="Category,issue")
     user = db.relationship('User', backref='Issue', lazy=True)
 
     def __repr__(self):

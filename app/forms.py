@@ -142,7 +142,7 @@ class RegisterForm(FlaskForm):
         user = User.query.filter_by(username=self.username.data).first()
         # db.session.query(Users).filter(username=self.username.data).first()
         if user:
-            self.username.errors.append('用户名不存在')
+            self.username.errors.append('用户名已存在！')
             flash(self.username.errors, 'error')
             return False
         else:
