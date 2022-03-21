@@ -131,7 +131,7 @@ tqdm==4.47.0
 traitlets==4.3.3
 twine==3.2.0
 urllib3==1.25.7
-waitress==1.4.4
+waitress==2.1.1
 wcwidth==0.1.7
 webencodings==0.5.1
 websocket-server==0.4
