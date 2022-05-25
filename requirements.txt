@@ -86,7 +86,7 @@ pycodestyle==2.6.0
 pycparser==2.20
 pyecharts==1.8.1
 Pygments==2.5.2
-PyJWT==1.7.1
+PyJWT==2.4.0
 pylint==2.5.3
 pylint-django==2.0.13
 pylint-plugin-utils==0.6
