@@ -8,7 +8,7 @@ from wtforms.validators import DataRequired, Regexp, Length, ValidationError, In
 from wtforms import PasswordField, SubmitField
 from wtforms import BooleanField
 from wtforms import TextAreaField, SelectField
-from wtforms.fields.html5 import EmailField
+from wtforms import EmailField
 from .model import User, db, Category, Issue, Contact
 from wtforms.validators import EqualTo
 import datetime
@@ -53,7 +53,7 @@ class LoginForm(FlaskForm):
                              render_kw={'class': 'form-control form-control-md my-3',
                                         'placeholder': 'password', 'required': 'required'}
                              )
-    recaptcha = RecaptchaField('验证码')
+    # recaptcha = RecaptchaField('验证码')
 
     remember_me = BooleanField(label='remember me')
 
