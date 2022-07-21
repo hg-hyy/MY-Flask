@@ -14,7 +14,7 @@ you're reading.** You probably want the latest tagged version, but the
 default Git version is the master branch. ::
 
     # clone the repository
-    $ git clone git@github.com:shenyunbrother/MY-Flask.git
+    $ git clone git@github.com:hg-hyy/MY-Flask.git
     $ cd config_studio
     # checkout the correct version
     $ git tag  # shows the tagged versions
