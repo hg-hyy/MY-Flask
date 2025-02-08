@@ -148,7 +148,7 @@ class Category(db.Model):
     name = db.Column(db.String(80), unique=True, nullable=False)
     created = db.Column(db.DateTime, index=True, default=datetime.datetime.now(
     ), onupdate=datetime.datetime.now())
-    issue = db.relationship('Issue', backref=db.backref('Category', lazy=True),overlaps="Category,issue")
+    issue = db.relationship('Issue', backref=db.backref('Category', lazy=True))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     user = db.relationship('User', backref='Category', lazy=True)
 
@@ -178,7 +178,7 @@ class Issue(db.Model):
     category_id = db.Column(db.Integer, db.ForeignKey(
         'category.id'), nullable=False)
     category = db.relationship(
-        'Category', backref=db.backref('Issue', lazy=True),overlaps="Category,issue")
+        'Category', backref=db.backref('Issue', lazy=True))
     user = db.relationship('User', backref='Issue', lazy=True)
 
     def __repr__(self):

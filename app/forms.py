@@ -8,7 +8,7 @@ from wtforms.validators import DataRequired, Regexp, Length, ValidationError, In
 from wtforms import PasswordField, SubmitField
 from wtforms import BooleanField
 from wtforms import TextAreaField, SelectField
-from wtforms import EmailField
+from wtforms.fields.html5 import EmailField
 from .model import User, db, Category, Issue, Contact
 from wtforms.validators import EqualTo
 import datetime
